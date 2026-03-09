@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Скрипт для развертывания проекта на GitHub (Ru55darts Edition)
-# Версия с авто-восстановлением (Smart Recovery v2.0)
+# Версия с авто-восстановлением (Smart Recovery v3.0)
 
 # Цвета для вывода
 GREEN='\033[0;32m'
@@ -14,53 +14,50 @@ REPO_URL="https://github.com/Aleksey29212/Ru55darts.git"
 
 echo -e "${GREEN}Начинаем процесс развертывания на GitHub...${NC}"
 
+# Функция для полной переинициализации Git
+reinit_git() {
+  echo -e "${YELLOW}Выполняем принудительную переинициализацию репозитория...${NC}"
+  rm -rf .git
+  git init
+  git remote add origin "$REPO_URL"
+  git branch -M main
+}
+
 # Проверка на повреждение Git
 if [ -d .git ]; then
+  # Пытаемся проверить статус, если ошибка - переинициализируем
   git status >/dev/null 2>&1
   if [ $? -ne 0 ]; then
     echo -e "${RED}Обнаружено повреждение локального Git-репозитория.${NC}"
-    echo -e "${YELLOW}Выполняем принудительную переинициализацию...${NC}"
-    rm -rf .git
+    reinit_git
   fi
-fi
-
-# Инициализация нового репозитория, если его нет
-if [ ! -d .git ]; then
-  echo -e "${GREEN}Инициализация нового Git-репозитория...${NC}"
+else
   git init
-  if [ $? -ne 0 ]; then
-    echo "Ошибка при инициализации Git. Выход."
-    exit 1
-  fi
+  git remote add origin "$REPO_URL"
+  git branch -M main
 fi
 
-# Настройка удаленного репозитория
-git remote remove origin >/dev/null 2>&1
-git remote add origin "$REPO_URL"
-echo -e "${BLUE}Удаленный репозиторий настроен: $REPO_URL${NC}"
-
-# Настройка ветки
-git branch -M main
+# Настройка удаленного репозитория (на случай если URL изменился)
+git remote set-url origin "$REPO_URL" 2>/dev/null || git remote add origin "$REPO_URL"
+echo -e "${BLUE}Удаленный репозиторий: $REPO_URL${NC}"
 
 # Добавление файлов
-echo -e "${GREEN}Добавление всех файлов в индекс...${NC}"
+echo -e "${GREEN}Добавление файлов...${NC}"
 git add .
 
 # Создание коммита
 echo -e "${GREEN}Создание коммита...${NC}"
-git commit -m "Deployment Update: $(date +'%Y-%m-%d %H:%M:%S')" --allow-empty
+git commit -m "Full Update with Docker support: $(date +'%Y-%m-%d %H:%M:%S')" --allow-empty
 
 # Отправка изменений
-echo -e "${YELLOW}Отправка изменений в ветку 'main' на GitHub (Force Push)...${NC}"
+echo -e "${YELLOW}Отправка изменений (Force Push)...${NC}"
 git push -u origin main --force
 
 if [ $? -ne 0 ]; then
   echo -e "${RED}Ошибка при отправке на GitHub.${NC}"
-  echo "Проверьте:"
-  echo "1. Наличие прав доступа к репозиторию Aleksey29212/Ru55darts."
-  echo "2. Наличие интернета и доступ к github.com."
+  echo "Попробуйте вручную проверить доступ к интернету и права доступа к Aleksey29212/Ru55darts."
   exit 1
 fi
 
-echo -e "${GREEN}Проект успешно отправлен в Ru55darts!${NC}"
+echo -e "${GREEN}ПРОЕКТ УСПЕШНО ОТПРАВЛЕН!${NC}"
 echo -e "URL: ${BLUE}$REPO_URL${NC}"
