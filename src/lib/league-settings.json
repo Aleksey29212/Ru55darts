@@ -1,0 +1,57 @@
+{
+  "general": {
+    "name": "Глобальный рейтинг",
+    "enabled": true,
+    "includeInGeneralRanking": false
+  },
+  "evening_omsk": {
+    "name": "Вечерний Омск",
+    "enabled": true,
+    "includeInGeneralRanking": true
+  },
+  "premier": {
+    "name": "Премьер-лига",
+    "enabled": false,
+    "includeInGeneralRanking": true
+  },
+  "first": {
+    "name": "Первая лига",
+    "enabled": false,
+    "includeInGeneralRanking": true
+  },
+  "cricket": {
+    "name": "Крикет",
+    "enabled": false,
+    "includeInGeneralRanking": true
+  },
+  "second": {
+    "name": "Вторая лига",
+    "enabled": false,
+    "includeInGeneralRanking": true
+  },
+  "third": {
+    "name": "Третья лига",
+    "enabled": false,
+    "includeInGeneralRanking": true
+  },
+  "fourth": {
+    "name": "Четвертая лига",
+    "enabled": false,
+    "includeInGeneralRanking": true
+  },
+  "senior": {
+    "name": "Ветераны",
+    "enabled": false,
+    "includeInGeneralRanking": true
+  },
+  "youth": {
+    "name": "Молодежь",
+    "enabled": false,
+    "includeInGeneralRanking": true
+  },
+  "women": {
+    "name": "Женщины",
+    "enabled": false,
+    "includeInGeneralRanking": true
+  }
+}
