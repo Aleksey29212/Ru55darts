@@ -15,8 +15,8 @@ interface NewsTickerProps {
 }
 
 const icons = {
-  checkout: <Flame className="h-3.5 w-3.5 text-orange-500 fill-orange-500/20 drop-shadow-[0_0_5px_rgba(249,115,22,0.5)]" />,
-  event: <Trophy className="h-3.5 w-3.5 text-gold drop-shadow-[0_0_5px_rgba(255,215,0,0.5)]" />,
+  checkout: <Flame className="h-4 w-4 text-orange-500 fill-orange-500/20 drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]" />,
+  event: <Trophy className="h-4 w-4 text-gold drop-shadow-[0_0_8px_rgba(255,215,0,0.6)]" />,
 };
 
 export function NewsTicker({ items }: NewsTickerProps) {
@@ -29,6 +29,7 @@ export function NewsTicker({ items }: NewsTickerProps) {
 
   if (!items || items.length === 0) return null;
 
+  // Тройное дублирование для гарантии бесшовного цикла при медленной скорости
   const tickerItems = [...items, ...items, ...items];
 
   const handleToggle = () => {
@@ -37,11 +38,13 @@ export function NewsTicker({ items }: NewsTickerProps) {
 
   return (
     <div 
-      className="relative w-full h-11 bg-black/40 backdrop-blur-2xl border-y border-white/5 flex items-center overflow-hidden select-none cursor-pointer rounded-xl"
+      className="relative w-full h-12 bg-black/60 backdrop-blur-3xl border-y border-white/10 flex items-center overflow-hidden select-none cursor-pointer rounded-xl group"
       onClick={handleToggle}
+      title="Нажмите, чтобы замедлить или остановить"
     >
-      <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+      {/* Усиленные маски для плавности */}
+      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none" />
       
       <div 
         className={cn(
@@ -50,28 +53,32 @@ export function NewsTicker({ items }: NewsTickerProps) {
         )}
         style={{ 
           animationPlayState: mode === 2 ? 'paused' : 'running',
-          animationDuration: mode === 1 ? '720s' : '240s'
+          animationDuration: mode === 1 ? '960s' : '480s'
         }}
       >
         {tickerItems.map((item, index) => (
           <div
             key={`${item.text}-${index}`}
             className={cn(
-              "flex items-center gap-3 mx-16 text-[10px] md:text-[11px] font-bold uppercase tracking-[0.25em] transition-all duration-500 hover:text-primary hover:scale-105",
-              mode === 1 ? "text-primary/80" : "text-muted-foreground/60",
-              mode === 2 ? "text-primary" : ""
+              "flex items-center gap-4 mx-24 transition-all duration-700",
+              mode === 1 ? "text-primary scale-105" : "text-muted-foreground/80",
+              mode === 2 ? "text-primary brightness-125" : "group-hover:text-primary/90"
             )}
           >
-            <div className="shrink-0">{icons[item.type]}</div>
-            <span className="font-headline tracking-tighter text-sm">{item.text}</span>
-            <div className="h-1.5 w-1.5 rounded-full bg-primary/20 ml-8 animate-pulse" />
+            <div className="shrink-0 transform transition-transform group-hover:scale-110">
+              {icons[item.type]}
+            </div>
+            <span className="font-headline tracking-tight text-base md:text-lg uppercase">
+              {item.text}
+            </span>
+            <div className="h-2 w-2 rounded-full bg-primary/30 ml-12 animate-pulse shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
           </div>
         ))}
       </div>
       
       {!isMounted && (
-        <div className="absolute inset-0 flex gap-12 px-8 items-center">
-          <div className="h-3 w-full bg-white/5 rounded-full animate-pulse" />
+        <div className="absolute inset-0 flex gap-16 px-12 items-center">
+          <div className="h-4 w-full bg-white/5 rounded-full animate-pulse" />
         </div>
       )}
     </div>
