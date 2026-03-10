@@ -8,15 +8,14 @@ import { getFirestore, type Firestore } from 'firebase/firestore';
  */
 
 function getFirebaseApp(): FirebaseApp | null {
-    // На стороне клиента это не должно вызываться, но добавим проверку
+    // На стороне клиента это не должно вызываться
     if (typeof window !== 'undefined') return null;
 
     const apps = getApps();
-    // Ищем уже созданное приложение с нашим именем сервера
     const existingApp = apps.find(app => app.name === "server-app");
     if (existingApp) return existingApp;
 
-    // Если ключей нет, возвращаем null. Ошибка будет обработана в библиотеках или UI.
+    // КРИТИЧЕСКИЙ GUARD: если ключи API невалидны, возвращаем null вместо ошибки
     if (!isFirebaseConfigValid) {
         return null;
     }
@@ -31,7 +30,7 @@ function getFirebaseApp(): FirebaseApp | null {
 
 /**
  * Возвращает экземпляр Firestore или null, если конфигурация не задана.
- * Больше не выбрасывает ошибку (throw), чтобы не ломать рендеринг при сборке.
+ * Мы больше не используем throw Error, чтобы не ломать сборку и рендеринг.
  */
 export function getDb(): Firestore | null {
     const app = getFirebaseApp();

@@ -5,8 +5,9 @@ import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
-import { isFirebaseConfigValid } from './config';
-import { ShieldAlert, Terminal, AlertCircle } from 'lucide-react';
+import { isFirebaseConfigValid, firebaseConfig } from './config';
+import { ShieldAlert, Terminal, AlertCircle, Copy, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 /**
  * @fileOverview Провайдер контекста Firebase с защитой от ошибок конфигурации.
@@ -52,8 +53,9 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     isAuthAttempted: false,
   });
 
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
   useEffect(() => {
-    // Если сервисы не инициализированы (из-за невалидного конфига), просто завершаем загрузку
     if (!auth) {
         setUserAuthState(prev => ({ ...prev, isAuthAttempted: true, isUserLoading: false }));
         return;
@@ -66,48 +68,28 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
             if (!auth.currentUser) {
                 await signInAnonymously(auth);
             }
-            if (isMounted) {
-                setUserAuthState(prev => ({ ...prev, isAuthAttempted: true }));
-            }
+            if (isMounted) setUserAuthState(prev => ({ ...prev, isAuthAttempted: true }));
         } catch (error) {
-            console.warn("Firebase Auth Initial Attempt:", error);
-            if (isMounted) {
-                setUserAuthState(prev => ({ ...prev, isAuthAttempted: true }));
-            }
+            if (isMounted) setUserAuthState(prev => ({ ...prev, isAuthAttempted: true }));
         }
     };
 
     performAuth();
 
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (firebaseUser) => {
-        if (isMounted) {
-            setUserAuthState({ 
-                user: firebaseUser, 
-                isUserLoading: false, 
-                userError: null,
-                isAuthAttempted: true
-            });
-        }
-      },
-      (error) => {
-        if (isMounted) {
-            setUserAuthState(prev => ({ 
-                ...prev,
-                isUserLoading: false, 
-                userError: error,
-                isAuthAttempted: true
-            }));
-        }
-      }
-    );
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+        if (isMounted) setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null, isAuthAttempted: true });
+    }, (error) => {
+        if (isMounted) setUserAuthState(prev => ({ ...prev, isUserLoading: false, userError: error, isAuthAttempted: true }));
+    });
     
-    return () => {
-        isMounted = false;
-        unsubscribe();
-    };
+    return () => { isMounted = false; unsubscribe(); };
   }, [auth]);
+
+  const copyToClipboard = (text: string, key: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
 
   const contextValue = useMemo((): FirebaseContextState => {
     const servicesAvailable = !!(firebaseApp && firestore && auth && userAuthState.isAuthAttempted);
@@ -122,30 +104,55 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     };
   }, [firebaseApp, firestore, auth, userAuthState]);
 
-  // ЭКРАН ПРЕДУПРЕЖДЕНИЯ ОБ ОТСУТСТВИИ КОНФИГУРАЦИИ
   if (!isFirebaseConfigValid) {
       return (
-          <div className="fixed inset-0 bg-background flex items-center justify-center p-6 z-[9999]">
-              <div className="max-w-md w-full glassmorphism p-8 rounded-[2.5rem] border-amber-500/30 text-center space-y-6">
-                  <div className="bg-amber-500/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-amber-500/30">
-                      <ShieldAlert className="h-10 w-10 text-amber-500" />
+          <div className="fixed inset-0 bg-background flex items-center justify-center p-4 md:p-6 z-[9999] overflow-y-auto">
+              <div className="max-w-2xl w-full glassmorphism p-6 md:p-10 rounded-[2rem] border-amber-500/30 space-y-8 my-auto">
+                  <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left border-b border-white/5 pb-8">
+                      <div className="bg-amber-500/20 w-20 h-20 rounded-3xl flex items-center justify-center border-2 border-amber-500/30 shrink-0 shadow-2xl shadow-amber-500/20">
+                          <ShieldAlert className="h-10 w-10 text-amber-500" />
+                      </div>
+                      <div>
+                          <h2 className="font-headline text-2xl md:text-3xl uppercase tracking-tight text-amber-500">Система не настроена</h2>
+                          <p className="text-muted-foreground mt-2 text-sm md:text-base">Для работы <strong>DartBrig Pro</strong> необходимо прописать ключи Firebase в настройках хостинга (Timeweb/Vercel).</p>
+                      </div>
                   </div>
-                  <h2 className="font-headline text-2xl uppercase tracking-tight text-amber-500">Система не настроена</h2>
-                  <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-                      <p>Приложение <strong>DartBrig Pro</strong> не может подключиться к базе данных Firebase.</p>
-                      <p>Пожалуйста, пропишите следующие <strong>Переменные окружения</strong> в панели управления вашим хостингом (например, Timeweb Cloud):</p>
+
+                  <div className="space-y-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+                          <Terminal className="h-3.5 w-3.5" /> 
+                          Список необходимых переменных:
+                      </p>
+                      <div className="grid gap-3">
+                          {[
+                              'NEXT_PUBLIC_FIREBASE_API_KEY',
+                              'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+                              'NEXT_PUBLIC_FIREBASE_APP_ID',
+                              'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
+                              'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
+                              'NEXT_PUBLIC_ADMIN_PASSWORD'
+                          ].map((key) => (
+                              <div key={key} className="group flex items-center justify-between bg-black/40 rounded-xl p-3 md:p-4 border border-white/5 hover:border-primary/30 transition-all">
+                                  <code className="text-[10px] md:text-xs text-primary font-bold">{key}</code>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-8 px-2 text-[10px] uppercase font-bold text-muted-foreground hover:text-primary"
+                                    onClick={() => copyToClipboard(key, key)}
+                                  >
+                                      {copiedKey === key ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                                      {copiedKey === key ? 'Ок' : 'Копировать'}
+                                  </Button>
+                              </div>
+                          ))}
+                      </div>
                   </div>
-                  <div className="bg-black/40 rounded-2xl p-4 text-left font-mono text-[10px] space-y-2 border border-white/5 max-h-[200px] overflow-y-auto">
-                      <p className="text-primary flex items-center gap-2"><Terminal className="h-3 w-3"/> NEXT_PUBLIC_FIREBASE_API_KEY</p>
-                      <p className="text-primary flex items-center gap-2"><Terminal className="h-3 w-3"/> NEXT_PUBLIC_FIREBASE_PROJECT_ID</p>
-                      <p className="text-primary flex items-center gap-2"><Terminal className="h-3 w-3"/> NEXT_PUBLIC_FIREBASE_APP_ID</p>
-                      <p className="text-primary flex items-center gap-2"><Terminal className="h-3 w-3"/> NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN</p>
-                      <p className="text-primary flex items-center gap-2"><Terminal className="h-3 w-3"/> NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID</p>
-                      <p className="text-amber-400 flex items-center gap-2 mt-4"><AlertCircle className="h-3 w-3"/> NEXT_PUBLIC_ADMIN_PASSWORD</p>
+
+                  <div className="bg-primary/5 rounded-2xl p-6 border border-primary/10">
+                      <p className="text-xs text-muted-foreground leading-relaxed italic text-center">
+                          Как только вы добавите эти переменные в панели управления Timeweb (раздел «Переменные окружения»), сохраните их и дождитесь пересборки — этот экран исчезнет автоматически.
+                      </p>
                   </div>
-                  <p className="text-xs text-muted-foreground italic">
-                      После добавления ключей сайт обновится автоматически.
-                  </p>
               </div>
           </div>
       );
@@ -166,28 +173,12 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   );
 };
 
-export const useFirebase = (): FirebaseContextState | null => {
-  const context = useContext(FirebaseContext);
-  return context;
-};
-
-export const useAuth = (): Auth | null => {
-  const context = useFirebase();
-  return context?.auth || null;
-};
-
-export const useFirestore = (): Firestore | null => {
-  const context = useFirebase();
-  return context?.firestore || null;
-};
-
-export const useFirebaseApp = (): FirebaseApp | null => {
-  const context = useFirebase();
-  return context?.firebaseApp || null;
-};
+export const useFirebase = (): FirebaseContextState | null => useContext(FirebaseContext);
+export const useAuth = (): Auth | null => useFirebase()?.auth || null;
+export const useFirestore = (): Firestore | null => useFirebase()?.firestore || null;
+export const useFirebaseApp = (): FirebaseApp | null => useFirebase()?.firebaseApp || null;
 
 type MemoFirebase <T> = T & {__memo?: boolean};
-
 export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | (MemoFirebase<T>) {
   const memoized = useMemo(factory, deps);
   if(typeof memoized !== 'object' || memoized === null) return memoized;
@@ -197,9 +188,5 @@ export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | 
 
 export const useUser = () => { 
   const context = useFirebase();
-  return { 
-    user: context?.user || null, 
-    isUserLoading: context?.isUserLoading ?? true, 
-    userError: context?.userError || null 
-  };
+  return { user: context?.user || null, isUserLoading: context?.isUserLoading ?? true, userError: context?.userError || null };
 };
