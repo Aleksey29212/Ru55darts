@@ -1,0 +1,26 @@
+{
+  "cardBackgrounds": [
+    { "id": "darts-bg-1", "url": "https://picsum.photos/seed/darts-bg-1/800/400", "hint": "darts background" },
+    { "id": "darts-bg-2", "url": "https://picsum.photos/seed/darts-bg-2/800/400", "hint": "dartboard abstract" },
+    { "id": "darts-bg-3", "url": "https://picsum.photos/seed/darts-bg-3/800/400", "hint": "dark texture" },
+    { "id": "darts-bg-4", "url": "https://picsum.photos/seed/darts-bg-4/800/400", "hint": "spotlight background" },
+    { "id": "darts-bg-5", "url": "https://picsum.photos/seed/darts-bg-5/800/400", "hint": "glowing lines" },
+    { "id": "darts-bg-6", "url": "https://picsum.photos/seed/darts-bg-6/800/400", "hint": "abstract pattern" },
+    { "id": "darts-bg-7", "url": "https://picsum.photos/seed/darts-bg-7/800/400", "hint": "fire sparks" },
+    { "id": "darts-bg-8", "url": "https://picsum.photos/seed/darts-bg-8/800/400", "hint": "blue energy" },
+    { "id": "darts-bg-9", "url": "https://picsum.photos/seed/darts-bg-9/800/400", "hint": "red smoke" },
+    { "id": "darts-bg-10", "url": "https://picsum.photos/seed/darts-bg-10/800/400", "hint": "geometric shapes" },
+    { "id": "darts-bg-11", "url": "https://picsum.photos/seed/darts-bg-11/800/400", "hint": "metal texture" },
+    { "id": "darts-bg-12", "url": "https://picsum.photos/seed/darts-bg-12/800/400", "hint": "dark wood" },
+    { "id": "darts-bg-13", "url": "https://picsum.photos/seed/darts-bg-13/800/400", "hint": "concrete wall" },
+    { "id": "darts-bg-14", "url": "https://picsum.photos/seed/darts-bg-14/800/400", "hint": "purple galaxy" },
+    { "id": "darts-bg-15", "url": "https://picsum.photos/seed/darts-bg-15/800/400", "hint": "gold glitter" },
+    { "id": "darts-bg-16", "url": "https://picsum.photos/seed/darts-bg-16/800/400", "hint": "silver liquid" },
+    { "id": "darts-bg-17", "url": "https://picsum.photos/seed/darts-bg-17/800/400", "hint": "bronze plate" },
+    { "id": "darts-bg-18", "url": "https://picsum.photos/seed/neon-city/800/400", "hint": "neon city" },
+    { "id": "darts-bg-19", "url": "https://picsum.photos/seed/mountain-fog/800/400", "hint": "mountain fog" },
+    { "id": "darts-bg-20", "url": "https://picsum.photos/seed/lava-flow/800/400", "hint": "lava flow" },
+    { "id": "darts-bg-21", "url": "https://picsum.photos/seed/ocean-wave/800/400", "hint": "ocean wave" },
+    { "id": "darts-bg-22", "url": "https://picsum.photos/seed/forest-path/800/400", "hint": "forest path" }
+  ]
+}
