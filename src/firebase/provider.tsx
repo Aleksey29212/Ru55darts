@@ -56,7 +56,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!auth) {
+    if (!auth || !isFirebaseConfigValid) {
         setUserAuthState(prev => ({ ...prev, isAuthAttempted: true, isUserLoading: false }));
         return;
     }
@@ -92,7 +92,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   };
 
   const contextValue = useMemo((): FirebaseContextState => {
-    const servicesAvailable = !!(firebaseApp && firestore && auth && userAuthState.isAuthAttempted);
+    const servicesAvailable = !!(firebaseApp && firestore && auth && userAuthState.isAuthAttempted && isFirebaseConfigValid);
     return {
       areServicesAvailable: servicesAvailable,
       firebaseApp,
@@ -104,24 +104,25 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     };
   }, [firebaseApp, firestore, auth, userAuthState]);
 
+  // ЭКРАН ПОМОЩНИКА КОНФИГУРАЦИИ
   if (!isFirebaseConfigValid) {
       return (
           <div className="fixed inset-0 bg-background flex items-center justify-center p-4 md:p-6 z-[9999] overflow-y-auto">
-              <div className="max-w-2xl w-full glassmorphism p-6 md:p-10 rounded-[2rem] border-amber-500/30 space-y-8 my-auto">
+              <div className="max-w-2xl w-full glassmorphism p-6 md:p-10 rounded-[2rem] border-amber-500/30 space-y-8 my-auto animate-in fade-in zoom-in-95 duration-500">
                   <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left border-b border-white/5 pb-8">
                       <div className="bg-amber-500/20 w-20 h-20 rounded-3xl flex items-center justify-center border-2 border-amber-500/30 shrink-0 shadow-2xl shadow-amber-500/20">
                           <ShieldAlert className="h-10 w-10 text-amber-500" />
                       </div>
                       <div>
                           <h2 className="font-headline text-2xl md:text-3xl uppercase tracking-tight text-amber-500">Система не настроена</h2>
-                          <p className="text-muted-foreground mt-2 text-sm md:text-base">Для работы <strong>DartBrig Pro</strong> необходимо прописать ключи Firebase в настройках хостинга (Timeweb/Vercel).</p>
+                          <p className="text-muted-foreground mt-2 text-sm md:text-base">Для работы <strong>DartBrig Pro</strong> на сервере <strong>Wise Crane</strong> необходимо добавить ключи Firebase.</p>
                       </div>
                   </div>
 
                   <div className="space-y-4">
                       <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
                           <Terminal className="h-3.5 w-3.5" /> 
-                          Список необходимых переменных:
+                          Переменные для файла .env или Timeweb Cloud:
                       </p>
                       <div className="grid gap-3">
                           {[
@@ -150,7 +151,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 
                   <div className="bg-primary/5 rounded-2xl p-6 border border-primary/10">
                       <p className="text-xs text-muted-foreground leading-relaxed italic text-center">
-                          Как только вы добавите эти переменные в панели управления Timeweb (раздел «Переменные окружения»), сохраните их и дождитесь пересборки — этот экран исчезнет автоматически.
+                          <strong>Для VPS:</strong> Создайте файл <code>.env.local</code> в корне проекта на сервере и вставьте туда эти ключи со значениями из Firebase Console. После этого выполните <code>npm run build</code> и <code>npm start</code>.
                       </p>
                   </div>
               </div>
