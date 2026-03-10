@@ -8,7 +8,7 @@ import { sanitizeFirestore } from './utils';
 
 /**
  * ГАРАНТИЯ: Устойчивость к отсутствию данных в БД. 
- * Возвращает стандартные настройки (default), если БД пуста.
+ * Возвращает стандартные настройки (default), если БД пуста или конфигурация Firebase отсутствует.
  */
 
 export const getAllScoringSettings = cache(
@@ -17,6 +17,8 @@ export const getAllScoringSettings = cache(
     
     try {
         const db = getDb();
+        if (!db) return allDefaults;
+
         const settingsCol = collection(db, 'scoring_configurations');
         const snapshot = await getDocs(settingsCol);
         
@@ -45,6 +47,8 @@ export const getScoringSettings = cache(
 
     try {
         const db = getDb();
+        if (!db) return { ...defaults, id: leagueId } as ScoringSettings;
+
         const docRef = doc(db, 'scoring_configurations', leagueId);
         const docSnap = await getDoc(docRef);
         
@@ -59,6 +63,7 @@ export const getScoringSettings = cache(
 
 export async function updateScoringSettings(leagueId: LeagueId, settings: ScoringSettings): Promise<void> {
   const db = getDb();
+  if (!db) return;
   const docRef = doc(db, 'scoring_configurations', leagueId);
   const dataToSet = { ...settings };
   delete (dataToSet as any).id;
@@ -71,6 +76,8 @@ export const getLeagueSettings = cache(
 
     try {
         const db = getDb();
+        if (!db) return defaults;
+
         const docRef = doc(db, 'app_settings', 'leagues');
         const docSnap = await getDoc(docRef);
         
@@ -92,6 +99,7 @@ export const getLeagueSettings = cache(
 
 export async function updateLeagueSettings(settings: AllLeagueSettings): Promise<void> {
     const db = getDb();
+    if (!db) return;
     const docRef = doc(db, 'app_settings', 'leagues');
     await setDoc(docRef, settings, { merge: true });
 }
@@ -100,6 +108,8 @@ export const getBackgroundUrl = cache(
   async (): Promise<string> => {
     try {
         const db = getDb();
+        if (!db) return '';
+
         const docRef = doc(db, 'app_settings', 'background');
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -113,6 +123,7 @@ export const getBackgroundUrl = cache(
 
 export async function updateBackgroundUrl(url: string): Promise<void> {
     const db = getDb();
+    if (!db) return;
     const docRef = doc(db, 'app_settings', 'background');
     await setDoc(docRef, { url });
 }
@@ -137,6 +148,8 @@ export const getSponsorshipSettings = cache(
     
     try {
         const db = getDb();
+        if (!db) return defaults;
+
         const docRef = doc(db, 'app_settings', 'sponsorship');
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -151,6 +164,7 @@ export const getSponsorshipSettings = cache(
 
 export async function updateSponsorshipSettings(settings: SponsorshipSettings): Promise<void> {
     const db = getDb();
+    if (!db) return;
     const docRef = doc(db, 'app_settings', 'sponsorship');
     await setDoc(docRef, settings, { merge: true });
 }

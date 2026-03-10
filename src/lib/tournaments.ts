@@ -9,13 +9,20 @@ import { sanitizeFirestore } from './utils';
 export const getTournaments = cache(
   async (): Promise<Tournament[]> => {
     const db = getDb();
-    const tournamentsCol = collection(db, 'tournaments');
-    const tournamentSnapshot = await getDocs(tournamentsCol);
-    const tournamentList = tournamentSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return sanitizeFirestore({ id: doc.id, ...data }) as Tournament;
-    });
-    return tournamentList;
+    if (!db) return [];
+
+    try {
+        const tournamentsCol = collection(db, 'tournaments');
+        const tournamentSnapshot = await getDocs(tournamentsCol);
+        const tournamentList = tournamentSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return sanitizeFirestore({ id: doc.id, ...data }) as Tournament;
+        });
+        return tournamentList;
+    } catch (e) {
+        console.error("Failed to fetch tournaments:", e);
+        return [];
+    }
   }
 );
 
@@ -24,6 +31,8 @@ export async function addTournaments(newTournaments: any[]): Promise<string[]> {
         return [];
     }
     const db = getDb();
+    if (!db) return [];
+
     const batch = writeBatch(db);
     const actuallyAddedIds: string[] = [];
 
@@ -49,24 +58,30 @@ export async function addTournaments(newTournaments: any[]): Promise<string[]> {
 
 export async function getTournamentById(id: string): Promise<Tournament | undefined> {
     const db = getDb();
-    const tournamentDocRef = doc(db, 'tournaments', id);
-    const docSnap = await getDoc(tournamentDocRef);
+    if (!db) return undefined;
 
-    if (docSnap.exists()) {
-        const data = docSnap.data();
-        return sanitizeFirestore({ id: docSnap.id, ...data }) as Tournament;
-    }
+    try {
+        const tournamentDocRef = doc(db, 'tournaments', id);
+        const docSnap = await getDoc(tournamentDocRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            return sanitizeFirestore({ id: docSnap.id, ...data }) as Tournament;
+        }
+    } catch (e) {}
     return undefined;
 }
 
 export async function deleteTournamentById(id: string): Promise<void> {
     const db = getDb();
+    if (!db) return;
     const tournamentDocRef = doc(db, 'tournaments', id);
     await deleteDoc(tournamentDocRef);
 }
 
 export async function clearAllTournamentData(): Promise<void> {
     const db = getDb();
+    if (!db) return;
     const tournamentsCol = collection(db, 'tournaments');
     const snapshot = await getDocs(tournamentsCol);
     if (snapshot.empty) return;

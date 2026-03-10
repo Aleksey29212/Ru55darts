@@ -8,12 +8,15 @@ import { getFirestore, type Firestore } from 'firebase/firestore';
  */
 
 function getFirebaseApp(): FirebaseApp | null {
+    // На стороне клиента это не должно вызываться, но добавим проверку
+    if (typeof window !== 'undefined') return null;
+
     const apps = getApps();
     // Ищем уже созданное приложение с нашим именем сервера
     const existingApp = apps.find(app => app.name === "server-app");
     if (existingApp) return existingApp;
 
-    // Если ключей нет, не падаем сразу, а возвращаем null. Ошибка будет обработана в UI.
+    // Если ключей нет, возвращаем null. Ошибка будет обработана в библиотеках или UI.
     if (!isFirebaseConfigValid) {
         return null;
     }
@@ -26,11 +29,14 @@ function getFirebaseApp(): FirebaseApp | null {
     }
 }
 
-export function getDb(): Firestore {
+/**
+ * Возвращает экземпляр Firestore или null, если конфигурация не задана.
+ * Больше не выбрасывает ошибку (throw), чтобы не ломать рендеринг при сборке.
+ */
+export function getDb(): Firestore | null {
     const app = getFirebaseApp();
     if (!app) {
-        // Выбрасываем понятную ошибку для серверных логов
-        throw new Error("CRITICAL: Firebase configuration missing on server side. Check environment variables.");
+        return null;
     }
     return getFirestore(app);
 }

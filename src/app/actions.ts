@@ -96,6 +96,8 @@ export async function importTournament(prevState: unknown, formData: FormData) {
 export async function updatePlayer(player: PlayerProfile) {
   try {
     const db = getDb();
+    if (!db) return { success: false, message: 'Ошибка: База данных недоступна.' };
+    
     const { id, ...playerData } = player;
     await updateDoc(doc(db, 'players', id), playerData);
     revalidatePath('/', 'layout');
@@ -110,6 +112,8 @@ export async function updatePlayer(player: PlayerProfile) {
 export async function deletePlayerAction(playerId: string) {
     try {
         const db = getDb();
+        if (!db) return { success: false, message: 'Ошибка: База данных недоступна.' };
+        
         await deleteDoc(doc(db, 'players', playerId));
         revalidatePath('/', 'layout');
         revalidatePath('/admin/players');
@@ -159,11 +163,16 @@ export async function clearTournamentsAction() {
 }
 
 export async function logVisitAction() {
-  const headersList = await headers(); // NEXT.JS 15: Must await headers()
-  const userAgent = headersList.get('user-agent') || '';
-  if (/bot|crawl|spider/i.test(userAgent)) return;
-  const db = getDb();
-  await addDoc(collection(db, 'visits'), { timestamp: serverTimestamp() });
+  try {
+    const headersList = await headers(); 
+    const userAgent = headersList.get('user-agent') || '';
+    if (/bot|crawl|spider/i.test(userAgent)) return;
+    
+    const db = getDb();
+    if (!db) return;
+    
+    await addDoc(collection(db, 'visits'), { timestamp: serverTimestamp() });
+  } catch (e) {}
 }
 
 export async function saveBackgroundAction(prevState: unknown, formData: FormData) {
@@ -196,6 +205,8 @@ export async function saveSponsorshipAction(settings: SponsorshipSettings) {
 export async function updatePlayerAvatar(playerId: string, dataUrl: string | null) {
     try {
         const db = getDb();
+        if (!db) return { success: false, message: 'Ошибка: База данных недоступна.' };
+        
         const playerRef = doc(db, 'players', playerId);
         if (dataUrl) {
             await updateDoc(playerRef, { avatarUrl: dataUrl });
@@ -216,6 +227,8 @@ export async function updatePlayerAvatar(playerId: string, dataUrl: string | nul
 export async function logSponsorClickAction(playerId: string, sponsorName: string) {
     try {
         const db = getDb();
+        if (!db) return { success: false };
+        
         await addDoc(collection(db, 'sponsor_clicks'), {
             playerId,
             sponsorName,
@@ -230,6 +243,8 @@ export async function logSponsorClickAction(playerId: string, sponsorName: strin
 export async function clearAllPlayerData() {
     try {
         const db = getDb();
+        if (!db) return { success: false, message: 'База недоступна.' };
+        
         const playersCol = collection(db, 'players');
         const snapshot = await getDocs(playersCol);
         if (snapshot.empty) return { success: true, message: 'База уже пуста.' };
@@ -251,6 +266,8 @@ export async function clearAllPlayerData() {
 export async function clearAnalyticsAction() {
     try {
         const db = getDb();
+        if (!db) return { success: false, message: 'База недоступна.' };
+        
         const visitsCol = collection(db, 'visits');
         const clicksCol = collection(db, 'sponsor_clicks');
         
@@ -273,6 +290,8 @@ export async function clearAnalyticsAction() {
 export async function clearPartnersAction() {
     try {
         const db = getDb();
+        if (!db) return { success: false, message: 'База недоступна.' };
+        
         const partnersCol = collection(db, 'partners');
         const snapshot = await getDocs(partnersCol);
         
