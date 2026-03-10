@@ -12,4 +12,5 @@ export const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
 };
 
+// Простая проверка: если ключ API пустой или слишком короткий, считаем конфиг невалидным
 export const isFirebaseConfigValid = !!firebaseConfig.apiKey && firebaseConfig.apiKey.length > 10;

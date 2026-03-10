@@ -4,18 +4,19 @@
 
 ## 🚀 Деплой на Timeweb / Vercel / Firebase
 
-Для успешной работы приложения на хостинге необходимо настроить **Переменные окружения (Environment Variables)**:
+Для успешной работы приложения необходимо настроить **Переменные окружения (Environment Variables)** в панели управления вашего хостинга:
 
-1. `NEXT_PUBLIC_ADMIN_PASSWORD` — пароль для доступа к панели `/admin`.
-2. `NEXT_PUBLIC_FIREBASE_API_KEY` — API ключ из настроек Firebase.
+### Список обязательных ключей:
+1. `NEXT_PUBLIC_ADMIN_PASSWORD` — ваш секретный пароль для доступа к админ-панели `/admin`.
+2. `NEXT_PUBLIC_FIREBASE_API_KEY` — API ключ из настроек вашего проекта Firebase.
 3. `NEXT_PUBLIC_FIREBASE_PROJECT_ID` — ID вашего проекта Firebase.
-4. `NEXT_PUBLIC_FIREBASE_APP_ID` — App ID вашего веб-приложения Firebase.
+4. `NEXT_PUBLIC_FIREBASE_APP_ID` — App ID веб-приложения Firebase.
 5. `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` — Домен авторизации (обычно `project-id.firebaseapp.com`).
 6. `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` — ID отправителя сообщений.
 
 ### Важно в консоли Firebase:
-- Включите **Anonymous Authentication** в разделе Authentication.
-- Создайте **Cloud Firestore** в разделе Firestore Database.
+- В разделе **Authentication** включите метод входа **Anonymous** (Анонимный).
+- В разделе **Firestore Database** создайте базу данных (рекомендуемый регион: `europe-west`).
 
 ## 🛠️ Основные функции
 - **Импорт турниров**: Автоматический парсинг с dartsbase.ru по ID.

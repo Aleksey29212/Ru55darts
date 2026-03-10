@@ -17,6 +17,7 @@ export type FirebaseServices = {
 }
 
 export function initializeFirebase(): FirebaseServices {
+  // На сервере (SSR) возвращаем пустые ссылки, инициализация произойдет на клиенте
   if (typeof window === 'undefined') return { firebaseApp: null, auth: null, firestore: null };
 
   const apps = getApps();
@@ -24,8 +25,9 @@ export function initializeFirebase(): FirebaseServices {
     return getSdks(getApp());
   }
 
+  // КРИТИЧЕСКИЙ GUARD: если конфиг невалиден, не инициализируем SDK
   if (!isFirebaseConfigValid) {
-    console.warn("Firebase config is missing or invalid. Check environment variables.");
+    console.warn("Firebase configuration is missing. Services will not be initialized.");
     return { firebaseApp: null, auth: null, firestore: null };
   }
 
