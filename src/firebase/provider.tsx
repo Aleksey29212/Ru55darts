@@ -5,6 +5,8 @@ import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
+import { isFirebaseConfigValid } from './config';
+import { ShieldAlert, Terminal } from 'lucide-react';
 
 /**
  * @fileOverview Провайдер контекста Firebase с защитой от PERMISSION_DENIED.
@@ -13,9 +15,9 @@ import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
 interface FirebaseProviderProps {
   children: ReactNode;
-  firebaseApp: FirebaseApp;
-  firestore: Firestore;
-  auth: Auth;
+  firebaseApp: FirebaseApp | null;
+  firestore: Firestore | null;
+  auth: Auth | null;
 }
 
 interface UserAuthState {
@@ -58,7 +60,6 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 
     let isMounted = true;
 
-    // ГАРАНТИЯ: Принудительный вход для предотвращения ошибок доступа к Firestore
     const performAuth = async () => {
         try {
             if (!auth.currentUser) {
@@ -111,19 +112,43 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     const servicesAvailable = !!(firebaseApp && firestore && auth && userAuthState.isAuthAttempted);
     return {
       areServicesAvailable: servicesAvailable,
-      firebaseApp: servicesAvailable ? firebaseApp : null,
-      firestore: servicesAvailable ? firestore : null,
-      auth: servicesAvailable ? auth : null,
+      firebaseApp,
+      firestore,
+      auth,
       user: userAuthState.user,
       isUserLoading: userAuthState.isUserLoading,
       userError: userAuthState.userError,
     };
   }, [firebaseApp, firestore, auth, userAuthState]);
 
+  // ЭКРАН ПРЕДУПРЕЖДЕНИЯ ОБ ОТСУТСТВИИ КОНФИГУРАЦИИ
+  if (!isFirebaseConfigValid) {
+      return (
+          <div className="fixed inset-0 bg-background flex items-center justify-center p-6 z-[9999]">
+              <div className="max-w-md w-full glassmorphism p-8 rounded-[2.5rem] border-amber-500/30 text-center space-y-6">
+                  <div className="bg-amber-500/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-amber-500/30">
+                      <ShieldAlert className="h-10 w-10 text-amber-500" />
+                  </div>
+                  <h2 className="font-headline text-2xl uppercase tracking-tight text-amber-500">Firebase не настроен</h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                      Для работы приложения необходимо прописать <strong>Переменные окружения</strong> в панели управления хостингом (Timeweb/Vercel).
+                  </p>
+                  <div className="bg-black/40 rounded-2xl p-4 text-left font-mono text-[10px] space-y-2 border border-white/5">
+                      <p className="text-primary flex items-center gap-2"><Terminal className="h-3 w-3"/> NEXT_PUBLIC_FIREBASE_API_KEY</p>
+                      <p className="text-primary flex items-center gap-2"><Terminal className="h-3 w-3"/> NEXT_PUBLIC_FIREBASE_PROJECT_ID</p>
+                      <p className="text-muted-foreground opacity-50 italic">...и остальные ключи из консоли Firebase</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground italic">
+                      Если вы разработчик, создайте файл .env в корне проекта.
+                  </p>
+              </div>
+          </div>
+      );
+  }
+
   return (
     <FirebaseContext.Provider value={contextValue}>
       <FirebaseErrorListener />
-      {/* КРИТИЧЕСКИЙ БЛОК: Ждем Auth, чтобы избежать Runtime FirebaseError PERMISSION_DENIED */}
       {userAuthState.isAuthAttempted ? children : (
           <div className="fixed inset-0 bg-background flex items-center justify-center z-[9999]">
               <div className="flex flex-col items-center gap-4">

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Скрипт для радикального исправления ошибок Git и деплоя (v2.2)
-# Специально для устранения ошибок "object file is empty"
+# Скрипт для радикального исправления ошибок Git и деплоя (v2.3)
+# Специально для устранения ошибок "object file is empty" и принудительного обновления
 
 # Цвета для вывода
 GREEN='\033[0;32m'
@@ -15,16 +15,14 @@ echo -e "${GREEN}   DartBrig Pro: GitHub Deployment     ${NC}"
 echo -e "${BLUE}=======================================${NC}"
 
 # 1. Проверка на критическое повреждение Git
-# Если git status выдает ошибку о пустых объектах или fatal
 CHECK_GIT=$(git status 2>&1)
 if [[ $CHECK_GIT == *"empty"* ]] || [[ $CHECK_GIT == *"fatal"* ]] || [ ! -d .git ]; then
-  echo -e "${RED}⚠️ Обнаружено критическое повреждение локальной базы Git.${NC}"
+  echo -e "${RED}⚠️ Обнаружено повреждение локальной базы Git.${NC}"
   echo -e "${YELLOW}🔄 Выполняется принудительная переинициализация...${NC}"
   
   # Пытаемся сохранить URL удаленного репозитория
   REMOTE_URL=$(git remote get-url origin 2>/dev/null)
   if [ -z "$REMOTE_URL" ]; then
-    # Используем URL из логов, если не удалось получить автоматически
     REMOTE_URL="https://github.com/Aleksey29212/Ru55darts.git"
   fi
 
@@ -46,7 +44,7 @@ echo -e "${GREEN}📦 Индексация файлов...${NC}"
 git add .
 
 echo -e "${GREEN}💾 Создание чистого коммита...${NC}"
-git commit -m "Critical Fix: Re-initialize repository and update DartBrig Pro to latest version"
+git commit -m "Deployment Fix: Update configuration logic and server stability"
 
 # 3. Отправка кода
 echo -e "${YELLOW}📤 Отправка в GitHub (Force Push)...${NC}"
@@ -54,6 +52,7 @@ echo -e "${RED}ВНИМАНИЕ: Если GitHub запросит пароль, 
 
 if git push -u origin main --force; then
   echo -e "\n${GREEN}🎉 ПРОЕКТ УСПЕШНО ОТПРАВЛЕН В GITHUB!${NC}"
+  echo -e "${YELLOW}👉 Не забудьте настроить Environment Variables в Timeweb Cloud!${NC}"
 else
   echo -e "\n${RED}❌ Ошибка доступа. Проверьте настройки Personal Access Token на GitHub.${NC}"
   echo -e "${YELLOW}Инструкция: GitHub -> Settings -> Developer Settings -> Tokens (classic)${NC}"

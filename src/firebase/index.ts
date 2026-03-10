@@ -1,39 +1,54 @@
 'use client';
 
-import { firebaseConfig } from '@/firebase/config';
+import { firebaseConfig, isFirebaseConfigValid } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore'
+import { getAuth, Auth } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore'
 
 /**
  * @fileOverview Единая точка входа для инициализации Firebase SDK.
+ * ГАРАНТИЯ: Безопасная инициализация без крашей при отсутствии ключей.
  */
 
-export function initializeFirebase() {
-  const apps = getApps();
-  let firebaseApp: FirebaseApp;
-
-  if (apps.length === 0) {
-    try {
-      // Пытаемся инициализироваться без параметров (для App Hosting)
-      firebaseApp = initializeApp();
-    } catch (e) {
-      // Используем конфиг, если авто-инициализация не сработала
-      firebaseApp = initializeApp(firebaseConfig);
-    }
-  } else {
-    firebaseApp = getApp();
-  }
-
-  return getSdks(firebaseApp);
+export type FirebaseServices = {
+  firebaseApp: FirebaseApp | null;
+  auth: Auth | null;
+  firestore: Firestore | null;
 }
 
-export function getSdks(firebaseApp: FirebaseApp) {
-  return {
-    firebaseApp,
-    auth: getAuth(firebaseApp),
-    firestore: getFirestore(firebaseApp)
-  };
+export function initializeFirebase(): FirebaseServices {
+  if (typeof window === 'undefined') return { firebaseApp: null, auth: null, firestore: null };
+
+  const apps = getApps();
+  if (apps.length > 0) {
+    return getSdks(getApp());
+  }
+
+  if (!isFirebaseConfigValid) {
+    console.warn("Firebase config is missing or invalid. Check environment variables.");
+    return { firebaseApp: null, auth: null, firestore: null };
+  }
+
+  try {
+    const firebaseApp = initializeApp(firebaseConfig);
+    return getSdks(firebaseApp);
+  } catch (e) {
+    console.error("Firebase initialization failed:", e);
+    return { firebaseApp: null, auth: null, firestore: null };
+  }
+}
+
+export function getSdks(firebaseApp: FirebaseApp): FirebaseServices {
+  try {
+    return {
+      firebaseApp,
+      auth: getAuth(firebaseApp),
+      firestore: getFirestore(firebaseApp)
+    };
+  } catch (e) {
+    console.error("Failed to get Firebase services:", e);
+    return { firebaseApp: null, auth: null, firestore: null };
+  }
 }
 
 export * from './provider';
