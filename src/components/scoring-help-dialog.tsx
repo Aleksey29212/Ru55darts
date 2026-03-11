@@ -32,7 +32,7 @@ import {
     ChevronRight
 } from 'lucide-react';
 import type { ScoringSettings, LeagueId, SponsorshipSettings } from '@/lib/types';
-import { ScrollArea, ScrollBar } from './ui/scroll-area';
+import { ScrollArea } from './ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import Link from 'next/link';
@@ -218,10 +218,10 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 defaultValue={settingsArray[0]?.id || "general"} 
                 className="w-full"
             >
-                {/* Bookshelf Navigation */}
+                {/* Bookshelf Navigation - Two Rows */}
                 <div className="relative z-20 -mt-10 mb-12">
-                    <div className="w-full px-4 overflow-x-auto no-scrollbar scroll-smooth">
-                        <TabsList className="bg-black/60 backdrop-blur-3xl p-4 border-y border-white/5 h-auto flex gap-3 mx-auto w-fit rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                    <div className="w-full px-4 flex justify-center">
+                        <TabsList className="bg-black/60 backdrop-blur-3xl p-4 border border-white/10 h-auto grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-11 gap-2 mx-auto w-fit rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
                             {settingsArray.map((s, idx) => {
                                 const id = s.id || 'general';
                                 const Icon = leagueIcons[id] || Trophy;
@@ -231,20 +231,19 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                         key={idx} 
                                         value={id} 
                                         className={cn(
-                                            "relative flex flex-col items-center justify-center w-16 h-20 md:w-24 md:h-28 rounded-2xl border-2 transition-all duration-500",
+                                            "relative flex flex-col items-center justify-center w-14 h-16 sm:w-16 sm:h-20 md:w-20 md:h-24 rounded-xl border-2 transition-all duration-500",
                                             "bg-gradient-to-br shadow-2xl overflow-hidden",
-                                            "data-[state=active]:-translate-y-4 data-[state=active]:scale-110 data-[state=active]:border-white data-[state=active]:z-10",
-                                            "data-[state=inactive]:opacity-40 data-[state=inactive]:grayscale data-[state=inactive]:scale-90 data-[state=inactive]:hover:opacity-100 data-[state=inactive]:hover:grayscale-0",
+                                            "data-[state=active]:-translate-y-2 data-[state=active]:scale-110 data-[state=active]:border-white data-[state=active]:z-10",
+                                            "data-[state=inactive]:opacity-40 data-[state=inactive]:grayscale data-[state=inactive]:scale-95 data-[state=inactive]:hover:opacity-100 data-[state=inactive]:hover:grayscale-0",
                                             style
                                         )}
                                     >
                                         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        <Icon className="h-6 w-6 md:h-8 md:w-8 mb-2 text-white drop-shadow-lg" />
-                                        <span className="text-[8px] md:text-[9px] font-black uppercase tracking-tighter text-white text-center leading-tight px-1 drop-shadow-md">
+                                        <Icon className="h-4 w-4 md:h-6 md:w-6 mb-1 text-white drop-shadow-lg" />
+                                        <span className="text-[7px] md:text-[8px] font-black uppercase tracking-tighter text-white text-center leading-tight px-1 drop-shadow-md">
                                             {namesArray[idx] || 'Лига'}
                                         </span>
-                                        {/* Spine Detail */}
-                                        <div className="absolute left-1 top-1/4 bottom-1/4 w-0.5 bg-white/20 rounded-full" />
+                                        <div className="absolute left-0.5 top-1/4 bottom-1/4 w-0.5 bg-white/20 rounded-full" />
                                     </TabsTrigger>
                                 )
                             })}
@@ -252,7 +251,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                     </div>
                 </div>
 
-                <ScrollArea className="max-h-[55vh] px-6 md:px-16 pb-16">
+                <ScrollArea className="max-h-[50vh] px-6 md:px-16 pb-16">
                     {settingsArray.map((s, idx) => (
                         <TabsContent key={idx} value={s.id || 'general'} className="outline-none animate-in fade-in slide-in-from-bottom-4 duration-700">
                             <div className="flex items-center gap-4 mb-8">
