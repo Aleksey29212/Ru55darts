@@ -45,19 +45,18 @@ const StatItem = ({
     const hasDecimal = valueString.includes('.') || valueString.includes(',');
     
     // УЛЬТРА-АДАПТАЦИЯ: Динамический подбор размера для предотвращения вылета за рамку
+    // Мы используем более агрессивное уменьшение для дробных чисел и строк > 3 символов
     let fontSizeClass = "text-4xl sm:text-5xl lg:text-6xl"; 
     
-    if (hasDecimal && len >= 4) {
-        fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl"; // Для AVG типа 60.15
-    } else if (len >= 5) {
-        fontSizeClass = "text-xl sm:text-2xl lg:text-3xl"; // Очень длинные бонусы
+    if (hasDecimal || len >= 5) {
+        fontSizeClass = "text-xl sm:text-2xl lg:text-3xl"; // Компактно для 60.0 или +1250
     } else if (len >= 4) {
-        fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl"; // 100%, +120
+        fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl"; // Для 100%, +120
     } else if (len >= 3) {
-        fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; // 125, 54.2
+        fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; // Для 125, 542
     }
     
-    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-5 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[145px] sm:min-h-[175px] cursor-pointer active:scale-95 select-none overflow-hidden";
+    const baseClasses = "flex flex-col items-center justify-between p-2 sm:p-4 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[150px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5",
@@ -65,7 +64,7 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 animate-in fade-in zoom-in-95 px-1",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 animate-in fade-in zoom-in-95 px-0.5",
         fontSizeClass,
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : ''
@@ -80,7 +79,7 @@ const StatItem = ({
             )}
             onClick={() => setIsRevealed(!isRevealed)}
         >
-            <div className="w-full flex items-center justify-center gap-1.5 mb-1">
+            <div className="w-full flex items-center justify-center gap-1 mb-1">
                 <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-tight text-muted-foreground/80 leading-tight text-center break-words max-w-[85%]">
                     {label}
                 </span>
@@ -113,7 +112,7 @@ const StatItem = ({
                 </TooltipProvider>
             </div>
             
-            <div className="flex-1 flex items-center justify-center w-full my-2 sm:my-3 overflow-visible">
+            <div className="flex-1 flex items-center justify-center w-full my-1 sm:my-2 overflow-visible">
                 {isRevealed ? (
                     <span className={valueClasses}>{value}</span>
                 ) : (
@@ -127,8 +126,8 @@ const StatItem = ({
             </div>
 
             <div className="w-full mt-auto">
-                <div className="h-px w-full bg-white/10 mb-1.5 sm:mb-2" />
-                <p className="text-[7px] sm:text-[9px] font-black uppercase text-primary/70 tracking-tight text-center leading-tight break-words px-1">
+                <div className="h-px w-full bg-white/10 mb-1 sm:mb-1.5" />
+                <p className="text-[7px] sm:text-[9px] font-black uppercase text-primary/70 tracking-tight text-center leading-tight break-words px-0.5">
                     {caption || "СТАТ"}
                 </p>
             </div>
@@ -477,7 +476,7 @@ export function PlayerCard({
                                 <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
                                 ЛИЧНЫЕ РЕКОРДЫ
                             </h3>
-                            <div className="grid grid-cols-3 gap-2 sm:gap-4 relative z-10 mt-auto">
+                            <div className="grid grid-cols-3 gap-2 sm:gap-3 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
                                     label="СРЕДНИЙ" 
