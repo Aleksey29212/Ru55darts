@@ -10,12 +10,11 @@ import { sanitizeFirestore } from './utils';
 if (!(global as any).demoPlayers) {
     (global as any).demoPlayers = [];
 }
-const demoPlayers: PlayerProfile[] = (global as any).demoPlayers;
 
 export const getPlayerProfiles = cache(
   async (): Promise<PlayerProfile[]> => {
     const db = getDb();
-    let players = [...demoPlayers];
+    let players = [...((global as any).demoPlayers as PlayerProfile[])];
 
     if (db) {
         try {
@@ -25,6 +24,9 @@ export const getPlayerProfiles = cache(
             
             const dbIds = new Set(dbList.map(p => p.id));
             players = [...dbList, ...players.filter(p => !dbIds.has(p.id))];
+            
+            // Синхронизируем память
+            (global as any).demoPlayers = players;
         } catch (e) {
             console.error("Failed to fetch players from DB:", e);
         }
@@ -35,7 +37,8 @@ export const getPlayerProfiles = cache(
 );
 
 export async function getPlayerProfileById(id: string): Promise<PlayerProfile | undefined> {
-  const fromMemory = demoPlayers.find(p => p.id === id);
+  const memoryStore = (global as any).demoPlayers as PlayerProfile[];
+  const fromMemory = memoryStore.find(p => p.id === id);
   if (fromMemory) return fromMemory;
 
   const db = getDb();
@@ -45,20 +48,26 @@ export async function getPlayerProfileById(id: string): Promise<PlayerProfile | 
       const playerDocRef = doc(db, 'players', id);
       const playerSnap = await getDoc(playerDocRef);
       if (playerSnap.exists()) {
-        return sanitizeFirestore({ ...playerSnap.data(), id: playerSnap.id }) as PlayerProfile;
+        const player = sanitizeFirestore({ ...playerSnap.data(), id: playerSnap.id }) as PlayerProfile;
+        if (!memoryStore.some(p => p.id === player.id)) {
+            memoryStore.push(player);
+        }
+        return player;
       }
   } catch (e) {}
   return undefined;
 }
 
 export async function updatePlayerProfiles(players: PlayerProfile[]): Promise<void> {
+  const memoryStore = (global as any).demoPlayers as PlayerProfile[];
+  
   // Обновляем глобальную память обязательно
   players.forEach(p => {
-      const idx = demoPlayers.findIndex(existing => existing.id === p.id);
+      const idx = memoryStore.findIndex(existing => existing.id === p.id);
       if (idx !== -1) {
-          demoPlayers[idx] = { ...demoPlayers[idx], ...p };
+          memoryStore[idx] = { ...memoryStore[idx], ...p };
       } else {
-          demoPlayers.push(p);
+          memoryStore.push(p);
       }
   });
 
@@ -80,7 +89,7 @@ export async function updatePlayerProfiles(players: PlayerProfile[]): Promise<vo
 }
 
 export async function clearAllPlayerProfiles(): Promise<void> {
-  demoPlayers.length = 0;
+  (global as any).demoPlayers = [];
   const db = getDb();
   if (!db) return;
 

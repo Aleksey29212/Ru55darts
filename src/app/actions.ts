@@ -90,7 +90,7 @@ export async function importTournament(prevState: unknown, formData: FormData) {
 
   return { 
     success: successCount > 0, 
-    message: `Успешно: ${successCount} турнир(ов) загружено в систему.`,
+    message: successCount > 0 ? `Успешно: ${successCount} турнир(ов) загружено в систему.` : 'Турниры не были загружены.',
     errors: errors.length > 0 ? errors : undefined
   };
 }
@@ -112,6 +112,11 @@ export async function deletePlayerAction(playerId: string) {
         if (db) {
             await deleteDoc(doc(db, 'players', playerId));
         }
+        // Очищаем в глобальной памяти тоже
+        const memoryStore = (global as any).demoPlayers as PlayerProfile[];
+        const idx = memoryStore.findIndex(p => p.id === playerId);
+        if (idx !== -1) memoryStore.splice(idx, 1);
+
         revalidatePath('/', 'layout');
         revalidateTag('players');
         return { success: true, message: 'Игрок удален.' };

@@ -8,28 +8,29 @@ import { sanitizeFirestore } from './utils';
 
 /**
  * ГАРАНТИЯ: Глобальное хранилище настроек для работы БЕЗ КЛЮЧЕЙ.
+ * Данные сохраняются в глобальном объекте Node.js для персистентности между запросами.
  */
 if (!(global as any).memoScoringSettings) (global as any).memoScoringSettings = {};
+if (!(global as any).memoLeagueSettings) (global as any).memoLeagueSettings = null;
+if (!(global as any).memoSponsorshipSettings) (global as any).memoSponsorshipSettings = null;
 if (!(global as any).memoBackgroundUrl) (global as any).memoBackgroundUrl = '';
-
-const memoScoringSettings: Partial<Record<LeagueId, ScoringSettings>> = (global as any).memoScoringSettings;
-let memoLeagueSettings: AllLeagueSettings | null = (global as any).memoLeagueSettings || null;
-let memoBackgroundUrl: string = (global as any).memoBackgroundUrl;
-let memoSponsorshipSettings: SponsorshipSettings | null = (global as any).memoSponsorshipSettings || null;
 
 export const getAllScoringSettings = cache(
   async (): Promise<Record<LeagueId, ScoringSettings>> => {
     const allDefaults: Record<LeagueId, ScoringSettings> = defaultScoringSettingsData as any;
     const db = getDb();
     
-    let fromDb: Partial<Record<LeagueId, ScoringSettings>> = { ...memoScoringSettings };
+    // Сначала берем данные из памяти
+    let fromDb: Partial<Record<LeagueId, ScoringSettings>> = { ...(global as any).memoScoringSettings };
 
     if (db) {
         try {
             const settingsCol = collection(db, 'scoring_configurations');
             const snapshot = await getDocs(settingsCol);
             snapshot.docs.forEach(doc => {
-                fromDb[doc.id as LeagueId] = sanitizeFirestore({ ...doc.data(), id: doc.id }) as ScoringSettings;
+                const data = sanitizeFirestore({ ...doc.data(), id: doc.id }) as ScoringSettings;
+                fromDb[doc.id as LeagueId] = data;
+                (global as any).memoScoringSettings[doc.id as LeagueId] = data;
             });
         } catch (e) {
             console.warn("DB fetch error, using memory/defaults");
@@ -52,7 +53,9 @@ export const getScoringSettings = cache(
 );
 
 export async function updateScoringSettings(leagueId: LeagueId, settings: ScoringSettings): Promise<void> {
-  memoScoringSettings[leagueId] = settings;
+  // Сохраняем в глобальную память (для демо-режима)
+  (global as any).memoScoringSettings[leagueId] = settings;
+  
   const db = getDb();
   if (!db) return;
   try {
@@ -68,7 +71,8 @@ export const getLeagueSettings = cache(
     const defaults: AllLeagueSettings = defaultLeagueSettingsData as any;
     const db = getDb();
     
-    let current = memoLeagueSettings || defaults;
+    // Приоритет: глобальная память, иначе дефолты
+    let current = (global as any).memoLeagueSettings || defaults;
 
     if (db) {
         try {
@@ -83,6 +87,7 @@ export const getLeagueSettings = cache(
                     }
                 });
                 current = merged;
+                (global as any).memoLeagueSettings = current;
             }
         } catch (e) {}
     }
@@ -92,8 +97,9 @@ export const getLeagueSettings = cache(
 );
 
 export async function updateLeagueSettings(settings: AllLeagueSettings): Promise<void> {
-    memoLeagueSettings = settings;
+    // Сохраняем в глобальную память
     (global as any).memoLeagueSettings = settings;
+    
     const db = getDb();
     if (!db) return;
     try {
@@ -105,22 +111,23 @@ export async function updateLeagueSettings(settings: AllLeagueSettings): Promise
 export const getBackgroundUrl = cache(
   async (): Promise<string> => {
     const db = getDb();
-    if (!db) return memoBackgroundUrl;
+    if (!db) return (global as any).memoBackgroundUrl;
 
     try {
         const docRef = doc(db, 'app_settings', 'background');
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             const data = sanitizeFirestore(docSnap.data());
-            return data.url || memoBackgroundUrl;
+            const url = data.url || '';
+            (global as any).memoBackgroundUrl = url;
+            return url;
         }
     } catch (e) {}
-    return memoBackgroundUrl;
+    return (global as any).memoBackgroundUrl;
   }
 );
 
 export async function updateBackgroundUrl(url: string): Promise<void> {
-    memoBackgroundUrl = url;
     (global as any).memoBackgroundUrl = url;
     const db = getDb();
     if (!db) return;
@@ -149,7 +156,7 @@ export const getSponsorshipSettings = cache(
     };
     
     const db = getDb();
-    let current = memoSponsorshipSettings || defaults;
+    let current = (global as any).memoSponsorshipSettings || defaults;
 
     if (db) {
         try {
@@ -158,6 +165,7 @@ export const getSponsorshipSettings = cache(
             if (docSnap.exists()) {
                 const data = sanitizeFirestore(docSnap.data());
                 current = { ...defaults, ...data };
+                (global as any).memoSponsorshipSettings = current;
             }
         } catch (e) {}
     }
@@ -167,7 +175,6 @@ export const getSponsorshipSettings = cache(
 );
 
 export async function updateSponsorshipSettings(settings: SponsorshipSettings): Promise<void> {
-    memoSponsorshipSettings = settings;
     (global as any).memoSponsorshipSettings = settings;
     const db = getDb();
     if (!db) return;

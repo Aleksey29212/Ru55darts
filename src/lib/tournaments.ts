@@ -12,14 +12,13 @@ import { sanitizeFirestore } from './utils';
 if (!(global as any).demoTournaments) {
     (global as any).demoTournaments = [];
 }
-const demoTournaments: Tournament[] = (global as any).demoTournaments;
 
 export const getTournaments = cache(
   async (): Promise<Tournament[]> => {
     const db = getDb();
     
     // Всегда начинаем с данных в памяти
-    let tournaments = [...demoTournaments];
+    let tournaments = [...((global as any).demoTournaments as Tournament[])];
 
     if (db) {
         try {
@@ -32,6 +31,9 @@ export const getTournaments = cache(
             // Объединяем, если есть в БД (приоритет БД)
             const dbIds = new Set(dbList.map(t => t.id));
             tournaments = [...dbList, ...tournaments.filter(t => !dbIds.has(t.id))];
+            
+            // Синхронизируем память
+            (global as any).demoTournaments = tournaments;
         } catch (e) {
             console.error("Failed to fetch tournaments from DB:", e);
         }
@@ -47,6 +49,7 @@ export async function addTournaments(newTournaments: any[]): Promise<string[]> {
     }
     const db = getDb();
     const actuallyAddedIds: string[] = [];
+    const memoryStore = (global as any).demoTournaments as Tournament[];
 
     for (const newT of newTournaments) {
         const docId = String(newT.id);
@@ -59,11 +62,11 @@ export async function addTournaments(newTournaments: any[]): Promise<string[]> {
         };
 
         // Всегда сохраняем в глобальную память
-        const existsIdx = demoTournaments.findIndex(existing => existing.id === dataToSave.id);
+        const existsIdx = memoryStore.findIndex(existing => existing.id === dataToSave.id);
         if (existsIdx !== -1) {
-            demoTournaments[existsIdx] = dataToSave as Tournament;
+            memoryStore[existsIdx] = dataToSave as Tournament;
         } else {
-            demoTournaments.push(dataToSave as Tournament);
+            memoryStore.push(dataToSave as Tournament);
         }
         actuallyAddedIds.push(docId);
 
@@ -84,7 +87,8 @@ export async function addTournaments(newTournaments: any[]): Promise<string[]> {
 }
 
 export async function getTournamentById(id: string): Promise<Tournament | undefined> {
-    const fromMemory = demoTournaments.find(t => t.id === id);
+    const memoryStore = (global as any).demoTournaments as Tournament[];
+    const fromMemory = memoryStore.find(t => t.id === id);
     if (fromMemory) return fromMemory;
 
     const db = getDb();
@@ -96,15 +100,21 @@ export async function getTournamentById(id: string): Promise<Tournament | undefi
 
         if (docSnap.exists()) {
             const data = docSnap.data();
-            return sanitizeFirestore({ id: docSnap.id, ...data }) as Tournament;
+            const tournament = sanitizeFirestore({ id: docSnap.id, ...data }) as Tournament;
+            // Кешируем в память
+            if (!memoryStore.some(t => t.id === tournament.id)) {
+                memoryStore.push(tournament);
+            }
+            return tournament;
         }
     } catch (e) {}
     return undefined;
 }
 
 export async function deleteTournamentById(id: string): Promise<void> {
-    const idx = demoTournaments.findIndex(t => t.id === id);
-    if (idx !== -1) demoTournaments.splice(idx, 1);
+    const memoryStore = (global as any).demoTournaments as Tournament[];
+    const idx = memoryStore.findIndex(t => t.id === id);
+    if (idx !== -1) memoryStore.splice(idx, 1);
 
     const db = getDb();
     if (!db) return;
@@ -115,7 +125,7 @@ export async function deleteTournamentById(id: string): Promise<void> {
 }
 
 export async function clearAllTournamentData(): Promise<void> {
-    demoTournaments.length = 0;
+    (global as any).demoTournaments = [];
     const db = getDb();
     if (!db) return;
     try {
