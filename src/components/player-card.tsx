@@ -25,8 +25,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ScoringHelpDialog } from './scoring-help-dialog';
 
 /**
- * @fileOverview Личная карточка игрока (Версия v3.2 - Perfect Readability).
- * ГАРАНТИЯ: Идеальная читаемость справки и отсутствие нахлеста данных.
+ * @fileOverview Личная карточка игрока (Версия v3.5 - Spacious Arena).
+ * ГАРАНТИЯ: Идеальная читаемость с увеличенными отступами и динамическими рамками.
  */
 
 const StatItem = ({ 
@@ -46,7 +46,8 @@ const StatItem = ({
 }) => {
     const isSmallStat = name === 'avg' || name === 'n180s' || name === 'hiOut';
     
-    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-4 rounded-[1.5rem] transition-all border border-transparent shadow-xl relative w-full h-full min-h-[100px] sm:min-h-[120px]";
+    // Увеличены padding и min-h для лучшей читаемости
+    const baseClasses = "flex flex-col items-center justify-between p-5 sm:p-6 rounded-[1.5rem] transition-all border border-transparent shadow-xl relative w-full h-full min-h-[130px] sm:min-h-[150px]";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
@@ -71,18 +72,19 @@ const StatItem = ({
                             templateClasses[template]
                         )}
                     >
-                        <div className="w-full flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity mb-1">
-                            <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] truncate">{label}</span>
-                            <Info className="h-2.5 w-2.5 shrink-0 text-primary" />
+                        <div className="w-full flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity mb-2">
+                            <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em] truncate">{label}</span>
+                            <Info className="h-3 w-3 shrink-0 text-primary" />
                         </div>
                         
-                        <div className="flex-1 flex items-center justify-center w-full overflow-hidden">
+                        {/* Контейнер цифры с отступом сверху и снизу */}
+                        <div className="flex-1 flex items-center justify-center w-full overflow-hidden my-3 sm:my-4">
                             <span className={valueClasses}>{value}</span>
                         </div>
 
-                        <div className="w-full mt-2">
-                            <div className="h-px w-full bg-white/5 mb-2" />
-                            <p className="text-[7px] sm:text-[9px] font-black uppercase text-primary/60 tracking-widest text-center leading-none truncate">
+                        <div className="w-full mt-3">
+                            <div className="h-px w-full bg-white/10 mb-2" />
+                            <p className="text-[8px] sm:text-[10px] font-black uppercase text-primary/70 tracking-[0.25em] text-center leading-none truncate">
                                 {caption || "СТАТ"}
                             </p>
                         </div>
