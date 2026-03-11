@@ -43,8 +43,8 @@ const DESKTOP_GRID_COLS = "grid-cols-[80px_1.8fr_100px_100px_100px_100px_120px_1
 function FederalHeader({ theme }: { theme: any }) {
     return (
         <div className={cn(
-            "grid gap-6 px-10 mb-6 opacity-60 select-none items-center font-headline text-[11px] uppercase tracking-[0.3em] font-black",
-            "sticky top-[280px] md:top-[340px] z-30 bg-background/90 backdrop-blur-xl py-6 border-b border-white/10 -mx-4 px-10 rounded-t-3xl shadow-xl",
+            "grid gap-6 px-10 opacity-60 select-none items-center font-headline text-[11px] uppercase tracking-[0.3em] font-black",
+            "sticky top-[290px] md:top-[350px] z-30 bg-background/95 backdrop-blur-xl py-6 border-b border-white/10 -mx-4 px-10 rounded-t-3xl shadow-[0_15px_30px_rgba(0,0,0,0.3)]",
             DESKTOP_GRID_COLS
         )}>
             <span className="text-center">МЕСТО</span>
@@ -155,7 +155,7 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
         {!isMobile ? (
             <div className="animate-in fade-in slide-in-from-bottom-6 duration-1000">
                 <FederalHeader theme={theme} />
-                <div className="space-y-2">
+                <div className="space-y-2 mt-4">
                     {players.map((player, idx) => (
                         <FederalCapsule 
                             key={player.id} 
@@ -170,7 +170,7 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
         ) : (
             <div className="animate-in fade-in duration-700 px-1">
                 {/* Mobile Sticky Title */}
-                <div className="sticky top-[280px] z-30 bg-background/95 backdrop-blur-xl py-4 mb-6 border-b border-white/10 rounded-t-[2rem] px-6">
+                <div className="sticky top-[290px] z-30 bg-background/95 backdrop-blur-xl py-4 mb-6 border-b border-white/10 rounded-t-[2rem] px-6 shadow-xl">
                     <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">СПИСОК УЧАСТНИКОВ</span>
                         <div className="flex items-center gap-2">
