@@ -1,20 +1,18 @@
-'use client';
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight, Calculator, Users, Wand2, Trophy, Camera, Library, Handshake, Image, BarChart, CloudDownload, Code2, AlertOctagon, Settings2 } from "lucide-react";
-import { useCollection, useDoc, useFirestore, useMemoFirebase } from "@/firebase";
-import { collection, doc } from "firebase/firestore";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import type { AllLeagueSettings, LeagueId } from "@/lib/types";
 import { ClearTournamentsButton } from "./tournaments/clear-button";
 import { ClearButton as ClearPlayersButton } from "./players/clear-button";
 import { ClearPartnersButton } from "./partners/clear-partners-button";
 import { ClearAnalyticsButton } from "./analytics/clear-analytics-button";
 import { ViewModeToggle } from "@/components/view-mode-toggle";
-import { isFirebaseConfigValid } from "@/firebase/config";
+import { getTournaments } from "@/lib/tournaments";
+import { getPlayerProfiles } from "@/lib/players";
+import { getPartners } from "@/lib/partners";
+import { getLeagueSettings } from "@/lib/settings";
+import type { LeagueId } from "@/lib/types";
 
 const adminSections = [
     { href: '/admin/source-code', title: 'Код программы (ЭТАЛОН)', icon: Code2, color: 'text-primary', description: 'Спецификации и исходные коды' },
@@ -30,7 +28,7 @@ const adminSections = [
     { href: '/admin/background', title: 'Фон страницы', icon: Image, description: 'Глобальный фон сайта' }
 ];
 
-function StatCard({ title, count, icon: Icon, isLoading, priority = false }: { title: string, count: number, icon: any, isLoading: boolean, priority?: boolean }) {
+function StatCard({ title, count, icon: Icon, priority = false }: { title: string, count: number, icon: any, priority?: boolean }) {
     return (
         <Card className={cn(
             "glassmorphism border-primary/20 transition-all duration-75",
@@ -42,7 +40,7 @@ function StatCard({ title, count, icon: Icon, isLoading, priority = false }: { t
                         "text-[10px] font-bold uppercase tracking-[0.2em]",
                         priority ? 'text-primary' : 'text-muted-foreground'
                     )}>{title}</p>
-                    {isLoading ? <Skeleton className="h-10 w-16 mt-2" /> : <p className="text-4xl font-headline mt-1 tracking-tighter">{count}</p>}
+                    <p className="text-4xl font-headline mt-1 tracking-tighter">{count}</p>
                 </div>
                 <div className={cn(
                     "p-3 rounded-2xl shadow-inner",
@@ -55,33 +53,22 @@ function StatCard({ title, count, icon: Icon, isLoading, priority = false }: { t
     );
 }
 
-export default function AdminPage() {
-  const db = useFirestore();
-  const isConfigured = isFirebaseConfigValid;
-  
-  const tournamentsQuery = useMemoFirebase(() => (db && isConfigured) ? collection(db, 'tournaments') : null, [db, isConfigured]);
-  const { data: tournaments, isLoading: isLoadingTournaments } = useCollection(tournamentsQuery);
+export default async function AdminPage() {
+  // Получаем статистику напрямую с сервера для поддержки демо-режима
+  const tournaments = await getTournaments();
+  const players = await getPlayerProfiles();
+  const partners = await getPartners();
+  const leagueSettings = await getLeagueSettings();
 
-  const playersQuery = useMemoFirebase(() => (db && isConfigured) ? collection(db, 'players') : null, [db, isConfigured]);
-  const { data: players, isLoading: isLoadingPlayers } = useCollection(playersQuery);
-
-  const partnersQuery = useMemoFirebase(() => (db && isConfigured) ? collection(db, 'partners') : null, [db, isConfigured]);
-  const { data: partners, isLoading: isLoadingPartners } = useCollection(partnersQuery);
-
-  const leagueSettingsRef = useMemoFirebase(() => (db && isConfigured) ? doc(db, 'app_settings', 'leagues') : null, [db, isConfigured]);
-  const { data: leagueSettings, isLoading: isLoadingLeagues } = useDoc<AllLeagueSettings>(leagueSettingsRef);
-
-  const enabledLeaguesCount = leagueSettings 
-    ? (Object.keys(leagueSettings) as LeagueId[]).filter(key => leagueSettings[key].enabled).length 
-    : (isConfigured ? 1 : 0);
+  const enabledLeaguesCount = Object.keys(leagueSettings).filter(key => leagueSettings[key as LeagueId].enabled).length;
 
   return (
     <div className="space-y-12 pb-24">
         <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard title="Турниров в базе" count={tournaments?.length || 0} icon={Trophy} isLoading={isLoadingTournaments && isConfigured} priority />
-            <StatCard title="Всего игроков" count={players?.length || 0} icon={Users} isLoading={isLoadingPlayers && isConfigured} />
-            <StatCard title="Активных лиг" count={enabledLeaguesCount} icon={Library} isLoading={isLoadingLeagues && isConfigured} />
-            <StatCard title="Партнеров" count={partners?.length || 0} icon={Handshake} isLoading={isLoadingPartners && isConfigured} />
+            <StatCard title="Турниров в базе" count={tournaments?.length || 0} icon={Trophy} priority />
+            <StatCard title="Всего игроков" count={players?.length || 0} icon={Users} />
+            <StatCard title="Активных лиг" count={enabledLeaguesCount} icon={Library} />
+            <StatCard title="Партнеров" count={partners?.length || 0} icon={Handshake} />
         </section>
 
         <section className="space-y-6">
