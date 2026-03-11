@@ -73,7 +73,7 @@ function PlayerFormDialog({
 
   const addSponsor = () => {
     if ((formData.sponsors?.length || 0) < 3) {
-      setFormData(prev => ({ ...prev, sponsors: [...(prev.sponsors || []), { name: '', logoUrl: '', linkUrl: '' }] }));
+      setFormData(prev => ({ ...prev, sponsors: [...(prev.sponsors || []), { name: '', logoUrl: '', linkUrl: '', promoCode: '' }] }));
     }
   }
 
@@ -102,7 +102,7 @@ function PlayerFormDialog({
       <DialogTrigger asChild>
         {trigger || <Button variant="outline" className="w-full sm:w-auto"><Edit className="h-4 w-4 mr-2" /> Редактировать</Button>}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] glassmorphism max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] glassmorphism max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{mode === 'edit' ? 'Редактировать игрока' : 'Добавить игрока'}</DialogTitle>
         </DialogHeader>
@@ -164,7 +164,7 @@ function PlayerFormDialog({
           </div>
           
           <div className="col-span-4 mt-4 border-t pt-4">
-             <h4 className="text-sm font-medium text-center mb-4 text-muted-foreground">Спонсорство</h4>
+             <h4 className="text-sm font-black uppercase tracking-widest text-center mb-4 text-primary">УПРАВЛЕНИЕ СПОНСОРАМИ (MAX 3)</h4>
              <div className="grid grid-cols-4 items-start gap-4">
                 <Label htmlFor="sponsorshipCallToAction" className="text-right pt-2">Призыв</Label>
                 <Textarea id="sponsorshipCallToAction" value={formData.sponsorshipCallToAction || ''} onChange={e => setFormData({...formData, sponsorshipCallToAction: e.target.value})} className="col-span-3" placeholder="Слоган для привлечения спонсоров" />
@@ -175,37 +175,47 @@ function PlayerFormDialog({
                     <Switch id="showSponsorshipCallToAction" checked={formData.showSponsorshipCallToAction ?? true} onCheckedChange={checked => setFormData({...formData, showSponsorshipCallToAction: checked})} />
                 </div>
             </div>
-             <Separator className="my-4"/>
-              {(formData.sponsors || []).map((sponsor, index) => (
-                <div key={index} className="space-y-3 p-3 border rounded-lg mb-4 relative">
-                  <p className="text-sm font-medium">Спонсор #{index + 1}</p>
-                   <Button variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => removeSponsor(index)}><Trash2 className="h-4 w-4" /></Button>
-                   <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right">Имя</Label>
-                      <Input name="name" value={sponsor.name} onChange={(e) => handleSponsorChange(index, e)} className="col-span-3" placeholder="Название компании"/>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right">URL лого</Label>
-                      <Input name="logoUrl" value={sponsor.logoUrl} onChange={(e) => handleSponsorChange(index, e)} className="col-span-3" placeholder="https://.../logo.png"/>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right">URL ссылки</Label>
-                      <Input name="linkUrl" value={sponsor.linkUrl} onChange={(e) => handleSponsorChange(index, e)} className="col-span-3" placeholder="https://.../"/>
-                  </div>
-                </div>
-              ))}
+             <Separator className="my-6"/>
+              <div className="space-y-6">
+                {(formData.sponsors || []).map((sponsor, index) => (
+                    <div key={index} className="space-y-4 p-4 border rounded-2xl bg-white/5 relative">
+                    <div className="flex justify-between items-center pr-8">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">СПОНСОР #{index + 1}</p>
+                        <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => removeSponsor(index)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                    <div className="grid gap-3">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label className="text-right text-xs">Имя</Label>
+                            <Input name="name" value={sponsor.name} onChange={(e) => handleSponsorChange(index, e)} className="col-span-3 h-9" placeholder="Название компании"/>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label className="text-right text-xs">Логотип</Label>
+                            <Input name="logoUrl" value={sponsor.logoUrl} onChange={(e) => handleSponsorChange(index, e)} className="col-span-3 h-9" placeholder="https://.../logo.png"/>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label className="text-right text-xs">Сайт</Label>
+                            <Input name="linkUrl" value={sponsor.linkUrl} onChange={(e) => handleSponsorChange(index, e)} className="col-span-3 h-9" placeholder="https://.../"/>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label className="text-right text-xs text-primary font-bold">Промокод</Label>
+                            <Input name="promoCode" value={sponsor.promoCode || ''} onChange={(e) => handleSponsorChange(index, e)} className="col-span-3 h-9 border-primary/20 bg-primary/5" placeholder="PROMO123 (необязательно)"/>
+                        </div>
+                    </div>
+                    </div>
+                ))}
+              </div>
                {(formData.sponsors?.length || 0) < 3 && (
-                <Button variant="outline" className="w-full" onClick={addSponsor}>
-                    <PlusCircle /> Добавить спонсора
+                <Button variant="outline" className="w-full mt-4 border-dashed rounded-xl h-12" onClick={addSponsor}>
+                    <PlusCircle className="mr-2 h-4 w-4" /> Добавить спонсора
                 </Button>
               )}
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="sticky bottom-0 bg-background pt-4 border-t">
           <DialogClose asChild>
-            <Button onClick={handleSave} disabled={isPending}>
-              {isPending ? <Loader2 className="animate-spin" /> : <Save />}
-              {mode === 'edit' ? 'Сохранить изменения' : 'Создать профиль'}
+            <Button onClick={handleSave} disabled={isPending} className="w-full h-12">
+              {isPending ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : <Save className="mr-2 h-5 w-5" />}
+              {mode === 'edit' ? 'Сохранить профиль' : 'Создать профиль'}
             </Button>
           </DialogClose>
         </DialogFooter>

@@ -18,6 +18,7 @@ export type PlayerSponsor = {
   name: string;
   logoUrl: string;
   linkUrl: string;
+  promoCode?: string;
 };
 
 export type PlayerProfile = {

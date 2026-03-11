@@ -1,6 +1,6 @@
 'use client';
 
-import type { Player, PlayerProfile, ScoringSettings, SponsorTemplateId } from '@/lib/types';
+import type { Player, PlayerProfile, ScoringSettings, SponsorTemplateId, PlayerSponsor } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
-import { Save, Edit, X, Info, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Handshake, ExternalLink, Lock } from 'lucide-react';
+import { Save, Edit, X, Info, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Handshake, ExternalLink, Lock, Eye, Copy, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { TemplateId } from './template-switcher';
 import { cn } from '@/lib/utils';
@@ -44,7 +44,6 @@ const StatItem = ({
     const len = valueString.length;
     const hasDecimal = valueString.includes('.') || valueString.includes(',');
     
-    // Агрессивное масштабирование для гарантии вхождения в рамки
     let fontSizeClass = "text-4xl sm:text-5xl lg:text-6xl"; 
     
     if (hasDecimal || len >= 5) {
@@ -129,6 +128,64 @@ const StatItem = ({
                 <p className="text-[7px] sm:text-[9px] font-black uppercase text-primary/70 tracking-tight text-center leading-tight break-words px-0.5">
                     {caption || "СТАТ"}
                 </p>
+            </div>
+        </div>
+    );
+}
+
+function SponsorWidget({ sponsor }: { sponsor: PlayerSponsor }) {
+    const [showPromo, setShowPromo] = useState(false);
+    const [hasCopied, setHasCopied] = useState(false);
+    const { toast } = useToast();
+
+    const handleCopy = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (sponsor.promoCode) {
+            navigator.clipboard.writeText(sponsor.promoCode);
+            setHasCopied(true);
+            toast({ title: 'Скопировано', description: `Промокод ${sponsor.promoCode} готов к использованию.` });
+            setTimeout(() => setHasCopied(false), 2000);
+        }
+    };
+
+    return (
+        <div className="group/sponsor relative h-24 w-full glassmorphism rounded-2xl border border-white/10 overflow-hidden shadow-xl transition-all hover:border-primary/40 active:scale-95">
+            <div className={cn(
+                "absolute inset-0 flex items-center justify-center p-4 transition-all duration-500",
+                showPromo ? "opacity-0 scale-90 pointer-events-none" : "opacity-100 scale-100"
+            )}>
+                <Image src={sponsor.logoUrl} alt={sponsor.name} fill className="object-contain p-4 filter brightness-125 group-hover/sponsor:brightness-150 transition-all" unoptimized={sponsor.logoUrl.startsWith('data:')} />
+            </div>
+
+            <div className={cn(
+                "absolute inset-0 bg-primary/95 flex flex-col items-center justify-center p-2 text-center transition-all duration-500",
+                showPromo ? "opacity-100 translate-y-0" : "opacity-0 translate-y-full pointer-events-none"
+            )}>
+                <p className="text-[10px] font-black text-black uppercase tracking-widest mb-1">ВАШ ПРОМОКОД</p>
+                <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-lg mb-2">
+                    <span className="font-headline text-lg text-black">{sponsor.promoCode}</span>
+                    <button onClick={handleCopy} className="p-1 hover:bg-black/10 rounded transition-colors">
+                        {hasCopied ? <Check className="h-4 w-4 text-black" /> : <Copy className="h-4 w-4 text-black" />}
+                    </button>
+                </div>
+                <button onClick={() => setShowPromo(false)} className="text-[8px] font-bold text-black/60 uppercase hover:text-black">Скрыть</button>
+            </div>
+
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/sponsor:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 backdrop-blur-sm">
+                {!showPromo && (
+                    <>
+                        <Button asChild variant="secondary" size="sm" className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest w-[80%] bg-white text-black hover:bg-white/90">
+                            <a href={sponsor.linkUrl} target="_blank" rel="noopener noreferrer">
+                                ПЕРЕЙТИ <ExternalLink className="ml-1 h-3 w-3" />
+                            </a>
+                        </Button>
+                        {sponsor.promoCode && (
+                            <Button onClick={() => setShowPromo(true)} variant="ghost" size="sm" className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest w-[80%] text-white border border-white/20 hover:bg-white/10">
+                                ПРОМОКОД <Eye className="ml-1 h-3 w-3" />
+                            </Button>
+                        )}
+                    </>
+                )}
             </div>
         </div>
     );
@@ -325,6 +382,20 @@ export function PlayerCard({
              )}
             
             <div className="grid grid-cols-1 gap-10 md:gap-16">
+                {showSponsors && hasSponsors && (
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3 px-2">
+                            <div className="h-1 w-8 rounded-full bg-primary" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">ПАРТНЕРЫ ИГРОКА</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            {player.sponsors?.map((sponsor, idx) => (
+                                <SponsorWidget key={idx} sponsor={sponsor} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {showCTA && (
                     <div className="p-6 md:p-10 rounded-[2.5rem] bg-primary/5 border-2 border-dashed border-primary/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-inner group/sponsorship transition-all hover:bg-primary/10">
                         <div className="flex items-center gap-5">
@@ -457,7 +528,7 @@ export function PlayerCard({
                                     value={player.basePoints} 
                                     caption="ЗА МЕСТА"
                                     description="Очки, начисленные строго за итоговую позицию в турнирах." 
-                                />
+                            />
                                 <StatItem 
                                     template={template} 
                                     label="БОНУСЫ" 
