@@ -44,7 +44,7 @@ function FederalHeader({ theme }: { theme: any }) {
     return (
         <div className={cn(
             "grid gap-6 px-10 opacity-60 select-none items-center font-headline text-[11px] uppercase tracking-[0.3em] font-black",
-            "sticky top-[290px] md:top-[350px] z-30 bg-background/95 backdrop-blur-xl py-6 border-b border-white/10 -mx-4 px-10 rounded-t-3xl shadow-[0_15px_30px_rgba(0,0,0,0.3)]",
+            "sticky top-[360px] md:top-[372px] z-30 bg-background/98 backdrop-blur-2xl py-6 border-b border-white/10 -mx-4 px-10 rounded-t-3xl shadow-[0_20px_40px_rgba(0,0,0,0.4)]",
             DESKTOP_GRID_COLS
         )}>
             <span className="text-center">МЕСТО</span>
@@ -170,7 +170,7 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
         ) : (
             <div className="animate-in fade-in duration-700 px-1">
                 {/* Mobile Sticky Title */}
-                <div className="sticky top-[290px] z-30 bg-background/95 backdrop-blur-xl py-4 mb-6 border-b border-white/10 rounded-t-[2rem] px-6 shadow-xl">
+                <div className="sticky top-[360px] z-30 bg-background/95 backdrop-blur-xl py-4 mb-6 border-b border-white/10 rounded-t-[2rem] px-6 shadow-xl">
                     <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">СПИСОК УЧАСТНИКОВ</span>
                         <div className="flex items-center gap-2">
