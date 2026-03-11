@@ -42,7 +42,11 @@ const DESKTOP_GRID_COLS = "grid-cols-[80px_1.8fr_100px_100px_100px_100px_120px_1
 
 function FederalHeader({ theme }: { theme: any }) {
     return (
-        <div className={cn("grid gap-6 px-10 mb-6 opacity-60 select-none items-center font-headline text-[11px] uppercase tracking-[0.3em] font-black", DESKTOP_GRID_COLS)}>
+        <div className={cn(
+            "grid gap-6 px-10 mb-6 opacity-60 select-none items-center font-headline text-[11px] uppercase tracking-[0.3em] font-black",
+            "sticky top-[280px] md:top-[340px] z-30 bg-background/90 backdrop-blur-xl py-6 border-b border-white/10 -mx-4 px-10 rounded-t-3xl shadow-xl",
+            DESKTOP_GRID_COLS
+        )}>
             <span className="text-center">МЕСТО</span>
             <span className="text-left pl-16">ПРО-ИГРОК</span>
             <span className="text-center">ТУРЫ</span>
@@ -73,8 +77,7 @@ function FederalCapsule({ player, leagueUrlParam, theme, intensity }: { player: 
                 theme.bg,
                 theme.border,
                 theme.glow,
-                "group-active:ring-4 group-active:ring-white/20 group-active:shadow-[0_0_50px_rgba(255,255,255,0.4)] shadow-2xl",
-                isSelected ? "animate-shimmer" : ""
+                "group-active:ring-4 group-active:ring-white/20 group-active:shadow-[0_0_50px_rgba(255,255,255,0.4)] shadow-2xl"
             )}>
                 <div className="flex justify-center items-center gap-2">
                     <span 
@@ -166,6 +169,17 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
             </div>
         ) : (
             <div className="animate-in fade-in duration-700 px-1">
+                {/* Mobile Sticky Title */}
+                <div className="sticky top-[280px] z-30 bg-background/95 backdrop-blur-xl py-4 mb-6 border-b border-white/10 rounded-t-[2rem] px-6">
+                    <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">СПИСОК УЧАСТНИКОВ</span>
+                        <div className="flex items-center gap-2">
+                            <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">LIVE RANKINGS</span>
+                        </div>
+                    </div>
+                </div>
+
                 <Accordion type="multiple" className="w-full space-y-8">
                 {players.map((player, idx) => {
                     const intensity = getIntensity(idx, players.length);
