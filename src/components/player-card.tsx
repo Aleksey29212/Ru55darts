@@ -58,7 +58,7 @@ const StatItem = ({
     return (
         <div 
             className={cn(
-                "relative group overflow-hidden", 
+                "relative group", 
                 baseClasses, 
                 templateClasses[template]
             )}
@@ -71,13 +71,13 @@ const StatItem = ({
                 <TooltipProvider>
                     <Tooltip delayDuration={0}>
                         <TooltipTrigger asChild>
-                            <div className="cursor-help p-1 -m-1 hover:text-primary transition-colors">
+                            <div className="cursor-help p-1 -m-1 hover:text-primary transition-all active:scale-90">
                                 <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 text-primary/60 hover:text-primary animate-pulse" />
                             </div>
                         </TooltipTrigger>
                         <TooltipContent 
                             side="top" 
-                            className="max-w-[320px] p-6 glassmorphism border-primary/50 z-[100] shadow-[0_30px_100px_rgba(0,0,0,0.9)] rounded-[1.5rem] bg-black/95 backdrop-blur-3xl animate-in fade-in zoom-in-95 duration-200"
+                            className="max-w-[320px] border-primary/50"
                         >
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3 border-b border-primary/20 pb-3">
@@ -416,8 +416,8 @@ export function PlayerCard({
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 lg:gap-12">
-                        <div className="glassmorphism p-6 md:p-10 rounded-[3rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full hover:border-primary/30 transition-all duration-500">
-                            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
+                        <div className="glassmorphism p-6 md:p-10 rounded-[3rem] border-white/10 relative shadow-4xl flex flex-col group/box h-full hover:border-primary/30 transition-all duration-500">
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000 rounded-[3rem]" />
                             <h3 className="text-[10px] md:text-[13px] font-headline uppercase tracking-[0.3em] text-white/40 mb-8 flex items-center gap-3 relative z-10">
                                 <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
                                 АНАЛИЗ РЕЗУЛЬТАТОВ
@@ -442,8 +442,8 @@ export function PlayerCard({
                             </div>
                         </div>
 
-                        <div className="glassmorphism p-6 md:p-10 rounded-[3rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full hover:border-accent/30 transition-all duration-500">
-                            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
+                        <div className="glassmorphism p-6 md:p-10 rounded-[3rem] border-white/10 relative shadow-4xl flex flex-col group/box h-full hover:border-accent/30 transition-all duration-500">
+                            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000 rounded-[3rem]" />
                             <h3 className="text-[10px] md:text-[13px] font-headline uppercase tracking-[0.3em] text-white/40 mb-8 flex items-center gap-3 relative z-10">
                                 <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
                                 ЛИЧНЫЕ РЕКОРДЫ
