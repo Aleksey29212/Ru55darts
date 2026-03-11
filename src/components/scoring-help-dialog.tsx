@@ -88,7 +88,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
   if (!mounted) return children || null;
 
   const renderHelpPill = (label: string, val: string | number, Icon: any, colorClass: string, description?: string) => (
-    <div className="flex items-center justify-between py-1 px-3 rounded-xl bg-white/[0.05] border border-white/5 hover:border-primary/40 transition-all group shadow-lg active:scale-[0.98]">
+    <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.05] border border-white/5 hover:border-primary/40 transition-all group shadow-lg active:scale-[0.98]">
         <div className="flex items-center gap-2.5 min-w-0">
             <div className={cn("p-1 rounded-lg bg-black/40 border border-white/5 shrink-0", colorClass)}>
                 <Icon className="h-3.5 w-3.5" />

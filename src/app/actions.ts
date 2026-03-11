@@ -12,11 +12,6 @@ import { CardBackgrounds } from '@/lib/card-backgrounds';
 import { scrapeTournamentData } from '@/lib/scraping';
 import { getRankings } from '@/lib/leagues';
 
-/**
- * ГАРАНТИЯ: Все действия работают автоматически. 
- * Если ключи Firebase отсутствуют, данные сохраняются во временном хранилище.
- */
-
 export async function importTournament(prevState: unknown, formData: FormData) {
   const tournamentIdsRaw = formData.get('tournamentId');
   const league = formData.get('league') as LeagueId;
@@ -109,14 +104,12 @@ export async function updateTournamentResultsAction(tournamentId: string, player
             isManuallyEdited: true
         };
 
-        // Update in memory
         const memoryStore = (global as any).demoTournaments as Tournament[];
         if (memoryStore) {
             const idx = memoryStore.findIndex(t => t.id === tournamentId);
             if (idx !== -1) memoryStore[idx] = updatedTournament;
         }
 
-        // Update in DB
         if (db) {
             const docRef = doc(db, 'tournaments', tournamentId);
             const dataToSet = { ...updatedTournament };
@@ -129,7 +122,7 @@ export async function updateTournamentResultsAction(tournamentId: string, player
         revalidateTag('tournaments');
         revalidateTag('leagues');
 
-        return { success: true, message: 'Результаты турнира обновлены вручную.' };
+        return { success: true, message: 'Результаты турнира обновлены и помечены как измененные вручную.' };
     } catch (e) {
         return { success: false, message: 'Ошибка при сохранении результатов.' };
     }
@@ -152,7 +145,6 @@ export async function deletePlayerAction(playerId: string) {
         if (db) {
             await deleteDoc(doc(db, 'players', playerId));
         }
-        // Очищаем в глобальной памяти тоже
         const memoryStore = (global as any).demoPlayers as PlayerProfile[];
         if (memoryStore) {
             const idx = memoryStore.findIndex(p => p.id === playerId);
@@ -317,7 +309,6 @@ export async function exportAllRankingsAction() {
         const rankings = await getRankings('general');
         if (!rankings || rankings.length === 0) return { success: false, message: 'Нет данных для экспорта. Сначала импортируйте турниры.' };
         
-        // CSV with semicolon for better Excel compatibility in RU locale
         const header = 'Место;Имя;Никнейм;Очки;Игры;AVG;180;Hi-Out\n';
         const rows = rankings.map(p => 
             `${p.rank};${p.name};${p.nickname};${p.points};${p.matchesPlayed};${p.avg.toFixed(2)};${p.n180s};${p.hiOut}`

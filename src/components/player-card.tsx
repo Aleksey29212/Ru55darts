@@ -44,8 +44,7 @@ const StatItem = ({
     const len = valueString.length;
     const hasDecimal = valueString.includes('.') || valueString.includes(',');
     
-    // УЛЬТРА-АДАПТАЦИЯ: Динамический подбор размера для всех шаблонов
-    // Приоритет: вписать число любой ценой
+    // Агрессивное масштабирование для гарантии вхождения в рамки
     let fontSizeClass = "text-4xl sm:text-5xl lg:text-6xl"; 
     
     if (hasDecimal || len >= 5) {

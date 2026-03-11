@@ -109,7 +109,7 @@ export type TournamentPlayerResult = {
 export type Tournament = {
   id: string;
   name: string;
-  date: Timestamp | string; // Support both Timestamp from Firestore and string for new data
+  date: Timestamp | string; 
   league: LeagueId;
   players: TournamentPlayerResult[];
   isFinalTour?: boolean;
