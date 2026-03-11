@@ -5,13 +5,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from 'recharts';
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart, PolarRadiusAxis } from 'recharts';
 import type { Player } from '@/lib/types';
 import { useMemo } from 'react';
 
 const chartConfig = {
   value: {
-    label: 'Значение',
+    label: 'Рейтинг',
     color: 'hsl(var(--primary))',
   },
 };
@@ -22,23 +22,23 @@ const calculateAggregateStats = (player: Player) => {
     const legQuality = player.bestLeg > 0 ? (100 * 36) / (player.bestLeg - 9 + 36) : 0;
 
     return [
-        { subject: 'Набор', value: power, fullMark: 100 },
-        { subject: 'Чекаут', value: finishing, fullMark: 100 },
-        { subject: 'Лег', value: legQuality, fullMark: 100 },
+        { subject: 'НАБОР', value: power, fullMark: 100 },
+        { subject: 'ЧЕКАУТ', value: finishing, fullMark: 100 },
+        { subject: 'ЛЕГ', value: legQuality, fullMark: 100 },
     ];
 };
 
 const calculateSingleTournamentStats = (player: Player) => {
     const avg = Math.min(100, (Number(player.avg) / 100) * 100);
     const powerScoring = Math.min(100, (Number(player.n180s) || 0) * 20);
-    const finishing = Math.min(100, (Number(player.hiOut) || 0) / 1.7); // 170 is max
-    const legQuality = player.bestLeg > 0 ? (100 * 36) / (player.bestLeg - 9 + 36) : 0; // x=9 -> 100, x=12 -> ~92
+    const finishing = Math.min(100, (Number(player.hiOut) || 0) / 1.7); 
+    const legQuality = player.bestLeg > 0 ? (100 * 36) / (player.bestLeg - 9 + 36) : 0;
 
     return [
-        { subject: 'Ср. набор', value: avg, fullMark: 100 },
-        { subject: '180-ки', value: powerScoring, fullMark: 100 },
-        { subject: 'Лучший лег', value: legQuality, fullMark: 100 },
-        { subject: 'Чекаут', value: finishing, fullMark: 100 },
+        { subject: 'AVG', value: avg, fullMark: 100 },
+        { subject: '180', value: powerScoring, fullMark: 100 },
+        { subject: 'ЛЕГ', value: legQuality, fullMark: 100 },
+        { subject: 'ФИНИШ', value: finishing, fullMark: 100 },
     ];
 }
 
@@ -54,28 +54,42 @@ export function PlayerRadarChart({ player, viewMode }: { player: Player, viewMod
   return (
       <ChartContainer
         config={chartConfig}
-        className="mx-auto aspect-square h-[250px] w-full"
+        className="mx-auto aspect-square h-[320px] w-full"
       >
         <RadarChart
           data={radarData}
-          outerRadius="60%"
+          outerRadius="75%"
         >
           <ChartTooltip
             cursor={false}
-            content={<ChartTooltipContent indicator="dot" />}
+            content={<ChartTooltipContent indicator="line" className="glassmorphism border-primary/50" />}
           />
-          <PolarGrid gridType="polygon" className="stroke-border/50" />
+          <PolarGrid gridType="polygon" className="stroke-white/10" strokeWidth={1} />
           <PolarAngleAxis 
             dataKey="subject" 
-            tick={{ fill: 'hsl(var(--foreground))', fontSize: 10, fontWeight: 500 }} 
+            tick={{ 
+                fill: 'rgba(255,255,255,0.6)', 
+                fontSize: 10, 
+                fontWeight: 900,
+                letterSpacing: '0.1em'
+            }} 
           />
+          <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
           <Radar
+            name="Skill"
             dataKey="value"
             stroke="hsl(var(--primary))"
             fill="hsl(var(--primary))"
-            strokeWidth={2}
-            fillOpacity={0.4}
-            dot={{ r: 3, fill: 'hsl(var(--primary))', stroke: 'hsl(var(--primary))', strokeWidth: 1 }}
+            strokeWidth={3}
+            fillOpacity={0.3}
+            dot={{ 
+                r: 5, 
+                fill: 'hsl(var(--primary))', 
+                stroke: '#000', 
+                strokeWidth: 2,
+                className: "drop-shadow-[0_0_10px_hsl(var(--primary))]"
+            }}
+            activeDot={{ r: 8, strokeWidth: 0 }}
           />
         </RadarChart>
       </ChartContainer>
