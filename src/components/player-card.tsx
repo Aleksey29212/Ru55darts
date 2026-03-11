@@ -25,7 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ScoringHelpDialog } from './scoring-help-dialog';
 
 /**
- * @fileOverview Личная карточка игрока (Локализованная версия).
+ * @fileOverview Личная карточка игрока (Дизайнерская версия v2.7).
  */
 
 const StatItem = ({ 
@@ -304,9 +304,9 @@ export function PlayerCard({
              )}
             
             <div className="grid grid-cols-1 gap-12 md:gap-20">
-                {/* Sponsorship Block */}
+                {/* Sponsorship Block - HIGHER VISIBILITY */}
                 {showCTA && (
-                    <div className="p-8 md:p-12 rounded-[3rem] bg-primary/5 border-2 border-dashed border-primary/30 flex flex-col md:flex-row items-center justify-between gap-8 shadow-inner group/sponsorship transition-all hover:bg-primary/10">
+                    <div className="p-8 md:p-12 rounded-[3rem] bg-primary/5 border-2 border-dashed border-primary/30 flex flex-col md:flex-row items-center justify-between gap-8 shadow-inner group/sponsorship transition-all hover:bg-primary/10 animate-shimmer">
                         <div className="flex items-center gap-6">
                             <div className="p-4 rounded-2xl bg-primary/20 text-primary shadow-xl group-hover/sponsorship:rotate-12 transition-transform">
                                 <Handshake className="h-10 w-10" />
@@ -316,7 +316,7 @@ export function PlayerCard({
                                 <p className="text-[10px] md:text-[12px] font-black text-muted-foreground uppercase tracking-[0.3em] mt-1">ПОДДЕРЖИТЕ ИГРОКА И ПОЛУЧИТЕ ОХВАТ</p>
                             </div>
                         </div>
-                        <Button asChild className="h-16 px-10 rounded-2xl font-black uppercase tracking-widest text-sm shadow-2xl shadow-primary/20 interactive-scale shrink-0">
+                        <Button asChild className="h-16 px-10 rounded-2xl font-black uppercase tracking-widest text-sm shadow-2xl shadow-primary/20 interactive-scale shrink-0 bg-primary text-primary-foreground">
                             <a href="/partners" className="flex items-center gap-3">
                                 УЗНАТЬ УСЛОВИЯ
                                 <ExternalLink className="h-5 w-5" />
@@ -351,9 +351,9 @@ export function PlayerCard({
                             </ScoringHelpDialog>
                         </div>
                     </div>
-                    <div className="relative">
-                        <div className="absolute -left-4 top-0 bottom-0 w-2 bg-gradient-to-b from-primary via-primary/50 to-transparent rounded-full shadow-[0_0_20px_rgba(var(--primary-rgb),0.5)]" />
-                        <p className="text-lg md:text-2xl lg:text-3xl text-white/95 font-body leading-relaxed italic pl-8 md:pl-12 lg:pl-16 py-4 font-medium bg-white/[0.03] rounded-r-[3rem] shadow-inner">
+                    <div className="relative group/bio">
+                        <div className="absolute -left-4 top-0 bottom-0 w-2 bg-gradient-to-b from-primary via-primary/50 to-transparent rounded-full shadow-[0_0_20px_rgba(var(--primary-rgb),0.5)] group-hover/bio:scale-y-110 transition-transform duration-700" />
+                        <p className="text-lg md:text-2xl lg:text-3xl text-white/95 font-body leading-relaxed italic pl-8 md:pl-12 lg:pl-16 py-6 font-medium bg-white/[0.03] rounded-r-[3rem] shadow-inner border-l border-white/5">
                             {currentPlayerData.bio || "История этой легенды все еще пишется на рубеже. Каждый матч добавляет новую главу в их профессиональную карьеру."}
                         </p>
                     </div>
@@ -434,7 +434,7 @@ export function PlayerCard({
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 lg:gap-20">
-                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[350px]">
+                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[350px] hover:border-primary/30 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
                             <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
                                 <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -464,7 +464,7 @@ export function PlayerCard({
                             </div>
                         </div>
 
-                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[350px]">
+                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[350px] hover:border-accent/30 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
                             <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
                                 <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />

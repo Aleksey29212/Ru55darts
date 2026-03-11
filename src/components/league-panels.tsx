@@ -205,7 +205,6 @@ export function LeaguePanels({
                     <PartnersDisplay partners={partners} variant="compact" hideLabel />
                 </div>
 
-                {/* ДВУХРЯДНАЯ СЕТКА С ПРИОРИТЕТОМ */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-3 animate-in fade-in duration-500">
                     {orderedLeagues.map((leagueId, idx) => {
                         const leagueInfo = leagueSettings[leagueId];
@@ -224,7 +223,7 @@ export function LeaguePanels({
                                 className={cn(
                                     'relative h-14 md:h-16 rounded-2xl overflow-hidden transition-all duration-500 transform shrink-0 cursor-pointer outline-none border-2 shadow-lg group',
                                     isSelected 
-                                        ? 'border-primary ring-2 ring-primary/20 scale-[1.02] z-10 shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)]' 
+                                        ? 'border-primary ring-2 ring-primary/20 scale-[1.02] z-10 shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] animate-shimmer' 
                                         : 'border-white/5 opacity-70 hover:opacity-100 hover:border-primary/40 hover:scale-[1.01]'
                                 )}
                             >
@@ -248,7 +247,6 @@ export function LeaguePanels({
                                                 <LeagueIcon className="h-4 w-4 md:h-5 md:w-5" />
                                             )}
                                         </div>
-                                        {/* Счетчик игроков в углу иконки */}
                                         <div className={cn(
                                             "absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full flex items-center justify-center text-[8px] font-black border border-white/20 shadow-lg transition-transform duration-500",
                                             isSelected ? "bg-primary text-primary-foreground scale-110" : "bg-black/80 text-white"

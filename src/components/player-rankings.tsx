@@ -3,7 +3,7 @@
 import type { Player, LeagueId } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
-import { ChevronRight, Award, Zap, Star, Calendar, ExternalLink, Target, Trophy } from 'lucide-react';
+import { ChevronRight, Award, Zap, Star, Calendar, ExternalLink, Target, Trophy, Medal } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from '@/lib/utils';
@@ -57,6 +57,13 @@ function FederalHeader({ theme }: { theme: any }) {
 }
 
 function FederalCapsule({ player, leagueUrlParam, theme, intensity }: { player: Player, leagueUrlParam: string, theme: any, intensity: number }) {
+    const isTop3 = player.rank >= 1 && player.rank <= 3;
+    const medalColors = {
+        1: 'text-gold',
+        2: 'text-silver',
+        3: 'text-bronze'
+    };
+
     return (
         <Link href={`/player/${player.id}?${leagueUrlParam}`} className="block group">
             <div className={cn(
@@ -66,11 +73,15 @@ function FederalCapsule({ player, leagueUrlParam, theme, intensity }: { player: 
                 theme.bg,
                 theme.border,
                 theme.glow,
-                "group-active:ring-4 group-active:ring-white/20 group-active:shadow-[0_0_50px_rgba(255,255,255,0.4)] shadow-2xl"
+                "group-active:ring-4 group-active:ring-white/20 group-active:shadow-[0_0_50px_rgba(255,255,255,0.4)] shadow-2xl",
+                isSelected ? "animate-shimmer" : ""
             )}>
-                <div className="flex justify-center">
+                <div className="flex justify-center items-center gap-2">
                     <span 
-                        className={cn("text-4xl font-headline transition-all duration-500 group-active:text-white drop-shadow-lg", theme.text)}
+                        className={cn(
+                            "text-4xl font-headline transition-all duration-500 group-active:text-white drop-shadow-lg", 
+                            isTop3 ? medalColors[player.rank as 1|2|3] : theme.text
+                        )}
                         style={{ opacity: intensity, textShadow: intensity > 0.8 ? '0 0 25px currentColor' : 'none' }}
                     >
                         {player.rank}
@@ -158,6 +169,13 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
                 <Accordion type="multiple" className="w-full space-y-8">
                 {players.map((player, idx) => {
                     const intensity = getIntensity(idx, players.length);
+                    const isTop3 = player.rank >= 1 && player.rank <= 3;
+                    const medalColors = {
+                        1: 'text-gold',
+                        2: 'text-silver',
+                        3: 'text-bronze'
+                    };
+
                     return (
                         <AccordionItem value={player.id} key={player.id} className={cn(
                             "border-0 rounded-[3rem] glassmorphism overflow-hidden transition-all duration-500 group relative shadow-[0_30px_80px_rgba(0,0,0,0.5)]",
@@ -167,7 +185,10 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
                             <AccordionTrigger className="px-6 py-8 hover:no-underline interactive-scale relative [&>svg]:hidden">
                                 <div className="flex items-center justify-start gap-4 w-full relative z-10">
                                     <div 
-                                        className={cn("font-headline text-4xl leading-none select-none pointer-events-none shrink-0 transition-all duration-700 min-w-[55px]", theme.text)}
+                                        className={cn(
+                                            "font-headline text-4xl leading-none select-none pointer-events-none shrink-0 transition-all duration-700 min-w-[55px]", 
+                                            isTop3 ? medalColors[player.rank as 1|2|3] : theme.text
+                                        )}
                                         style={{ opacity: Math.max(0.3, intensity), filter: intensity > 0.8 ? 'drop-shadow(0 0 15px currentColor)' : 'none' }}
                                     >
                                         #{player.rank}

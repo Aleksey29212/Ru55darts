@@ -97,6 +97,22 @@
     @apply transition-transform active:scale-95 duration-100 hover:brightness-110;
   }
 
+  .animate-shimmer {
+    background: linear-gradient(
+      110deg,
+      transparent 25%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite linear;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
