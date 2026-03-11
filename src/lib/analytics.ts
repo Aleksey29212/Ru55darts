@@ -20,18 +20,19 @@ export type SponsorClickStat = {
 export async function getVisitStats(): Promise<VisitStats> {
   noStore();
   const db = getDb();
-  const visitsCol = collection(db, 'visits');
-
-  const now = new Date();
-  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-
-  const dayQuery = query(visitsCol, where('timestamp', '>=', oneDayAgo));
-  const weekQuery = query(visitsCol, where('timestamp', '>=', oneWeekAgo));
-  const yearQuery = query(visitsCol, where('timestamp', '>=', oneYearAgo));
+  if (!db) return { day: 0, week: 0, year: 0, total: 0 };
 
   try {
+    const visitsCol = collection(db, 'visits');
+    const now = new Date();
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+
+    const dayQuery = query(visitsCol, where('timestamp', '>=', oneDayAgo));
+    const weekQuery = query(visitsCol, where('timestamp', '>=', oneWeekAgo));
+    const yearQuery = query(visitsCol, where('timestamp', '>=', oneYearAgo));
+
     const [daySnapshot, weekSnapshot, yearSnapshot, totalSnapshot] = await Promise.all([
       getDocs(dayQuery),
       getDocs(weekQuery),
@@ -54,6 +55,7 @@ export async function getVisitStats(): Promise<VisitStats> {
 export async function getSponsorClickStats(): Promise<SponsorClickStat[]> {
     noStore();
     const db = getDb();
+    if (!db) return [];
     
     try {
         const clicksCol = collection(db, 'sponsor_clicks');
