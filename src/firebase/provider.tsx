@@ -5,14 +5,9 @@ import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
-import { isFirebaseConfigValid, firebaseConfig } from './config';
-import { ShieldAlert, Terminal, AlertCircle, Copy, Check } from 'lucide-react';
+import { isFirebaseConfigValid } from './config';
+import { ShieldAlert, Terminal, Check, Copy, Settings2, Rocket, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-/**
- * @fileOverview Провайдер контекста Firebase с защитой от ошибок конфигурации.
- * ГАРАНТИЯ: Понятное уведомление пользователя вместо падения приложения.
- */
 
 interface FirebaseProviderProps {
   children: ReactNode;
@@ -104,27 +99,26 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     };
   }, [firebaseApp, firestore, auth, userAuthState]);
 
-  // ЭКРАН ПОМОЩНИКА КОНФИГУРАЦИИ
   if (!isFirebaseConfigValid) {
       return (
-          <div className="fixed inset-0 bg-background flex items-center justify-center p-4 md:p-6 z-[9999] overflow-y-auto">
-              <div className="max-w-2xl w-full glassmorphism p-6 md:p-10 rounded-[2rem] border-amber-500/30 space-y-8 my-auto animate-in fade-in zoom-in-95 duration-500">
+          <div className="fixed inset-0 bg-neutral-950 flex items-center justify-center p-4 md:p-6 z-[9999] overflow-y-auto">
+              <div className="max-w-2xl w-full glassmorphism p-6 md:p-10 rounded-[2.5rem] border-primary/30 space-y-8 my-auto animate-in fade-in zoom-in-95 duration-500">
                   <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left border-b border-white/5 pb-8">
-                      <div className="bg-amber-500/20 w-20 h-20 rounded-3xl flex items-center justify-center border-2 border-amber-500/30 shrink-0 shadow-2xl shadow-amber-500/20">
-                          <ShieldAlert className="h-10 w-10 text-amber-500" />
+                      <div className="bg-primary/20 w-20 h-20 rounded-3xl flex items-center justify-center border-2 border-primary/30 shrink-0 shadow-2xl shadow-primary/20">
+                          <Settings2 className="h-10 w-10 text-primary animate-spin-slow" />
                       </div>
                       <div>
-                          <h2 className="font-headline text-2xl md:text-3xl uppercase tracking-tight text-amber-500">Система не настроена</h2>
-                          <p className="text-muted-foreground mt-2 text-sm md:text-base">Для работы <strong>DartBrig Pro</strong> на сервере <strong>Wise Crane</strong> необходимо добавить ключи Firebase.</p>
+                          <h2 className="font-headline text-2xl md:text-3xl uppercase tracking-tight text-primary">Мастер настройки</h2>
+                          <p className="text-muted-foreground mt-2 text-sm md:text-base">Для запуска <strong>DartBrig Pro</strong> на вашем сервере необходимо добавить ключи из Firebase Console.</p>
                       </div>
                   </div>
 
-                  <div className="space-y-4">
-                      <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-                          <Terminal className="h-3.5 w-3.5" /> 
-                          Переменные для файла .env или Timeweb Cloud:
-                      </p>
-                      <div className="grid gap-3">
+                  <div className="space-y-6">
+                      <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-xs">
+                          <Rocket className="h-4 w-4" />
+                          Шаг 1: Добавьте переменные на хостинг
+                      </div>
+                      <div className="grid gap-2">
                           {[
                               'NEXT_PUBLIC_FIREBASE_API_KEY',
                               'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
@@ -133,26 +127,39 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
                               'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
                               'NEXT_PUBLIC_ADMIN_PASSWORD'
                           ].map((key) => (
-                              <div key={key} className="group flex items-center justify-between bg-black/40 rounded-xl p-3 md:p-4 border border-white/5 hover:border-primary/30 transition-all">
-                                  <code className="text-[10px] md:text-xs text-primary font-bold">{key}</code>
+                              <div key={key} className="group flex items-center justify-between bg-black/60 rounded-xl p-3 border border-white/5 hover:border-primary/30 transition-all">
+                                  <code className="text-[10px] md:text-xs text-primary/80 font-bold">{key}</code>
                                   <Button 
                                     variant="ghost" 
                                     size="sm" 
-                                    className="h-8 px-2 text-[10px] uppercase font-bold text-muted-foreground hover:text-primary"
+                                    className="h-8 px-3 text-[10px] uppercase font-bold text-muted-foreground hover:text-primary gap-2"
                                     onClick={() => copyToClipboard(key, key)}
                                   >
-                                      {copiedKey === key ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
-                                      {copiedKey === key ? 'Ок' : 'Копировать'}
+                                      {copiedKey === key ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                                      {copiedKey === key ? 'Готово' : 'Копировать'}
                                   </Button>
                               </div>
                           ))}
                       </div>
                   </div>
 
-                  <div className="bg-primary/5 rounded-2xl p-6 border border-primary/10">
-                      <p className="text-xs text-muted-foreground leading-relaxed italic text-center">
-                          <strong>Для VPS:</strong> Создайте файл <code>.env.local</code> в корне проекта на сервере и вставьте туда эти ключи со значениями из Firebase Console. После этого выполните <code>npm run build</code> и <code>npm start</code>.
+                  <div className="bg-white/5 rounded-2xl p-6 border border-white/10 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Где взять значения?</span>
+                        <Button variant="link" className="h-auto p-0 text-primary text-[10px] font-bold uppercase" asChild>
+                            <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer">
+                                Консоль Firebase <ExternalLink className="h-3 w-3 ml-1" />
+                            </a>
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground leading-relaxed italic">
+                          Зайдите в <strong>Project Settings</strong> &rarr; <strong>General</strong> &rarr; <strong>Your apps</strong>. 
+                          Выберите <strong>Web App</strong> и скопируйте значения из блока <code>firebaseConfig</code> в панель управления <strong>Timeweb</strong> или в файл <code>.env.local</code>.
                       </p>
+                  </div>
+                  
+                  <div className="pt-4 text-center">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest opacity-40">Система автоматически заработает после обновления переменных</p>
                   </div>
               </div>
           </div>
@@ -166,7 +173,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
           <div className="fixed inset-0 bg-background flex items-center justify-center z-[9999]">
               <div className="flex flex-col items-center gap-4">
                   <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Установка соединения...</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Установка связи...</p>
               </div>
           </div>
       )}

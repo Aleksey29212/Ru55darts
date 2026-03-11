@@ -13,7 +13,7 @@ import { CardBackgrounds } from '@/lib/card-backgrounds';
 import { scrapeTournamentData } from '@/lib/scraping';
 
 /**
- * ГАРАНТИЯ: Все экшены асинхронны и используют revalidatePath для мгновенного обновления UI.
+ * ГАРАНТИЯ: Все экшены асинхронны, используют Safe DB Check и мгновенно обновляют UI.
  */
 
 export async function importTournament(prevState: unknown, formData: FormData) {
@@ -23,6 +23,9 @@ export async function importTournament(prevState: unknown, formData: FormData) {
   if (!tournamentIdsRaw || typeof tournamentIdsRaw !== 'string' || !league) {
     return { success: false, message: 'Некорректный ввод.' };
   }
+
+  const db = getDb();
+  if (!db) return { success: false, message: 'Система не настроена. Проверьте ключи Firebase.' };
 
   const inputs = tournamentIdsRaw.split(/[,;\s]+/).filter(Boolean);
   const scoringSettings = await getScoringSettings(league);
@@ -37,7 +40,7 @@ export async function importTournament(prevState: unknown, formData: FormData) {
       
       const existing = await getTournamentById(scraped.id);
       if (existing) {
-        errors.push(`${input}: Турнир уже загружен в систему.`);
+        errors.push(`${input}: Турнир уже загружен.`);
         continue;
       }
 
@@ -88,7 +91,7 @@ export async function importTournament(prevState: unknown, formData: FormData) {
     success: successCount > 0, 
     message: successCount > 0 
       ? `Успешно: ${successCount} турнир(ов) добавлено.` 
-      : `Ошибка импорта: турниры уже в базе или некорректные ID.`,
+      : `Ошибка импорта.`,
     errors: errors.length > 0 ? errors : undefined
   };
 }
@@ -96,7 +99,7 @@ export async function importTournament(prevState: unknown, formData: FormData) {
 export async function updatePlayer(player: PlayerProfile) {
   try {
     const db = getDb();
-    if (!db) return { success: false, message: 'Ошибка: База данных недоступна.' };
+    if (!db) return { success: false, message: 'База данных недоступна.' };
     
     const { id, ...playerData } = player;
     await updateDoc(doc(db, 'players', id), playerData);
@@ -112,7 +115,7 @@ export async function updatePlayer(player: PlayerProfile) {
 export async function deletePlayerAction(playerId: string) {
     try {
         const db = getDb();
-        if (!db) return { success: false, message: 'Ошибка: База данных недоступна.' };
+        if (!db) return { success: false, message: 'База данных недоступна.' };
         
         await deleteDoc(doc(db, 'players', playerId));
         revalidatePath('/', 'layout');
@@ -130,7 +133,7 @@ export async function saveScoringSettings(leagueId: LeagueId, data: ScoringSetti
   revalidateTag('settings');
   revalidateTag('leagues');
   revalidatePath('/', 'layout');
-  return { success: true, message: `Настройки очков для лиги "${leagueId}" сохранены.` };
+  return { success: true, message: `Настройки сохранены.` };
 }
 
 export async function saveLeagueSettings(data: AllLeagueSettings) {
@@ -141,7 +144,7 @@ export async function saveLeagueSettings(data: AllLeagueSettings) {
   revalidateTag('tournaments');
   revalidatePath('/', 'layout');
   revalidatePath('/admin/leagues');
-  return { success: true, message: `Настройки лиг успешно обновлены на главной панели.` };
+  return { success: true, message: `Настройки лиг обновлены.` };
 }
 
 export async function deleteTournamentAction(tournamentId: string) {
@@ -150,7 +153,7 @@ export async function deleteTournamentAction(tournamentId: string) {
     revalidateTag('leagues');
     revalidatePath('/', 'layout');
     revalidatePath('/admin/tournaments');
-    return { success: true, message: `Турнир #${tournamentId} удален из базы.` };
+    return { success: true, message: `Турнир удален.` };
 }
 
 export async function clearTournamentsAction() {
@@ -159,7 +162,7 @@ export async function clearTournamentsAction() {
     revalidatePath('/admin/tournaments');
     revalidateTag('tournaments');
     revalidateTag('leagues');
-    return { success: true, message: 'Архив турниров полностью очищен.' };
+    return { success: true, message: 'Архив очищен.' };
 }
 
 export async function logVisitAction() {
@@ -191,7 +194,7 @@ export async function saveBackgroundAction(prevState: unknown, formData: FormDat
     revalidateTag('background');
     revalidateTag('settings');
     revalidatePath('/', 'layout');
-    return { success: true, message: 'Новый фон применен.' };
+    return { success: true, message: 'Фон обновлен.' };
 }
 
 export async function saveSponsorshipAction(settings: SponsorshipSettings) {
@@ -199,13 +202,13 @@ export async function saveSponsorshipAction(settings: SponsorshipSettings) {
     revalidateTag('sponsorship');
     revalidateTag('settings');
     revalidatePath('/', 'layout');
-    return { success: true, message: 'Настройки связи и спонсорства обновлены.' };
+    return { success: true, message: 'Настройки спонсорства обновлены.' };
 }
 
 export async function updatePlayerAvatar(playerId: string, dataUrl: string | null) {
     try {
         const db = getDb();
-        if (!db) return { success: false, message: 'Ошибка: База данных недоступна.' };
+        if (!db) return { success: false, message: 'База недоступна.' };
         
         const playerRef = doc(db, 'players', playerId);
         if (dataUrl) {
@@ -218,7 +221,7 @@ export async function updatePlayerAvatar(playerId: string, dataUrl: string | nul
         revalidatePath('/', 'layout');
         revalidatePath('/admin/photo-studio');
         revalidateTag('players');
-        return { success: true, message: 'Фото игрока обновлено.' };
+        return { success: true, message: 'Фото обновлено.' };
     } catch (e) {
         return { success: false, message: 'Ошибка фотостудии.' };
     }
@@ -281,9 +284,9 @@ export async function clearAnalyticsAction() {
         
         await batch.commit();
         revalidatePath('/admin/analytics');
-        return { success: true, message: 'Статистика посещений и кликов полностью очищена.' };
+        return { success: true, message: 'Аналитика очищена.' };
     } catch (e) {
-        return { success: false, message: 'Ошибка при очистке логов.' };
+        return { success: false, message: 'Ошибка при очистке.' };
     }
 }
 
@@ -295,7 +298,7 @@ export async function clearPartnersAction() {
         const partnersCol = collection(db, 'partners');
         const snapshot = await getDocs(partnersCol);
         
-        if (snapshot.empty) return { success: true, message: 'Список партнеров уже пуст.' };
+        if (snapshot.empty) return { success: true, message: 'Список пуст.' };
 
         const batch = writeBatch(db);
         snapshot.docs.forEach(doc => batch.delete(doc.ref));
@@ -303,29 +306,24 @@ export async function clearPartnersAction() {
         await batch.commit();
         revalidatePath('/admin/partners');
         revalidatePath('/partners');
-        return { success: true, message: 'Все партнеры удалены из базы.' };
+        return { success: true, message: 'Партнеры удалены.' };
     } catch (e) {
-        return { success: false, message: 'Ошибка при очистке партнеров.' };
+        return { success: false, message: 'Ошибка при очистке.' };
     }
 }
 
 export async function exportAllRankingsAction() {
     try {
         const rankings = await getRankings('general');
-        if (!rankings || rankings.length === 0) return { success: false, message: 'Нет данных для экспорта.' };
+        if (!rankings || rankings.length === 0) return { success: false, message: 'Нет данных.' };
 
-        const headers = ['Место', 'Игрок', 'Никнейм', 'Очки (Всего)', 'Основные', 'Бонусы', 'Матчи', 'Победы', 'AVG', 'Hi-Out'];
+        const headers = ['Место', 'Игрок', 'Никнейм', 'Очки', 'AVG'];
         const csvRows = rankings.map(p => [
             p.rank,
             p.name,
             p.nickname,
             p.points,
-            p.basePoints,
-            p.bonusPoints,
-            p.matchesPlayed,
-            p.wins,
-            p.avg.toFixed(2),
-            p.hiOut
+            p.avg.toFixed(2)
         ].join(','));
 
         const csv = [headers.join(','), ...csvRows].join('\n');

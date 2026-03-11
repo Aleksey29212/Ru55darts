@@ -1,6 +1,6 @@
 /**
- * @fileOverview Конфигурация Firebase. 
- * ГАРАНТИЯ: Использование переменных окружения для безопасного развертывания на любом хостинге.
+ * @fileOverview Конфигурация Firebase с улучшенной валидацией.
+ * ГАРАНТИЯ: Приложение поймет, если используются значения-заглушки или ключи отсутствуют.
  */
 
 export const firebaseConfig = {
@@ -12,9 +12,9 @@ export const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
 };
 
-// Расширенная проверка валидности: исключаем пустые строки и значения-заглушки
+// Проверка: ключи должны быть реальными, а не стандартными заглушками
 export const isFirebaseConfigValid = 
     !!firebaseConfig.apiKey && 
-    firebaseConfig.apiKey.length > 10 && 
-    firebaseConfig.projectId !== 'project-id' &&
+    firebaseConfig.apiKey.length > 15 && 
+    !firebaseConfig.projectId.includes('project-id') &&
     firebaseConfig.projectId !== '';
