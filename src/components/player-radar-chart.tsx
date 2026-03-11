@@ -17,14 +17,20 @@ const chartConfig = {
 };
 
 const calculateAggregateStats = (player: Player) => {
+    // Расчет силы набора (AVG + 180s)
     const power = Math.min(100, (Number(player.avg) || 0) * 1.2 + (Number(player.n180s) || 0) * 2);
+    // Расчет точности финиша (Hi-Out)
     const finishing = Math.min(100, (Number(player.hiOut) || 0) / 1.7);
+    // Расчет мастерства лега (Best Leg)
     const legQuality = player.bestLeg > 0 ? (100 * 36) / (player.bestLeg - 9 + 36) : 0;
+    // НОВЫЙ ЭЛЕМЕНТ: Стабильность (Win Rate + Опыт)
+    const stability = Math.min(100, ((player.wins / (player.matchesPlayed || 1)) * 80) + Math.min(20, player.matchesPlayed * 2));
 
     return [
         { subject: 'НАБОР', value: power, fullMark: 100 },
         { subject: 'ЧЕКАУТ', value: finishing, fullMark: 100 },
         { subject: 'ЛЕГ', value: legQuality, fullMark: 100 },
+        { subject: 'СТАБИЛЬНОСТЬ', value: stability, fullMark: 100 },
     ];
 };
 

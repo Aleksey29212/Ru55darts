@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlayerRadarChart } from './player-radar-chart';
 import { PlayerRatingChart } from './player-rating-chart';
 import type { Player, PlayerTournamentHistory } from '@/lib/types';
-import { Activity, Zap, BarChart3, Target, ShieldCheck, TrendingUp, Star } from 'lucide-react';
+import { Activity, Zap, BarChart3, Target, ShieldCheck, TrendingUp, Star, ShieldAlert } from 'lucide-react';
 import { useIsClient } from '@/hooks/use-is-client';
 import { Skeleton } from './ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -41,17 +41,20 @@ export function PlayerVisualizations({ player, tournaments, viewMode }: PlayerVi
     return <Skeleton className="h-[500px] w-full rounded-[2.5rem]" />;
   }
 
-  // Расчет общего уровня мастерства (Skill Level)
+  // Расчет параметров навыков
   const power = Math.min(100, (Number(player.avg) || 0) * 1.2 + (Number(player.n180s) || 0) * 2);
   const finishing = Math.min(100, (Number(player.hiOut) || 0) / 1.7);
   const legQuality = player.bestLeg > 0 ? (100 * 36) / (player.bestLeg - 9 + 36) : 0;
-  const overallSkill = Math.round((power + finishing + legQuality) / 3);
+  const stability = Math.min(100, ((player.wins / (player.matchesPlayed || 1)) * 80) + Math.min(20, player.matchesPlayed * 2));
+  
+  const overallSkill = Math.round((power + finishing + legQuality + stability) / 4);
 
   // Определение архетипа
   let archetype = "Универсал";
-  if (power > finishing + 15) archetype = "Снайпер (Power)";
-  else if (finishing > power + 15) archetype = "Финишер (Clutch)";
-  else if (legQuality > 80) archetype = "Гроссмейстер";
+  if (stability > 80 && power > 70) archetype = "Несокрушимый (Tank)";
+  else if (power > finishing + 20) archetype = "Снайпер (Power)";
+  else if (finishing > power + 20) archetype = "Финишер (Clutch)";
+  else if (legQuality > 85) archetype = "Гроссмейстер";
 
   return (
     <Card className="glassmorphism overflow-hidden rounded-[2.5rem] border-white/10 shadow-4xl">
@@ -128,6 +131,12 @@ export function PlayerVisualizations({ player, tournaments, viewMode }: PlayerVi
                         label="Мастерство лега" 
                         value={`${Math.round(legQuality)}/100`}
                         description="Стабильность и скорость прохождения дистанции (на основе лучшего лега)." 
+                    />
+                    <AnalysisMetric 
+                        icon={ShieldAlert} 
+                        label="Стабильность" 
+                        value={`${Math.round(stability)}/100`}
+                        description="Уровень опасности игрока: как часто он подтверждает свой класс в плей-офф." 
                     />
                 </div>
               </div>

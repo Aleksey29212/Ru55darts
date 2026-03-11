@@ -42,19 +42,22 @@ const StatItem = ({
     const [isRevealed, setIsRevealed] = useState(false);
     const valueString = String(value);
     const len = valueString.length;
+    const hasDecimal = valueString.includes('.') || valueString.includes(',');
     
-    // ПРЕДЕЛЬНАЯ АДАПТАЦИЯ: Динамический выбор размера шрифта на основе длины строки
-    let fontSizeClass = "text-3xl sm:text-4xl md:text-5xl lg:text-6xl"; // Стандарт
+    // УЛЬТРА-АДАПТАЦИЯ: Динамический подбор размера для предотвращения вылета за рамку
+    let fontSizeClass = "text-4xl sm:text-5xl lg:text-6xl"; 
     
-    if (len >= 5) {
-        fontSizeClass = "text-xl sm:text-2xl md:text-3xl lg:text-4xl"; // Очень длинные (AVG 60.15)
+    if (hasDecimal && len >= 4) {
+        fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl"; // Для AVG типа 60.15
+    } else if (len >= 5) {
+        fontSizeClass = "text-xl sm:text-2xl lg:text-3xl"; // Очень длинные бонусы
     } else if (len >= 4) {
-        fontSizeClass = "text-2xl sm:text-3xl md:text-4xl lg:text-5xl"; // Длинные (100%, +120)
+        fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl"; // 100%, +120
     } else if (len >= 3) {
-        fontSizeClass = "text-3xl sm:text-4xl md:text-4xl lg:text-5xl"; // Средние (125, 54.2)
+        fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; // 125, 54.2
     }
     
-    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-5 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[140px] sm:min-h-[165px] cursor-pointer active:scale-95 select-none overflow-hidden";
+    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-5 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[145px] sm:min-h-[175px] cursor-pointer active:scale-95 select-none overflow-hidden";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5",
@@ -62,7 +65,7 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 animate-in fade-in zoom-in-95 px-0.5",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 animate-in fade-in zoom-in-95 px-1",
         fontSizeClass,
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : ''
@@ -89,7 +92,7 @@ const StatItem = ({
                                 className="cursor-help p-1 -m-1 hover:text-primary transition-all active:scale-90 shrink-0"
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <Info className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 text-primary/60 hover:text-primary animate-pulse" />
+                                <Info className="h-3 w-3 sm:h-4 sm:w-4 text-primary/60 hover:text-primary animate-pulse" />
                             </div>
                         </TooltipTrigger>
                         <TooltipContent 
@@ -116,7 +119,7 @@ const StatItem = ({
                 ) : (
                     <div className="flex flex-col items-center gap-2 animate-in fade-in duration-500">
                         <div className="p-2.5 sm:p-3 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform">
-                            <Lock className="h-5 w-5 sm:h-7 sm:w-7 text-primary opacity-60 group-hover:opacity-100" />
+                            <Lock className="h-6 w-6 sm:h-8 sm:w-8 text-primary opacity-60 group-hover:opacity-100" />
                         </div>
                         <span className="text-[6px] sm:text-[7px] font-black uppercase tracking-widest text-primary/40 group-hover:text-primary/60">ОТКРЫТЬ</span>
                     </div>
@@ -125,7 +128,7 @@ const StatItem = ({
 
             <div className="w-full mt-auto">
                 <div className="h-px w-full bg-white/10 mb-1.5 sm:mb-2" />
-                <p className="text-[7px] sm:text-[9px] font-black uppercase text-primary/70 tracking-tighter text-center leading-tight break-words px-1">
+                <p className="text-[7px] sm:text-[9px] font-black uppercase text-primary/70 tracking-tight text-center leading-tight break-words px-1">
                     {caption || "СТАТ"}
                 </p>
             </div>
