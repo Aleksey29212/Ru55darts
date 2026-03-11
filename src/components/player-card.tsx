@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
-import { Save, Edit, X, Info, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Eye, EyeOff, Lock, Handshake, ExternalLink } from 'lucide-react';
+import { Save, Edit, X, Info, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Handshake, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { TemplateId } from './template-switcher';
 import { cn } from '@/lib/utils';
@@ -25,7 +25,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ScoringHelpDialog } from './scoring-help-dialog';
 
 /**
- * @fileOverview Личная карточка игрока (Дизайнерская версия v2.7).
+ * @fileOverview Личная карточка игрока (Дизайнерская версия v2.8).
+ * Оптимизирована читаемость всех блоков статистики.
  */
 
 const StatItem = ({ 
@@ -35,8 +36,6 @@ const StatItem = ({
     template = 'classic', 
     description,
     caption,
-    interactive = false,
-    forcedReveal = false
 }: { 
     label: string; 
     value: string | number; 
@@ -44,13 +43,8 @@ const StatItem = ({
     template?: TemplateId, 
     description?: string,
     caption?: string,
-    interactive?: boolean,
-    forcedReveal?: boolean
 }) => {
-    const [localReveal, setLocalReveal] = useState(false);
-    const isRevealed = !interactive || forcedReveal || localReveal;
-    
-    const baseClasses = "flex flex-col items-center justify-center p-4 rounded-[2rem] gap-1 min-h-[120px] transition-all border border-transparent interactive-scale overflow-hidden shadow-2xl relative w-full";
+    const baseClasses = "flex flex-col items-center justify-center p-4 rounded-[2rem] gap-1 min-h-[130px] transition-all border border-transparent interactive-scale overflow-hidden shadow-xl relative w-full";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
@@ -58,10 +52,9 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "text-2xl sm:text-3xl font-headline tracking-tight leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap px-1",
+        "text-2xl sm:text-4xl font-headline tracking-tight leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap px-1",
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
-        template === 'dynamic' ? 'text-accent text-glow-accent' : '',
-        !isRevealed && "blur-2xl scale-75 opacity-0"
+        template === 'dynamic' ? 'text-accent text-glow-accent' : ''
     );
     
     return (
@@ -69,12 +62,10 @@ const StatItem = ({
             <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
                     <div 
-                        onClick={() => interactive && !isRevealed && setLocalReveal(true)}
                         className={cn(
                             "cursor-help group", 
                             baseClasses, 
-                            templateClasses[template],
-                            interactive && !isRevealed && "cursor-pointer hover:bg-primary/20 hover:border-primary/50"
+                            templateClasses[template]
                         )}
                     >
                         <p className="text-[10px] font-black text-muted-foreground/80 flex items-center justify-center gap-2 text-center uppercase tracking-[0.15em] font-body leading-none mb-2 px-2">
@@ -85,18 +76,9 @@ const StatItem = ({
                         <div className="relative w-full flex flex-col items-center justify-center">
                             <p className={valueClasses}>{value}</p>
                             
-                            {isRevealed && (
-                                <p className="text-[9px] font-black uppercase text-primary/60 tracking-widest mt-2 text-center line-clamp-1 opacity-80 group-hover:text-primary transition-colors">
-                                    {caption || "СТАТИСТИКА"}
-                                </p>
-                            )}
-
-                            {interactive && !isRevealed && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center animate-in fade-in duration-700">
-                                    <Lock className="h-5 w-5 text-primary/30 mb-1 animate-bounce" />
-                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/50">ОТКРЫТЬ</span>
-                                </div>
-                            )}
+                            <p className="text-[9px] font-black uppercase text-primary/60 tracking-widest mt-2 text-center line-clamp-1 opacity-80 group-hover:text-primary transition-colors">
+                                {caption || "СТАТИСТИКА"}
+                            </p>
                         </div>
                     </div>
                 </TooltipTrigger>
@@ -137,7 +119,6 @@ export function PlayerCard({
   const [isEditing, setIsEditing] = useState(false);
   const [editablePlayer, setEditablePlayer] = useState<PlayerProfile>(player);
   const [isFormDirty, setIsFormDirty] = useState(false);
-  const [revealAll, setAreAllStatsRevealed] = useState(false);
   const { toast } = useToast();
   const isClient = useIsClient();
 
@@ -334,15 +315,6 @@ export function PlayerCard({
                             <h3 className="text-[12px] md:text-lg font-headline uppercase tracking-[0.4em] text-white/60">БИОГРАФИЯ</h3>
                         </div>
                         <div className="flex items-center gap-4">
-                            <Button 
-                                onClick={() => setAreAllStatsRevealed(!revealAll)}
-                                variant="outline" 
-                                size="sm" 
-                                className="rounded-2xl h-12 px-6 gap-3 border-primary/30 text-primary hover:bg-primary/20 text-[11px] font-black uppercase tracking-widest"
-                            >
-                                {revealAll ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                {revealAll ? 'СКРЫТЬ ДАННЫЕ' : 'ПОКАЗАТЬ ВСЁ'}
-                            </Button>
                             <ScoringHelpDialog settings={scoringSettings} leagueName={leagueNames} sponsorshipSettings={{ groupVkLink: 'https://vk.com/dartbrig' } as any}>
                                 <Button variant="ghost" size="sm" className="hidden sm:flex gap-4 rounded-2xl h-12 px-6 text-[11px] md:text-sm uppercase font-black tracking-widest hover:bg-primary/20 text-primary border-2 border-primary/20">
                                     <ShieldCheck className="h-6 w-6" />
@@ -434,7 +406,7 @@ export function PlayerCard({
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 lg:gap-20">
-                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[350px] hover:border-primary/30 transition-all duration-500">
+                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[380px] hover:border-primary/30 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
                             <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
                                 <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -447,8 +419,6 @@ export function PlayerCard({
                                     name="basePoints" 
                                     value={player.basePoints} 
                                     caption="ЗА МЕСТА"
-                                    interactive={!revealAll} 
-                                    forcedReveal={revealAll} 
                                     description="Очки, начисленные строго за итоговую позицию в турнирах." 
                                 />
                                 <StatItem 
@@ -457,14 +427,12 @@ export function PlayerCard({
                                     name="bonusPoints" 
                                     value={`+${player.bonusPoints}`} 
                                     caption="ЗА СТАТИСТИКУ"
-                                    interactive={!revealAll} 
-                                    forcedReveal={revealAll} 
                                     description="Дополнительные очки за 180, высокие чекауты и средний набор." 
                                 />
                             </div>
                         </div>
 
-                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[350px] hover:border-accent/30 transition-all duration-500">
+                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[380px] hover:border-accent/30 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
                             <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
                                 <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
@@ -477,18 +445,14 @@ export function PlayerCard({
                                     name="avg" 
                                     value={(Number(player.avg) || 0).toFixed(1)} 
                                     caption="НАБОР"
-                                    interactive={!revealAll} 
-                                    forcedReveal={revealAll} 
                                     description="Средний балл за 3 дротика на протяжении карьеры." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="180-ки" 
+                                    label="180-КИ" 
                                     name="n180s" 
                                     value={player.n180s} 
                                     caption="МАКСИМУМЫ"
-                                    interactive={!revealAll} 
-                                    forcedReveal={revealAll} 
                                     description="Общее количество идеальных подходов по 180 очков." 
                                 />
                                 <StatItem 
@@ -497,8 +461,6 @@ export function PlayerCard({
                                     name="hiOut" 
                                     value={Number(player.hiOut) || 0} 
                                     caption="ФИНИШ"
-                                    interactive={!revealAll} 
-                                    forcedReveal={revealAll} 
                                     description="Самое высокое закрытие лега в официальных матчах." 
                                 />
                             </div>
