@@ -1,3 +1,4 @@
+
 'use client';
 
 import { ImportForm } from "@/components/import-form";
@@ -8,8 +9,8 @@ import type { LeagueId, AllLeagueSettings, League, Tournament } from "@/lib/type
 import { Skeleton } from "@/components/ui/skeleton";
 import { Info, History } from "lucide-react";
 import { TournamentManagement } from "../tournaments/tournament-management";
+import defaultLeagueSettings from '@/lib/league-settings.json';
 
-// Move Evening Omsk to be more prominent in the admin list as well
 const LEAGUE_IDS: LeagueId[] = ['general', 'evening_omsk', 'premier', 'first', 'cricket', 'second', 'third', 'fourth', 'senior', 'youth', 'women'];
 
 export default function ImportAdminPage() {
@@ -21,14 +22,17 @@ export default function ImportAdminPage() {
     const tournamentsQuery = useMemoFirebase(() => db ? collection(db, 'tournaments') : null, [db]);
     const { data: tournaments, isLoading: isLoadingTournaments } = useCollection<Tournament>(tournamentsQuery);
 
-    const leagueSettings = leagueSettingsData || {};
-
-    const leagues: League[] = LEAGUE_IDS.map(key => ({
-        id: key,
-        name: leagueSettings[key]?.name || key,
-        enabled: leagueSettings[key]?.enabled ?? false,
-        includeInGeneralRanking: (leagueSettings[key] as any)?.includeInGeneralRanking ?? false
-    }));
+    // Умное слияние: приоритет БД, иначе JSON, иначе ID (fallback)
+    const leagues: League[] = LEAGUE_IDS.map(key => {
+        const fromDb = leagueSettingsData?.[key];
+        const fromJson = (defaultLeagueSettings as any)[key];
+        return {
+            id: key,
+            name: fromDb?.name || fromJson?.name || key,
+            enabled: fromDb?.enabled ?? fromJson?.enabled ?? false,
+            includeInGeneralRanking: (fromDb as any)?.includeInGeneralRanking ?? fromJson?.includeInGeneralRanking ?? false
+        };
+    });
 
     const isLoading = isLoadingLeagues || isLoadingTournaments;
 

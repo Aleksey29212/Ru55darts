@@ -1,3 +1,4 @@
+
 {
   "general": {
     "name": "Глобальный рейтинг",
@@ -11,47 +12,47 @@
   },
   "premier": {
     "name": "Премьер-лига",
-    "enabled": false,
+    "enabled": true,
     "includeInGeneralRanking": true
   },
   "first": {
     "name": "Первая лига",
-    "enabled": false,
+    "enabled": true,
     "includeInGeneralRanking": true
   },
   "cricket": {
     "name": "Крикет",
-    "enabled": false,
+    "enabled": true,
     "includeInGeneralRanking": true
   },
   "second": {
     "name": "Вторая лига",
-    "enabled": false,
+    "enabled": true,
     "includeInGeneralRanking": true
   },
   "third": {
     "name": "Третья лига",
-    "enabled": false,
+    "enabled": true,
     "includeInGeneralRanking": true
   },
   "fourth": {
     "name": "Четвертая лига",
-    "enabled": false,
+    "enabled": true,
     "includeInGeneralRanking": true
   },
   "senior": {
     "name": "Ветераны",
-    "enabled": false,
+    "enabled": true,
     "includeInGeneralRanking": true
   },
   "youth": {
     "name": "Молодежь",
-    "enabled": false,
+    "enabled": true,
     "includeInGeneralRanking": true
   },
   "women": {
     "name": "Женщины",
-    "enabled": false,
+    "enabled": true,
     "includeInGeneralRanking": true
   }
 }

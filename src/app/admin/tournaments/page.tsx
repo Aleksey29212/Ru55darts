@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,9 @@ import type { LeagueId, Tournament, AllLeagueSettings, League } from "@/lib/type
 import { useCollection, useDoc, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection, doc } from "firebase/firestore";
 import { Skeleton } from "@/components/ui/skeleton";
+import defaultLeagueSettings from '@/lib/league-settings.json';
+
+const LEAGUE_IDS: LeagueId[] = ['general', 'evening_omsk', 'premier', 'first', 'cricket', 'second', 'third', 'fourth', 'senior', 'youth', 'women'];
 
 export default function TournamentsAdminPage() {
     const db = useFirestore();
@@ -17,16 +21,16 @@ export default function TournamentsAdminPage() {
     const leagueSettingsRef = useMemoFirebase(() => db ? doc(db, 'app_settings', 'leagues') : null, [db]);
     const { data: leagueSettingsData, isLoading: isLoadingLeagues } = useDoc<AllLeagueSettings>(leagueSettingsRef);
 
-    const leagueSettings = leagueSettingsData || {
-        general: { enabled: true, name: 'Общий рейтинг' },
-    };
-
-    const leagues: League[] = (Object.keys(leagueSettings) as LeagueId[]).map(key => ({
-        id: key,
-        name: leagueSettings[key].name,
-        enabled: leagueSettings[key].enabled,
-        includeInGeneralRanking: (leagueSettings[key] as any).includeInGeneralRanking ?? false
-    }));
+    const leagues: League[] = LEAGUE_IDS.map(key => {
+        const fromDb = leagueSettingsData?.[key];
+        const fromJson = (defaultLeagueSettings as any)[key];
+        return {
+            id: key,
+            name: fromDb?.name || fromJson?.name || key,
+            enabled: fromDb?.enabled ?? fromJson?.enabled ?? false,
+            includeInGeneralRanking: (fromDb as any)?.includeInGeneralRanking ?? fromJson?.includeInGeneralRanking ?? false
+        };
+    });
 
     const isLoading = isLoadingTournaments || isLoadingLeagues;
 
