@@ -107,22 +107,36 @@ function PartnerCard({ partner, variant }: { partner: Partner; variant: 'default
     );
 }
 
-function RecruitmentCard({ variant }: { variant: 'default' | 'compact' }) {
+function RecruitmentCard({ variant, isStatic = false }: { variant: 'default' | 'compact', isStatic?: boolean }) {
     const isCompact = variant === 'compact';
     const containerClasses = isCompact ? 'h-20 w-36' : 'h-40 w-40';
 
     return (
-        <Link href="/partners" className="group block shrink-0">
+        <Link href="/partners" className={cn("group block shrink-0", isStatic && "relative z-30")}>
             <div className={cn(
-                "relative rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all duration-300 flex flex-col items-center justify-center text-center p-2 group-hover:border-primary group-hover:scale-105",
+                "relative rounded-lg border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center text-center p-2 group-hover:scale-105",
+                isStatic 
+                    ? "border-primary bg-primary/10 shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" 
+                    : "border-primary/30 bg-primary/5 hover:border-primary group-hover:bg-primary/10",
                 containerClasses
             )}>
-                <PlusCircle className="text-primary h-5 w-5 mb-1 opacity-50 group-hover:opacity-100 transition-opacity" />
+                <PlusCircle className={cn(
+                    "text-primary h-5 w-5 mb-1 transition-opacity",
+                    isStatic ? "opacity-100 animate-pulse" : "opacity-50 group-hover:opacity-100"
+                )} />
                 <p className={cn(
-                    "font-bold text-primary opacity-70 group-hover:opacity-100",
+                    "font-bold text-primary",
+                    isStatic ? "opacity-100" : "opacity-70 group-hover:opacity-100",
                     isCompact ? 'text-[9px]' : 'text-xs'
                 )}>СТАТЬ ПАРТНЕРОМ</p>
                 <p className="text-[7px] text-muted-foreground mt-0.5 uppercase tracking-tighter">Ваш логотип здесь</p>
+                
+                {isStatic && (
+                    <div className="absolute -top-1.5 -right-1.5 flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                    </div>
+                )}
             </div>
         </Link>
     );
@@ -162,7 +176,7 @@ export function PartnersDisplay({
         );
     }
 
-    // Дублируем партнеров для бесконечного цикла, даже если их мало
+    // Подготовка элементов для бесконечного цикла
     const items = [...partners];
     const tickerItems = items.length > 0 
         ? [...items, ...items, ...items, ...items, ...items, ...items] 
@@ -177,24 +191,30 @@ export function PartnersDisplay({
                 </div>
             )}
             
-            <div className="relative group/ticker w-full">
-                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none" />
-                <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none" />
+            <div className="flex items-center gap-4 relative">
+                {/* СТАТИЧНАЯ КАРТОЧКА РЕКРУТИНГА - ВСЕГДА ВИДИМА */}
+                <RecruitmentCard variant={variant} isStatic />
 
-                <div 
-                    className="flex gap-6 animate-ticker hover:[animation-play-state:paused] transition-[animation-play-state] w-max"
-                    style={{ animationDuration: '40s' }}
-                >
-                    {tickerItems.map((partner, index) => (
-                        <PartnerCard 
-                            key={`${partner.id}-${index}`} 
-                            partner={partner} 
-                            variant={variant} 
-                        />
-                    ))}
-                    <RecruitmentCard variant={variant} />
-                    {/* Добавляем еще одну карточку рекрутинга для баланса в начале/конце */}
-                    {tickerItems.length > 0 && <RecruitmentCard variant={variant} />}
+                {/* БЕГУЩАЯ СТРОКА ПАРТНЕРОВ */}
+                <div className="relative group/ticker flex-1 overflow-hidden">
+                    {/* Градиенты для мягкого перехода */}
+                    <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+                    <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+
+                    <div 
+                        className="flex gap-6 animate-ticker hover:[animation-play-state:paused] transition-[animation-play-state] w-max py-2"
+                        style={{ animationDuration: '40s' }}
+                    >
+                        {tickerItems.map((partner, index) => (
+                            <PartnerCard 
+                                key={`${partner.id}-${index}`} 
+                                partner={partner} 
+                                variant={variant} 
+                            />
+                        ))}
+                        {/* Если партнеров нет, показываем вторую карточку рекрутинга в ленте */}
+                        {tickerItems.length === 0 && <RecruitmentCard variant={variant} />}
+                    </div>
                 </div>
             </div>
         </div>
