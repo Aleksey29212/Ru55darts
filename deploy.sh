@@ -24,6 +24,7 @@ if [[ $CHECK_GIT == *"empty"* ]] || [[ $CHECK_GIT == *"fatal"* ]] || [ ! -d .git
   # Пытаемся сохранить URL удаленного репозитория
   REMOTE_URL=$(git remote get-url origin 2>/dev/null)
   if [ -z "$REMOTE_URL" ]; then
+    # Если не удалось найти, используем ваш репозиторий по умолчанию
     REMOTE_URL="https://github.com/Aleksey29212/Ru55darts.git"
   fi
 
@@ -45,7 +46,7 @@ echo -e "${GREEN}📦 Подготовка файлов к отправке...${
 git add .
 
 echo -e "${GREEN}💾 Сохранение изменений...${NC}"
-git commit -m "Auto-Update: Stable build for Timeweb Cloud Deployment" --quiet
+git commit -m "Auto-Update: Stable build for deployment" --quiet
 
 # 3. Отправка кода
 echo -e "${YELLOW}📤 Отправка в GitHub (Принудительно)...${NC}"
@@ -53,7 +54,7 @@ echo -e "${RED}ВНИМАНИЕ: Если GitHub запросит пароль, 
 
 if git push -u origin main --force; then
   echo -e "\n${GREEN}🎉 ПРОЕКТ УСПЕШНО ОТПРАВЛЕН В GITHUB!${NC}"
-  echo -e "${YELLOW}👉 Теперь обновите переменные окружения на сервере или в Timeweb.${NC}"
+  echo -e "${YELLOW}👉 Теперь ваш сайт на хостинге обновится автоматически.${NC}"
 else
   echo -e "\n${RED}❌ Ошибка доступа. Возможно, нужно обновить Personal Access Token на GitHub.${NC}"
   echo -e "${YELLOW}Инструкция: Настройки GitHub -> Developer Settings -> Tokens (classic)${NC}"
