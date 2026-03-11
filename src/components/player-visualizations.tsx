@@ -60,7 +60,7 @@ export function PlayerVisualizations({ player, tournaments, viewMode }: PlayerVi
                   <div className="grid grid-cols-1 gap-1 text-[10px] leading-tight">
                     <div className="flex justify-between border-b border-primary/10 pb-1">
                       <span className="text-muted-foreground">Набор:</span>
-                      <span className="text-foreground">AVG + 180</span>
+                      <span className="text-foreground">AVG + 180-ки</span>
                     </div>
                     <div className="flex justify-between border-b border-primary/10 pb-1">
                       <span className="text-muted-foreground">Успешность:</span>
@@ -82,8 +82,8 @@ export function PlayerVisualizations({ player, tournaments, viewMode }: PlayerVi
                 <PlayerRatingChart tournaments={tournaments} hideHeader />
               </div>
             ) : (
-              <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm italic">
-                Недостаточно данных для графика
+              <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm italic text-center px-4">
+                Недостаточно данных для построения графика прогресса
               </div>
             )}
           </TabsContent>

@@ -25,8 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ScoringHelpDialog } from './scoring-help-dialog';
 
 /**
- * @fileOverview Личная карточка игрока.
- * ГАРАНТИЯ: Улучшенная читаемость и доступность блока спонсорства.
+ * @fileOverview Личная карточка игрока (Локализованная версия).
  */
 
 const StatItem = ({ 
@@ -51,7 +50,7 @@ const StatItem = ({
     const [localReveal, setLocalReveal] = useState(false);
     const isRevealed = !interactive || forcedReveal || localReveal;
     
-    const baseClasses = "flex flex-col items-center justify-center p-4 rounded-[2rem] gap-1 min-h-[110px] transition-all border border-transparent interactive-scale overflow-hidden shadow-2xl relative w-full";
+    const baseClasses = "flex flex-col items-center justify-center p-4 rounded-[2rem] gap-1 min-h-[120px] transition-all border border-transparent interactive-scale overflow-hidden shadow-2xl relative w-full";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
@@ -59,7 +58,7 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "text-2xl sm:text-3xl lg:text-4xl font-headline tracking-tight leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap px-1",
+        "text-2xl sm:text-3xl font-headline tracking-tight leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap px-1",
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : '',
         !isRevealed && "blur-2xl scale-75 opacity-0"
@@ -78,24 +77,24 @@ const StatItem = ({
                             interactive && !isRevealed && "cursor-pointer hover:bg-primary/20 hover:border-primary/50"
                         )}
                     >
-                        <p className="text-[9px] md:text-[10px] font-black text-muted-foreground/80 flex items-center justify-center gap-2 text-center uppercase tracking-[0.2em] font-body leading-none mb-2">
+                        <p className="text-[10px] font-black text-muted-foreground/80 flex items-center justify-center gap-2 text-center uppercase tracking-[0.15em] font-body leading-none mb-2 px-2">
                             {label}
-                            <Info className="h-3 sm:h-3.5 shrink-0 opacity-40 text-primary group-hover:opacity-100 transition-opacity" />
+                            <Info className="h-3 shrink-0 opacity-40 text-primary group-hover:opacity-100 transition-opacity" />
                         </p>
                         
                         <div className="relative w-full flex flex-col items-center justify-center">
                             <p className={valueClasses}>{value}</p>
                             
                             {isRevealed && (
-                                <p className="text-[8px] md:text-[9px] font-black uppercase text-primary/60 tracking-widest mt-2 text-center line-clamp-1 opacity-80 group-hover:text-primary transition-colors">
-                                    {caption || "STATISTICS"}
+                                <p className="text-[9px] font-black uppercase text-primary/60 tracking-widest mt-2 text-center line-clamp-1 opacity-80 group-hover:text-primary transition-colors">
+                                    {caption || "СТАТИСТИКА"}
                                 </p>
                             )}
 
                             {interactive && !isRevealed && (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center animate-in fade-in duration-700">
                                     <Lock className="h-5 w-5 text-primary/30 mb-1 animate-bounce" />
-                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/50">UNFOLD</span>
+                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/50">ОТКРЫТЬ</span>
                                 </div>
                             )}
                         </div>
@@ -104,7 +103,7 @@ const StatItem = ({
                 <TooltipContent side="top" className="max-w-[280px] text-center p-5 glassmorphism border-primary/50 z-[100] shadow-[0_20px_80px_rgba(0,0,0,0.8)] rounded-[1.5rem]">
                     <div className="space-y-3">
                         <p className="text-[11px] font-headline text-primary uppercase tracking-[0.2em] mb-1">{label}</p>
-                        <p className="text-sm leading-relaxed font-bold text-white/90">{description || "Professional performance metrics."}</p>
+                        <p className="text-sm leading-relaxed font-bold text-white/90">{description || "Профессиональные метрики игрока."}</p>
                     </div>
                 </TooltipContent>
             </Tooltip>
@@ -155,7 +154,7 @@ export function PlayerCard({
   const handleSave = async () => {
     if (!db) return;
     updatePlayerProfile(db, editablePlayer);
-    toast({ title: 'System Update', description: `Player profile synced successfully.` });
+    toast({ title: 'Система обновлена', description: `Профиль игрока успешно сохранен.` });
     setIsFormDirty(false);
     setIsEditing(false);
   }
@@ -165,7 +164,6 @@ export function PlayerCard({
   const winRate = player.matchesPlayed > 0 ? `${((player.wins / player.matchesPlayed) * 100).toFixed(0)}%` : '0%';
   const hasOmskStats = player.cashValue && player.cashValue > 0;
 
-  // Спонсорские данные
   const hasSponsors = player.sponsors && player.sponsors.length > 0;
   const showCTA = !hasSponsors && showSponsorshipCallToActionGlobal && player.showSponsorshipCallToAction !== false;
 
@@ -225,7 +223,7 @@ export function PlayerCard({
                         {player.isQualifiedForFinal && (
                             <Badge className="bg-orange-600 text-white font-black uppercase tracking-[0.3em] animate-pulse shadow-[0_0_40px_rgba(234,88,12,0.5)] py-2.5 px-8 text-[11px] md:text-[14px] border-2 border-orange-400/50">
                                 <Award className="h-5 w-5 mr-3" />
-                                QUALIFIED
+                                В ФИНАЛЕ
                             </Badge>
                         )}
                     </div>
@@ -237,7 +235,7 @@ export function PlayerCard({
                     "flex flex-col items-center justify-center min-w-[110px] md:min-w-[150px] p-6 md:p-8 rounded-[2.5rem] md:rounded-[3.5rem] backdrop-blur-3xl border-2 shadow-[0_20px_60px_rgba(0,0,0,0.6)] transition-all hover:scale-110 duration-500",
                     template === 'dynamic' ? 'bg-accent/50 border-accent/60 text-accent' : 'bg-primary/50 border-primary/60 text-primary-foreground'
                 )}>
-                    <span className="text-[11px] md:text-[14px] font-black uppercase tracking-[0.3em] opacity-80 mb-2">RANK</span>
+                    <span className="text-[11px] md:text-[14px] font-black uppercase tracking-[0.3em] opacity-80 mb-2">МЕСТО</span>
                     <span className="text-4xl md:text-7xl font-headline leading-none drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
                         {currentPlayerData.rank > 0 ? `#${currentPlayerData.rank}` : '—'}
                     </span>
@@ -253,11 +251,11 @@ export function PlayerCard({
              {isClient && isAdmin && (
                 <div className="mb-14 md:mb-20 p-8 md:p-12 rounded-[3rem] border-2 border-primary/40 bg-primary/10 flex flex-col sm:flex-row items-center justify-between gap-10 shadow-3xl">
                     <div className="text-center sm:text-left">
-                        <h4 className="font-headline text-2xl md:text-4xl text-primary tracking-tighter uppercase">ADMIN STUDIO</h4>
-                        <p className="text-[12px] text-muted-foreground uppercase tracking-[0.4em] font-black opacity-60 mt-2">CONFIGURE PRO PROFILE & BIOGRAPHY</p>
+                        <h4 className="font-headline text-2xl md:text-4xl text-primary tracking-tighter uppercase">АДМИН-СТУДИЯ</h4>
+                        <p className="text-[12px] text-muted-foreground uppercase tracking-[0.4em] font-black opacity-60 mt-2">НАСТРОЙКА ПРОФИЛЯ И БИОГРАФИИ</p>
                     </div>
                     <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "destructive" : "default"} size="lg" className="w-full sm:w-auto rounded-[1.5rem] h-16 px-10 shadow-[0_20px_50px_rgba(var(--primary-rgb),0.4)] font-black text-lg uppercase tracking-widest transition-all">
-                        {isEditing ? <><X className="mr-3 h-7 w-7" /> CANCEL</> : <><Edit className="mr-3 h-7 w-7" /> EDIT PROFILE</>}
+                        {isEditing ? <><X className="mr-3 h-7 w-7" /> ОТМЕНА</> : <><Edit className="mr-3 h-7 w-7" /> ИЗМЕНИТЬ</>}
                     </Button>
                 </div>
              )}
@@ -266,20 +264,20 @@ export function PlayerCard({
                 <div className="mb-20 space-y-10 md:space-y-14 p-10 md:p-16 border-2 border-primary/50 rounded-[3.5rem] glassmorphism shadow-4xl animate-in zoom-in-95 duration-700">
                     <div className="grid md:grid-cols-2 gap-10 md:gap-16">
                         <div className="space-y-5">
-                            <Label className="text-[12px] md:text-[14px] uppercase font-black tracking-[0.3em] text-primary ml-2">PRO NICKNAME</Label>
+                            <Label className="text-[12px] md:text-[14px] uppercase font-black tracking-[0.3em] text-primary ml-2">ПРО-НИКНЕЙМ</Label>
                             <Input name="nickname" value={editablePlayer.nickname} onChange={handleInputChange} className="rounded-2xl bg-black/50 h-16 text-xl border-white/10 px-6 font-bold" />
                         </div>
                         <div className="space-y-5">
-                            <Label className="text-[12px] md:text-[14px] uppercase font-black tracking-[0.3em] text-primary ml-2">ARENA BACKGROUND</Label>
+                            <Label className="text-[12px] md:text-[14px] uppercase font-black tracking-[0.3em] text-primary ml-2">ФОН КАРТОЧКИ</Label>
                             <Select
                                 value={editablePlayer.backgroundUrl || ''}
                                 onValueChange={(value) => { setEditablePlayer(prev => ({ ...prev, backgroundUrl: value })); setIsFormDirty(true); }}
                             >
                                 <SelectTrigger className="h-16 rounded-2xl bg-black/50 border-white/10 px-6 text-xl font-bold">
-                                    <SelectValue placeholder="Select Arena..." />
+                                    <SelectValue placeholder="Выберите фон..." />
                                 </SelectTrigger>
                                 <SelectContent className="max-h-[500px] rounded-3xl glassmorphism border-white/20 p-2">
-                                    <SelectItem value=" " className="rounded-xl h-12">Default Dark Theme</SelectItem>
+                                    <SelectItem value=" " className="rounded-xl h-12">Темная тема (стандарт)</SelectItem>
                                     {CardBackgrounds.map(bg => (
                                         <SelectItem key={bg.id} value={bg.url} className="rounded-xl h-16">
                                             <div className="flex items-center gap-6">
@@ -294,19 +292,19 @@ export function PlayerCard({
                     </div>
                     
                     <div className="space-y-5">
-                        <Label className="text-[12px] md:text-[14px] uppercase font-black tracking-[0.3em] text-primary ml-2">PLAYER LEGEND (STORY)</Label>
+                        <Label className="text-[12px] md:text-[14px] uppercase font-black tracking-[0.3em] text-primary ml-2">ЛЕГЕНДА ИГРОКА (БИОГРАФИЯ)</Label>
                         <Textarea name="bio" value={editablePlayer.bio} onChange={handleInputChange} rows={6} className="rounded-[2.5rem] bg-black/50 resize-none p-8 md:p-12 text-lg border-white/10 leading-relaxed font-medium" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-8 pt-8">
-                        <Button onClick={handleSave} className='flex-1 h-20 rounded-3xl shadow-[0_30px_80px_rgba(var(--primary-rgb),0.5)] font-black text-xl text-primary-foreground uppercase tracking-[0.2em]' disabled={!isFormDirty}><Save className="mr-3 h-7 w-7" />SAVE PROFILE</Button>
-                        <Button onClick={() => { setIsEditing(false); setEditablePlayer(player); }} className='flex-1 h-20 rounded-3xl text-xl font-black uppercase tracking-[0.2em]' variant="ghost"><X className="mr-3 h-7 w-7" />DISCARD</Button>
+                        <Button onClick={handleSave} className='flex-1 h-20 rounded-3xl shadow-[0_30px_80px_rgba(var(--primary-rgb),0.5)] font-black text-xl text-primary-foreground uppercase tracking-[0.2em]' disabled={!isFormDirty}><Save className="mr-3 h-7 w-7" />СОХРАНИТЬ</Button>
+                        <Button onClick={() => { setIsEditing(false); setEditablePlayer(player); }} className='flex-1 h-20 rounded-3xl text-xl font-black uppercase tracking-[0.2em]' variant="ghost"><X className="mr-3 h-7 w-7" />СБРОСИТЬ</Button>
                     </div>
                 </div>
              )}
             
             <div className="grid grid-cols-1 gap-12 md:gap-20">
-                {/* Sponsorship Block - Visible Area */}
+                {/* Sponsorship Block */}
                 {showCTA && (
                     <div className="p-8 md:p-12 rounded-[3rem] bg-primary/5 border-2 border-dashed border-primary/30 flex flex-col md:flex-row items-center justify-between gap-8 shadow-inner group/sponsorship transition-all hover:bg-primary/10">
                         <div className="flex items-center gap-6">
@@ -333,7 +331,7 @@ export function PlayerCard({
                             <div className="p-4 rounded-2xl bg-primary/20 text-primary shrink-0 shadow-2xl border border-primary/30">
                                 <Info className="h-7 w-7 md:h-9 md:w-9" />
                             </div>
-                            <h3 className="text-[12px] md:text-lg font-headline uppercase tracking-[0.4em] text-white/60">PLAYER BIO</h3>
+                            <h3 className="text-[12px] md:text-lg font-headline uppercase tracking-[0.4em] text-white/60">БИОГРАФИЯ</h3>
                         </div>
                         <div className="flex items-center gap-4">
                             <Button 
@@ -343,12 +341,12 @@ export function PlayerCard({
                                 className="rounded-2xl h-12 px-6 gap-3 border-primary/30 text-primary hover:bg-primary/20 text-[11px] font-black uppercase tracking-widest"
                             >
                                 {revealAll ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                {revealAll ? 'HIDE DATA' : 'REVEAL STATS'}
+                                {revealAll ? 'СКРЫТЬ ДАННЫЕ' : 'ПОКАЗАТЬ ВСЁ'}
                             </Button>
                             <ScoringHelpDialog settings={scoringSettings} leagueName={leagueNames} sponsorshipSettings={{ groupVkLink: 'https://vk.com/dartbrig' } as any}>
                                 <Button variant="ghost" size="sm" className="hidden sm:flex gap-4 rounded-2xl h-12 px-6 text-[11px] md:text-sm uppercase font-black tracking-widest hover:bg-primary/20 text-primary border-2 border-primary/20">
                                     <ShieldCheck className="h-6 w-6" />
-                                    RULES
+                                    ПРАВИЛА
                                 </Button>
                             </ScoringHelpDialog>
                         </div>
@@ -356,7 +354,7 @@ export function PlayerCard({
                     <div className="relative">
                         <div className="absolute -left-4 top-0 bottom-0 w-2 bg-gradient-to-b from-primary via-primary/50 to-transparent rounded-full shadow-[0_0_20px_rgba(var(--primary-rgb),0.5)]" />
                         <p className="text-lg md:text-2xl lg:text-3xl text-white/95 font-body leading-relaxed italic pl-8 md:pl-12 lg:pl-16 py-4 font-medium bg-white/[0.03] rounded-r-[3rem] shadow-inner">
-                            {currentPlayerData.bio || "This legend's story is still being written on the oche. Every match adds a new chapter to their professional career."}
+                            {currentPlayerData.bio || "История этой легенды все еще пишется на рубеже. Каждый матч добавляет новую главу в их профессиональную карьеру."}
                         </p>
                     </div>
                 </div>
@@ -371,8 +369,8 @@ export function PlayerCard({
                                 <Wallet className="h-8 w-8 md:h-12 md:w-12" />
                             </div>
                             <div>
-                                <h3 className="text-[12px] md:text-lg font-headline uppercase tracking-[0.4em] text-orange-300">EVENING OMSK</h3>
-                                <p className="text-[10px] md:text-[13px] text-muted-foreground font-black uppercase tracking-[0.3em] opacity-60 mt-1">CURRENT FINANCIAL STANDING</p>
+                                <h3 className="text-[12px] md:text-lg font-headline uppercase tracking-[0.4em] text-orange-300">ВЕЧЕРНИЙ ОМСК</h3>
+                                <p className="text-[10px] md:text-[13px] text-muted-foreground font-black uppercase tracking-[0.3em] opacity-60 mt-1">ТЕКУЩИЙ ФИНАНСОВЫЙ БАЛАНС</p>
                             </div>
                         </div>
                         <div className="flex relative z-10">
@@ -389,119 +387,119 @@ export function PlayerCard({
                             <div className="p-4 rounded-2xl bg-primary/20 text-primary shadow-2xl border border-primary/30">
                                 <TrendingUp className="h-7 w-7 md:h-9 md:w-9" />
                             </div>
-                            <h3 className="text-[12px] md:text-lg font-headline uppercase tracking-[0.4em] text-white/60">CAREER DASHBOARD</h3>
+                            <h3 className="text-[12px] md:text-lg font-headline uppercase tracking-[0.4em] text-white/60">КАРЬЕРНЫЙ ДАШБОРД</h3>
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-8 lg:gap-10">
                             <StatItem 
                                 template={template} 
-                                label="POINTS" 
+                                label="ОЧКИ" 
                                 name="points" 
                                 value={player.points} 
-                                caption="SEASON TOTAL"
-                                description="Total aggregation of ranking points earned across all active leagues." 
+                                caption="ВСЕГО В СЕЗОНЕ"
+                                description="Общее количество рейтинговых очков, заработанных во всех активных лигах." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="TOURS" 
+                                label="ТУРЫ" 
                                 name="matchesPlayed" 
                                 value={player.matchesPlayed} 
-                                caption="PARTICIPATION"
-                                description="Total number of official tournaments the player has attended." 
+                                caption="УЧАСТИЕ"
+                                description="Общее количество официальных турниров, которые посетил игрок." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="TOP-8" 
+                                label="ТОП-8" 
                                 name="wins" 
                                 value={player.wins} 
-                                caption="PLAYOFF REACH"
-                                description="Number of times the player reached the quarter-finals or higher." 
+                                caption="ПЛЕЙ-ОФФ"
+                                description="Сколько раз игрок выходил в четвертьфинал или выше." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="GROUP" 
+                                label="ГРУППА" 
                                 name="losses" 
                                 value={player.losses} 
-                                caption="EARLY EXITS"
-                                description="Tournaments where the player was eliminated during group stages." 
+                                caption="ВЫЛЕТЫ"
+                                description="Турниры, в которых игрок завершил выступление на групповой стадии." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="EFF." 
+                                label="ЭФФ." 
                                 name="winRate" 
                                 value={winRate} 
-                                caption="WIN RATIO"
-                                description="Performance coefficient: percentage of playoff appearances per tournament." 
+                                caption="КОЭФФИЦИЕНТ"
+                                description="Процент попадания в плей-офф от общего количества сыгранных турниров." 
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 lg:gap-20">
-                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[300px]">
+                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[350px]">
                             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
                             <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
                                 <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                                PERFORMANCE ANALYSIS
+                                АНАЛИЗ РЕЗУЛЬТАТОВ
                             </h3>
                             <div className="grid grid-cols-2 gap-6 md:gap-10 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
-                                    label="BASE" 
+                                    label="БАЗОВЫЕ" 
                                     name="basePoints" 
                                     value={player.basePoints} 
-                                    caption="RANK REWARDS"
+                                    caption="ЗА МЕСТА"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
-                                    description="Points awarded strictly based on final tournament position." 
+                                    description="Очки, начисленные строго за итоговую позицию в турнирах." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="BONUS" 
+                                    label="БОНУСЫ" 
                                     name="bonusPoints" 
                                     value={`+${player.bonusPoints}`} 
-                                    caption="STAT REWARDS"
+                                    caption="ЗА СТАТИСТИКУ"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
-                                    description="Extra points for 180s, high checkouts, and high averages." 
+                                    description="Дополнительные очки за 180, высокие чекауты и средний набор." 
                                 />
                             </div>
                         </div>
 
-                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[300px]">
+                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[350px]">
                             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
                             <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
                                 <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-                                PERSONAL RECORDS
+                                ЛИЧНЫЕ РЕКОРДЫ
                             </h3>
                             <div className="grid grid-cols-3 gap-4 md:gap-6 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
-                                    label="AVG" 
+                                    label="СРЕДНИЙ" 
                                     name="avg" 
                                     value={(Number(player.avg) || 0).toFixed(1)} 
-                                    caption="SCORING"
+                                    caption="НАБОР"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
-                                    description="Average score per 3 darts thrown throughout the career." 
+                                    description="Средний балл за 3 дротика на протяжении карьеры." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="180" 
+                                    label="180-ки" 
                                     name="n180s" 
                                     value={player.n180s} 
-                                    caption="MAXES"
+                                    caption="МАКСИМУМЫ"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
-                                    description="Total count of perfect 180 scores in official matches." 
+                                    description="Общее количество идеальных подходов по 180 очков." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="MAX OUT" 
+                                    label="ЧЕКАУТ" 
                                     name="hiOut" 
                                     value={Number(player.hiOut) || 0} 
-                                    caption="FINISH"
+                                    caption="ФИНИШ"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
-                                    description="Highest score successfully closed in a single leg." 
+                                    description="Самое высокое закрытие лега в официальных матчах." 
                                 />
                             </div>
                         </div>

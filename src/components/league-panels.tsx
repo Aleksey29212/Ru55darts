@@ -175,9 +175,8 @@ export function LeaguePanels({
 
     return (
         <div className="w-full space-y-14">
-            {/* Sticky Header Section combining Partners and Leagues */}
+            {/* Sticky Header Section */}
             <div className="sticky top-16 md:top-20 z-40 bg-background/95 backdrop-blur-3xl border-b-2 border-white/10 -mx-4 px-4 py-6 space-y-8 shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-all">
-                {/* Fixed Partners Ticker inside sticky area */}
                 <div className="w-full">
                     <PartnersDisplay partners={partners} variant="compact" hideLabel />
                 </div>
@@ -232,7 +231,7 @@ export function LeaguePanels({
                                                 style={{ backgroundColor: baseColor }}
                                             />
                                             <p className="text-[7px] md:text-[8px] text-white/60 font-black uppercase tracking-[0.25em]">
-                                                {isSelected ? 'ACTIVE NOW' : 'VIEW LEAGUE'}
+                                                {isSelected ? 'АКТИВНО' : 'СМОТРЕТЬ'}
                                             </p>
                                         </div>
                                     </div>

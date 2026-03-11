@@ -38,21 +38,20 @@ const getLeagueTheme = (leagueId: LeagueId = 'general') => {
     return themes[leagueId] || themes.general;
 };
 
-// Строгая конфигурация колонок CSS Grid для идеального выравнивания
 const DESKTOP_GRID_COLS = "grid-cols-[80px_1.8fr_100px_100px_100px_100px_120px_100px_140px]";
 
 function FederalHeader({ theme }: { theme: any }) {
     return (
         <div className={cn("grid gap-6 px-10 mb-6 opacity-60 select-none items-center font-headline text-[11px] uppercase tracking-[0.3em] font-black", DESKTOP_GRID_COLS)}>
-            <span className="text-center">RANK</span>
-            <span className="text-left pl-16">PRO PLAYER</span>
-            <span className="text-center">TOUR</span>
-            <span className="text-center">BASE</span>
-            <span className="text-center">180S</span>
-            <span className="text-center">MAX</span>
+            <span className="text-center">МЕСТО</span>
+            <span className="text-left pl-16">ПРО-ИГРОК</span>
+            <span className="text-center">ТУРЫ</span>
+            <span className="text-center">БАЗА</span>
+            <span className="text-center">180</span>
+            <span className="text-center">МАКС</span>
             <span className="text-center">AVG</span>
-            <span className="text-right">BONUS</span>
-            <span className="text-right pr-6">TOTAL PTS</span>
+            <span className="text-right">БОНУС</span>
+            <span className="text-right pr-6">ВСЕГО</span>
         </div>
     );
 }
@@ -195,7 +194,7 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
                                             <span className={cn("font-headline text-3xl leading-none transition-all duration-1000 text-glow", theme.text)}>
                                                 {player.points}
                                             </span>
-                                            <span className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[0.3em]">PTS</span>
+                                            <span className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[0.3em]">ОЧКОВ</span>
                                         </div>
                                     </div>
 
@@ -210,21 +209,21 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
                                 <div className="p-8 space-y-10">
                                     <div className="grid grid-cols-3 gap-4 w-full">
                                         <div className="flex flex-col items-center justify-center bg-white/[0.04] border-2 border-white/10 rounded-[2rem] py-6 px-2 shadow-inner h-full transition-all hover:bg-white/[0.08] active:scale-95 group/stat">
-                                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40 mb-3">AVG POWER</span>
+                                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40 mb-3 text-center">НАБОР AVG</span>
                                             <div className="flex flex-col items-center gap-2">
                                                 <Zap className="h-6 w-6 drop-shadow-[0_0_12px_currentColor] text-yellow-400 group-hover/stat:animate-pulse" />
                                                 <span className="font-headline font-bold text-2xl text-white tracking-tight leading-none">{(player.avg || 0).toFixed(1)}</span>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-center justify-center bg-white/[0.04] border-2 border-white/10 rounded-[2rem] py-6 px-2 shadow-inner h-full transition-all hover:bg-white/[0.08] active:scale-95 group/stat">
-                                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40 mb-3">MAX FINISH</span>
+                                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40 mb-3 text-center">ФИНИШ MAX</span>
                                             <div className="flex flex-col items-center gap-2">
                                                 <Target className="h-6 w-6 drop-shadow-[0_0_12px_currentColor] text-pink-500 group-hover/stat:animate-pulse" />
                                                 <span className="font-headline font-bold text-2xl text-white tracking-tight leading-none">{player.hiOut}</span>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-center justify-center bg-white/[0.04] border-2 border-white/10 rounded-[2rem] py-6 px-2 shadow-inner h-full transition-all hover:bg-white/[0.08] active:scale-95 group/stat">
-                                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40 mb-3">180 COUNTER</span>
+                                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40 mb-3 text-center">180-КИ</span>
                                             <div className="flex flex-col items-center gap-2">
                                                 <Star className="h-6 w-6 drop-shadow-[0_0_12px_currentColor] text-orange-500 group-hover/stat:animate-pulse" />
                                                 <span className="font-headline font-bold text-2xl text-white tracking-tight leading-none">{player.n180s}</span>
@@ -235,15 +234,15 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="flex flex-col items-center justify-center bg-white/5 border-2 border-white/5 rounded-[3rem] p-8 shadow-3xl relative overflow-hidden group/detail">
                                             <Calendar className="h-8 w-8 opacity-30 mb-4 text-muted-foreground group-hover/detail:scale-110 transition-transform" />
-                                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/50 mb-2">PARTICIPATION</span>
+                                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/50 mb-2">УЧАСТИЕ</span>
                                             <div className="flex items-baseline gap-2">
                                                 <span className="font-headline text-4xl md:text-5xl tracking-tighter text-white/80">{player.matchesPlayed}</span>
-                                                <span className="text-xs font-black uppercase text-white/30">TOURS</span>
+                                                <span className="text-xs font-black uppercase text-white/30">ТУРОВ</span>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-center justify-center bg-white/5 border-2 border-white/5 rounded-[3rem] p-8 shadow-3xl relative overflow-hidden group/detail">
                                             <Award className="h-8 w-8 opacity-30 mb-4 text-success group-hover/detail:scale-110 transition-transform" />
-                                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/50 mb-2">BONUS POINTS</span>
+                                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/50 mb-2">БОНУСЫ</span>
                                             <div className="flex items-baseline gap-2">
                                                 <span className="font-headline text-4xl md:text-5xl tracking-tighter text-success text-glow-white">+{player.bonusPoints}</span>
                                             </div>
@@ -255,7 +254,7 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
                                             <div className="flex items-center gap-6">
                                                 <div className="p-4 rounded-[1.5rem] bg-orange-500/20 shadow-2xl transition-transform group-hover/omsk:rotate-12"><Trophy className="h-8 w-8 text-orange-400" /></div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-orange-300/50 uppercase tracking-[0.3em]">CASH BALANCE</span>
+                                                    <span className="text-[11px] font-black text-orange-300/50 uppercase tracking-[0.3em]">БАЛАНС</span>
                                                     <span className="font-headline text-3xl text-orange-400 text-glow-accent">{(player.cashValue || 0).toLocaleString('ru-RU')} ₽</span>
                                                 </div>
                                             </div>
@@ -269,7 +268,7 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
                                     )} size="lg">
                                         <Link href={`/player/${player.id}?${leagueUrlParam}`}>
                                             <div className="flex items-center justify-center gap-6">
-                                                <span className="uppercase tracking-tighter">VIEW PRO CARD</span>
+                                                <span className="uppercase tracking-tighter">ПРОФИЛЬ ИГРОКА</span>
                                                 <ExternalLink className="h-8 w-8 transition-all duration-500 group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:scale-110" />
                                             </div>
                                         </Link>
