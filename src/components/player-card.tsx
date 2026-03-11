@@ -25,8 +25,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ScoringHelpDialog } from './scoring-help-dialog';
 
 /**
- * @fileOverview Личная карточка игрока (Версия v3.1 - Fixed Overlap).
- * ГАРАНТИЯ: Никакого нахлеста данных. Сетки адаптированы под любые цифры.
+ * @fileOverview Личная карточка игрока (Версия v3.2 - Perfect Readability).
+ * ГАРАНТИЯ: Идеальная читаемость справки и отсутствие нахлеста данных.
  */
 
 const StatItem = ({ 
@@ -44,18 +44,18 @@ const StatItem = ({
     description?: string,
     caption?: string,
 }) => {
-    const baseClasses = "flex flex-col items-center justify-center p-3 sm:py-5 sm:px-2 rounded-[1.5rem] gap-1 transition-all border border-transparent interactive-scale overflow-hidden shadow-xl relative w-full";
+    const isSmallStat = name === 'avg' || name === 'n180s' || name === 'hiOut';
+    
+    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-4 rounded-[1.5rem] transition-all border border-transparent shadow-xl relative w-full h-full min-h-[100px] sm:min-h-[120px]";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
         dynamic: "bg-black/80 text-white border-accent/50 shadow-[0_0_30px_rgba(var(--accent-rgb),0.2)]"
     };
 
-    const isRecordBlock = name === 'avg' || name === 'n180s' || name === 'hiOut';
-
     const valueClasses = cn(
-        "font-headline tracking-tight leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap",
-        isRecordBlock ? "text-xl sm:text-3xl md:text-4xl" : "text-2xl sm:text-4xl md:text-5xl",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap",
+        isSmallStat ? "text-2xl sm:text-3xl md:text-4xl" : "text-3xl sm:text-5xl md:text-6xl",
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : ''
     );
@@ -66,29 +66,40 @@ const StatItem = ({
                 <TooltipTrigger asChild>
                     <div 
                         className={cn(
-                            "cursor-help group", 
+                            "cursor-help group overflow-hidden", 
                             baseClasses, 
                             templateClasses[template]
                         )}
                     >
-                        <p className="text-[9px] sm:text-[10px] font-black text-muted-foreground/80 flex items-center justify-center gap-1 text-center uppercase tracking-[0.1em] font-body leading-none mb-2 px-1 w-full">
-                            <span className="truncate">{label}</span>
-                            <Info className="h-2.5 w-2.5 shrink-0 opacity-40 text-primary group-hover:opacity-100 transition-opacity" />
-                        </p>
+                        <div className="w-full flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity mb-1">
+                            <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] truncate">{label}</span>
+                            <Info className="h-2.5 w-2.5 shrink-0 text-primary" />
+                        </div>
                         
-                        <div className="relative w-full flex flex-col items-center justify-center py-1">
-                            <p className={valueClasses}>{value}</p>
+                        <div className="flex-1 flex items-center justify-center w-full overflow-hidden">
+                            <span className={valueClasses}>{value}</span>
                         </div>
 
-                        <p className="text-[8px] font-black uppercase text-primary/60 tracking-widest mt-2 text-center opacity-80 group-hover:text-primary transition-colors leading-none w-full">
-                            <span className="truncate">{caption || "СТАТ"}</span>
-                        </p>
+                        <div className="w-full mt-2">
+                            <div className="h-px w-full bg-white/5 mb-2" />
+                            <p className="text-[7px] sm:text-[9px] font-black uppercase text-primary/60 tracking-widest text-center leading-none truncate">
+                                {caption || "СТАТ"}
+                            </p>
+                        </div>
                     </div>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-[280px] text-center p-5 glassmorphism border-primary/50 z-[100] shadow-[0_20px_80px_rgba(0,0,0,0.8)] rounded-[1.5rem]">
+                <TooltipContent 
+                    side="top" 
+                    className="max-w-[300px] p-6 glassmorphism border-primary/50 z-[100] shadow-[0_30px_100px_rgba(0,0,0,0.9)] rounded-[2rem] bg-black/95 backdrop-blur-3xl animate-in fade-in zoom-in-95 duration-200"
+                >
                     <div className="space-y-3">
-                        <p className="text-[11px] font-headline text-primary uppercase tracking-[0.2em] mb-1">{label}</p>
-                        <p className="text-sm leading-relaxed font-bold text-white/90">{description || "Профессиональные метрики игрока."}</p>
+                        <div className="flex items-center gap-3 border-b border-primary/20 pb-2">
+                            <div className="p-2 bg-primary/20 rounded-lg"><Info className="h-4 w-4 text-primary" /></div>
+                            <p className="text-xs font-headline text-white uppercase tracking-[0.2em]">{label}</p>
+                        </div>
+                        <p className="text-sm leading-relaxed font-bold text-white/90 italic">
+                            {description || "Профессиональные метрики игрока в официальных турнирах."}
+                        </p>
                     </div>
                 </TooltipContent>
             </Tooltip>
