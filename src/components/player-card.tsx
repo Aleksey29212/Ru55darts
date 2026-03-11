@@ -41,8 +41,10 @@ const StatItem = ({
 }) => {
     const [isRevealed, setIsRevealed] = useState(false);
     const isSmallStat = name === 'avg' || name === 'n180s' || name === 'hiOut';
+    const valueString = String(value);
+    const isLongValue = valueString.length > 3;
     
-    const baseClasses = "flex flex-col items-center justify-between p-4 sm:p-5 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[150px] sm:min-h-[160px] cursor-pointer active:scale-95 select-none";
+    const baseClasses = "flex flex-col items-center justify-between p-4 sm:p-5 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[150px] sm:min-h-[165px] cursor-pointer active:scale-95 select-none overflow-hidden";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
@@ -50,8 +52,10 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap animate-in fade-in zoom-in-95",
-        isSmallStat ? "text-2xl sm:text-3xl md:text-4xl" : "text-4xl sm:text-5xl md:text-6xl",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 animate-in fade-in zoom-in-95 px-2",
+        isSmallStat 
+            ? "text-2xl sm:text-3xl md:text-4xl" 
+            : (isLongValue ? "text-3xl sm:text-4xl md:text-5xl" : "text-4xl sm:text-5xl md:text-6xl"),
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : ''
     );
@@ -66,7 +70,7 @@ const StatItem = ({
             onClick={() => setIsRevealed(!isRevealed)}
         >
             <div className="w-full flex items-center justify-center gap-2 mb-1">
-                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-tight text-muted-foreground/80 leading-tight text-center break-words max-w-[90%]">
+                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-tight text-muted-foreground/80 leading-tight text-center break-words max-w-[85%]">
                     {label}
                 </span>
                 
@@ -77,19 +81,19 @@ const StatItem = ({
                                 className="cursor-help p-1 -m-1 hover:text-primary transition-all active:scale-90 shrink-0"
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary/60 hover:text-primary animate-pulse" />
+                                <Info className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary/60 hover:text-primary animate-pulse" />
                             </div>
                         </TooltipTrigger>
                         <TooltipContent 
                             side="top" 
-                            className="max-w-[320px] border-primary/50"
+                            className="max-w-[300px] border-primary/50 z-[100]"
                         >
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3 border-b border-primary/20 pb-3">
-                                    <div className="p-2 bg-primary/20 rounded-xl"><Info className="h-5 w-5 text-primary" /></div>
-                                    <p className="text-sm font-headline text-white uppercase tracking-widest">{label}</p>
+                                    <div className="p-2 bg-primary/20 rounded-xl"><Info className="h-4 w-4 text-primary" /></div>
+                                    <p className="text-xs font-headline text-white uppercase tracking-widest">{label}</p>
                                 </div>
-                                <p className="text-xs leading-relaxed font-bold text-white/90 italic">
+                                <p className="text-[11px] leading-relaxed font-bold text-white/90 italic">
                                     {description || "Профессиональная метрика игрока."}
                                 </p>
                             </div>
@@ -98,22 +102,22 @@ const StatItem = ({
                 </TooltipProvider>
             </div>
             
-            <div className="flex-1 flex items-center justify-center w-full my-2 sm:my-3">
+            <div className="flex-1 flex items-center justify-center w-full my-3">
                 {isRevealed ? (
                     <span className={valueClasses}>{value}</span>
                 ) : (
                     <div className="flex flex-col items-center gap-2 animate-in fade-in duration-500">
                         <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform">
-                            <Lock className="h-6 w-6 sm:h-8 sm:w-8 text-primary opacity-60 group-hover:opacity-100" />
+                            <Lock className="h-6 w-6 sm:h-7 sm:w-7 text-primary opacity-60 group-hover:opacity-100" />
                         </div>
-                        <span className="text-[8px] font-black uppercase tracking-widest text-primary/40 group-hover:text-primary/60">Открыть</span>
+                        <span className="text-[7px] font-black uppercase tracking-widest text-primary/40 group-hover:text-primary/60">ОТКРЫТЬ</span>
                     </div>
                 )}
             </div>
 
             <div className="w-full mt-auto">
                 <div className="h-px w-full bg-white/10 mb-2" />
-                <p className="text-[9px] sm:text-[10px] font-black uppercase text-primary/70 tracking-tight text-center leading-tight break-words px-1">
+                <p className="text-[8px] sm:text-[9px] font-black uppercase text-primary/70 tracking-tight text-center leading-tight break-words px-1">
                     {caption || "СТАТ"}
                 </p>
             </div>
