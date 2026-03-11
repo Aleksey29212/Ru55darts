@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
-import { Save, Edit, X, Info, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Eye, EyeOff, Lock } from 'lucide-react';
+import { Save, Edit, X, Info, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Eye, EyeOff, Lock, Handshake, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { TemplateId } from './template-switcher';
 import { cn } from '@/lib/utils';
@@ -26,7 +26,7 @@ import { ScoringHelpDialog } from './scoring-help-dialog';
 
 /**
  * @fileOverview Личная карточка игрока.
- * ГАРАНТИЯ: Полное описание каждого элемента статистики для пользователя.
+ * ГАРАНТИЯ: Улучшенная читаемость и доступность блока спонсорства.
  */
 
 const StatItem = ({ 
@@ -51,7 +51,7 @@ const StatItem = ({
     const [localReveal, setLocalReveal] = useState(false);
     const isRevealed = !interactive || forcedReveal || localReveal;
     
-    const baseClasses = "flex flex-col items-center justify-center p-3 rounded-[2rem] gap-1 min-h-[130px] transition-all border border-transparent interactive-scale overflow-hidden shadow-2xl relative";
+    const baseClasses = "flex flex-col items-center justify-center p-4 rounded-[2rem] gap-1 min-h-[110px] transition-all border border-transparent interactive-scale overflow-hidden shadow-2xl relative w-full";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
@@ -59,7 +59,7 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "text-xl sm:text-2xl lg:text-4xl font-headline tracking-tight leading-none mt-2 w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap px-2",
+        "text-2xl sm:text-3xl lg:text-4xl font-headline tracking-tight leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap px-1",
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : '',
         !isRevealed && "blur-2xl scale-75 opacity-0"
@@ -72,22 +72,22 @@ const StatItem = ({
                     <div 
                         onClick={() => interactive && !isRevealed && setLocalReveal(true)}
                         className={cn(
-                            "cursor-help w-full group", 
+                            "cursor-help group", 
                             baseClasses, 
                             templateClasses[template],
                             interactive && !isRevealed && "cursor-pointer hover:bg-primary/20 hover:border-primary/50"
                         )}
                     >
-                        <p className="text-[9px] md:text-[10px] font-black text-muted-foreground/60 flex items-center justify-center gap-2 text-center uppercase tracking-[0.2em] font-body leading-none mb-1">
+                        <p className="text-[9px] md:text-[10px] font-black text-muted-foreground/80 flex items-center justify-center gap-2 text-center uppercase tracking-[0.2em] font-body leading-none mb-2">
                             {label}
                             <Info className="h-3 sm:h-3.5 shrink-0 opacity-40 text-primary group-hover:opacity-100 transition-opacity" />
                         </p>
                         
-                        <div className="relative w-full flex flex-col items-center justify-center min-h-[60px]">
+                        <div className="relative w-full flex flex-col items-center justify-center">
                             <p className={valueClasses}>{value}</p>
                             
                             {isRevealed && (
-                                <p className="text-[8px] md:text-[10px] font-black uppercase text-primary/50 tracking-widest mt-2 text-center line-clamp-1 opacity-80 group-hover:text-primary/100 transition-colors">
+                                <p className="text-[8px] md:text-[9px] font-black uppercase text-primary/60 tracking-widest mt-2 text-center line-clamp-1 opacity-80 group-hover:text-primary transition-colors">
                                     {caption || "STATISTICS"}
                                 </p>
                             )}
@@ -124,7 +124,15 @@ interface PlayerCardProps {
   leagueNames: string[];
 }
 
-export function PlayerCard({ player, template = 'classic', viewMode, scoringSettings, leagueNames }: PlayerCardProps) {
+export function PlayerCard({ 
+    player, 
+    template = 'classic', 
+    viewMode, 
+    scoringSettings, 
+    leagueNames,
+    showSponsors,
+    showSponsorshipCallToActionGlobal
+}: PlayerCardProps) {
   const { isAdmin } = useAdmin();
   const db = useFirestore();
   const [isEditing, setIsEditing] = useState(false);
@@ -156,6 +164,10 @@ export function PlayerCard({ player, template = 'classic', viewMode, scoringSett
   const backgroundImageUrl = currentPlayerData.backgroundUrl || `https://picsum.photos/seed/bg-fallback/800/400`;
   const winRate = player.matchesPlayed > 0 ? `${((player.wins / player.matchesPlayed) * 100).toFixed(0)}%` : '0%';
   const hasOmskStats = player.cashValue && player.cashValue > 0;
+
+  // Спонсорские данные
+  const hasSponsors = player.sponsors && player.sponsors.length > 0;
+  const showCTA = !hasSponsors && showSponsorshipCallToActionGlobal && player.showSponsorshipCallToAction !== false;
 
   return (
     <div className="space-y-10 md:space-y-16 animate-in fade-in duration-1000">
@@ -294,6 +306,27 @@ export function PlayerCard({ player, template = 'classic', viewMode, scoringSett
              )}
             
             <div className="grid grid-cols-1 gap-12 md:gap-20">
+                {/* Sponsorship Block - Visible Area */}
+                {showCTA && (
+                    <div className="p-8 md:p-12 rounded-[3rem] bg-primary/5 border-2 border-dashed border-primary/30 flex flex-col md:flex-row items-center justify-between gap-8 shadow-inner group/sponsorship transition-all hover:bg-primary/10">
+                        <div className="flex items-center gap-6">
+                            <div className="p-4 rounded-2xl bg-primary/20 text-primary shadow-xl group-hover/sponsorship:rotate-12 transition-transform">
+                                <Handshake className="h-10 w-10" />
+                            </div>
+                            <div className="text-center md:text-left">
+                                <h3 className="font-headline text-xl md:text-2xl text-primary uppercase tracking-tight">{player.sponsorshipCallToAction || "Станьте спонсором легенды!"}</h3>
+                                <p className="text-[10px] md:text-[12px] font-black text-muted-foreground uppercase tracking-[0.3em] mt-1">ПОДДЕРЖИТЕ ИГРОКА И ПОЛУЧИТЕ ОХВАТ</p>
+                            </div>
+                        </div>
+                        <Button asChild className="h-16 px-10 rounded-2xl font-black uppercase tracking-widest text-sm shadow-2xl shadow-primary/20 interactive-scale shrink-0">
+                            <a href="/partners" className="flex items-center gap-3">
+                                УЗНАТЬ УСЛОВИЯ
+                                <ExternalLink className="h-5 w-5" />
+                            </a>
+                        </Button>
+                    </div>
+                )}
+
                 <div className="space-y-10 md:space-y-14">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 md:gap-10">
                         <div className="flex items-center gap-6 md:gap-8">
@@ -402,14 +435,14 @@ export function PlayerCard({ player, template = 'classic', viewMode, scoringSett
                         </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-10 md:gap-16 lg:gap-20">
-                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col h-full group/box">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 lg:gap-20">
+                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[300px]">
                             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
                             <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
                                 <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
                                 PERFORMANCE ANALYSIS
                             </h3>
-                            <div className="grid grid-cols-2 gap-6 md:gap-10 lg:gap-12 mt-auto relative z-10">
+                            <div className="grid grid-cols-2 gap-6 md:gap-10 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
                                     label="BASE" 
@@ -433,19 +466,19 @@ export function PlayerCard({ player, template = 'classic', viewMode, scoringSett
                             </div>
                         </div>
 
-                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col h-full group/box">
+                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[300px]">
                             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
                             <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
                                 <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
                                 PERSONAL RECORDS
                             </h3>
-                            <div className="grid grid-cols-3 gap-4 md:gap-8 lg:gap-10 mt-auto relative z-10">
+                            <div className="grid grid-cols-3 gap-4 md:gap-6 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
                                     label="AVG" 
                                     name="avg" 
                                     value={(Number(player.avg) || 0).toFixed(1)} 
-                                    caption="SCORING POWER"
+                                    caption="SCORING"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
                                     description="Average score per 3 darts thrown throughout the career." 
@@ -455,7 +488,7 @@ export function PlayerCard({ player, template = 'classic', viewMode, scoringSett
                                     label="180" 
                                     name="n180s" 
                                     value={player.n180s} 
-                                    caption="MAXIMUMS"
+                                    caption="MAXES"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
                                     description="Total count of perfect 180 scores in official matches." 
@@ -465,7 +498,7 @@ export function PlayerCard({ player, template = 'classic', viewMode, scoringSett
                                     label="MAX OUT" 
                                     name="hiOut" 
                                     value={Number(player.hiOut) || 0} 
-                                    caption="TOP FINISH"
+                                    caption="FINISH"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
                                     description="Highest score successfully closed in a single leg." 
