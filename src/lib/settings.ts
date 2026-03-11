@@ -7,125 +7,124 @@ import defaultLeagueSettingsData from './league-settings.json';
 import { sanitizeFirestore } from './utils';
 
 /**
- * ГАРАНТИЯ: Устойчивость к отсутствию данных в БД. 
- * Возвращает стандартные настройки (default), если БД пуста или конфигурация Firebase отсутствует.
+ * ГАРАНТИЯ: Полная поддержка Демо-режима. 
+ * Настройки сохраняются в памяти сервера, если Firebase не настроен.
  */
+
+let memoScoringSettings: Partial<Record<LeagueId, ScoringSettings>> = {};
+let memoLeagueSettings: AllLeagueSettings | null = null;
+let memoBackgroundUrl: string = '';
+let memoSponsorshipSettings: SponsorshipSettings | null = null;
 
 export const getAllScoringSettings = cache(
   async (): Promise<Record<LeagueId, ScoringSettings>> => {
     const allDefaults: Record<LeagueId, ScoringSettings> = defaultScoringSettingsData as any;
+    const db = getDb();
     
-    try {
-        const db = getDb();
-        if (!db) return allDefaults;
+    let fromDb: Partial<Record<LeagueId, ScoringSettings>> = { ...memoScoringSettings };
 
-        const settingsCol = collection(db, 'scoring_configurations');
-        const snapshot = await getDocs(settingsCol);
-        
-        if (snapshot.empty) return allDefaults;
-        
-        const fromDb: Partial<Record<LeagueId, ScoringSettings>> = {};
-        snapshot.docs.forEach(doc => {
-            fromDb[doc.id as LeagueId] = sanitizeFirestore({ ...doc.data(), id: doc.id }) as ScoringSettings;
-        });
-
-        const merged: any = {};
-        (Object.keys(allDefaults) as LeagueId[]).forEach(key => {
-            merged[key] = { ...allDefaults[key], ...(fromDb[key] || {}) };
-        });
-        return merged;
-    } catch (e) {
-        console.warn("Using default scoring settings due to fetch error:", e);
-        return allDefaults;
+    if (db) {
+        try {
+            const settingsCol = collection(db, 'scoring_configurations');
+            const snapshot = await getDocs(settingsCol);
+            snapshot.docs.forEach(doc => {
+                fromDb[doc.id as LeagueId] = sanitizeFirestore({ ...doc.data(), id: doc.id }) as ScoringSettings;
+            });
+        } catch (e) {
+            console.warn("DB fetch error, using memory/defaults");
+        }
     }
+
+    const merged: any = {};
+    (Object.keys(allDefaults) as LeagueId[]).forEach(key => {
+        merged[key] = { ...allDefaults[key], ...(fromDb[key] || {}) };
+    });
+    return merged;
   }
 );
 
 export const getScoringSettings = cache(
   async (leagueId: LeagueId): Promise<ScoringSettings> => {
-    const defaults = (defaultScoringSettingsData as any)[leagueId] || (defaultScoringSettingsData as any).general;
-
-    try {
-        const db = getDb();
-        if (!db) return { ...defaults, id: leagueId } as ScoringSettings;
-
-        const docRef = doc(db, 'scoring_configurations', leagueId);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-            return sanitizeFirestore({ ...defaults, ...docSnap.data(), id: docSnap.id }) as ScoringSettings;
-        }
-    } catch (e) {}
-    
-    return { ...defaults, id: leagueId } as ScoringSettings;
+    const all = await getAllScoringSettings();
+    return all[leagueId] || all.general;
   }
 );
 
 export async function updateScoringSettings(leagueId: LeagueId, settings: ScoringSettings): Promise<void> {
+  memoScoringSettings[leagueId] = settings;
   const db = getDb();
   if (!db) return;
-  const docRef = doc(db, 'scoring_configurations', leagueId);
-  const dataToSet = { ...settings };
-  delete (dataToSet as any).id;
-  await setDoc(docRef, dataToSet);
+  try {
+      const docRef = doc(db, 'scoring_configurations', leagueId);
+      const dataToSet = { ...settings };
+      delete (dataToSet as any).id;
+      await setDoc(docRef, dataToSet);
+  } catch (e) {}
 }
 
 export const getLeagueSettings = cache(
   async (): Promise<AllLeagueSettings> => {
     const defaults: AllLeagueSettings = defaultLeagueSettingsData as any;
-
-    try {
-        const db = getDb();
-        if (!db) return defaults;
-
-        const docRef = doc(db, 'app_settings', 'leagues');
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-            const dbSettings = sanitizeFirestore(docSnap.data()) as Partial<AllLeagueSettings>;
-            const merged = { ...defaults };
-            (Object.keys(defaults) as LeagueId[]).forEach(key => {
-                if (dbSettings[key]) {
-                    merged[key] = { ...defaults[key], ...dbSettings[key] };
-                }
-            });
-            return merged;
-        }
-    } catch (e) {}
+    const db = getDb();
     
-    return defaults;
+    let current = memoLeagueSettings || defaults;
+
+    if (db) {
+        try {
+            const docRef = doc(db, 'app_settings', 'leagues');
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const dbSettings = sanitizeFirestore(docSnap.data()) as Partial<AllLeagueSettings>;
+                const merged = { ...defaults };
+                (Object.keys(defaults) as LeagueId[]).forEach(key => {
+                    if (dbSettings[key]) {
+                        merged[key] = { ...defaults[key], ...dbSettings[key] };
+                    }
+                });
+                current = merged;
+            }
+        } catch (e) {}
+    }
+    
+    return current;
   }
 );
 
 export async function updateLeagueSettings(settings: AllLeagueSettings): Promise<void> {
+    memoLeagueSettings = settings;
     const db = getDb();
     if (!db) return;
-    const docRef = doc(db, 'app_settings', 'leagues');
-    await setDoc(docRef, settings, { merge: true });
+    try {
+        const docRef = doc(db, 'app_settings', 'leagues');
+        await setDoc(docRef, settings, { merge: true });
+    } catch (e) {}
 }
 
 export const getBackgroundUrl = cache(
   async (): Promise<string> => {
-    try {
-        const db = getDb();
-        if (!db) return '';
+    const db = getDb();
+    if (!db) return memoBackgroundUrl;
 
+    try {
         const docRef = doc(db, 'app_settings', 'background');
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             const data = sanitizeFirestore(docSnap.data());
-            return data.url || '';
+            return data.url || memoBackgroundUrl;
         }
     } catch (e) {}
-    return '';
+    return memoBackgroundUrl;
   }
 );
 
 export async function updateBackgroundUrl(url: string): Promise<void> {
+    memoBackgroundUrl = url;
     const db = getDb();
     if (!db) return;
-    const docRef = doc(db, 'app_settings', 'background');
-    await setDoc(docRef, { url });
+    try {
+        const docRef = doc(db, 'app_settings', 'background');
+        await setDoc(docRef, { url });
+    } catch (e) {}
 }
 
 export const getSponsorshipSettings = cache(
@@ -146,25 +145,30 @@ export const getSponsorshipSettings = cache(
         ],
     };
     
-    try {
-        const db = getDb();
-        if (!db) return defaults;
+    const db = getDb();
+    let current = memoSponsorshipSettings || defaults;
 
-        const docRef = doc(db, 'app_settings', 'sponsorship');
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            const data = sanitizeFirestore(docSnap.data());
-            return { ...defaults, ...data };
-        }
-    } catch (e) {}
+    if (db) {
+        try {
+            const docRef = doc(db, 'app_settings', 'sponsorship');
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = sanitizeFirestore(docSnap.data());
+                current = { ...defaults, ...data };
+            }
+        } catch (e) {}
+    }
     
-    return defaults;
+    return current;
   }
 );
 
 export async function updateSponsorshipSettings(settings: SponsorshipSettings): Promise<void> {
+    memoSponsorshipSettings = settings;
     const db = getDb();
     if (!db) return;
-    const docRef = doc(db, 'app_settings', 'sponsorship');
-    await setDoc(docRef, settings, { merge: true });
+    try {
+        const docRef = doc(db, 'app_settings', 'sponsorship');
+        await setDoc(docRef, settings, { merge: true });
+    } catch (e) {}
 }

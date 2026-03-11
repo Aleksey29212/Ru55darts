@@ -55,39 +55,32 @@ export async function addTournaments(newTournaments: any[]): Promise<string[]> {
             date: newT.date instanceof Timestamp ? newT.date : Timestamp.fromDate(new Date(newT.date as string)) 
         };
 
+        // Всегда сохраняем в память для демо-режима
+        const existsIdx = demoTournaments.findIndex(existing => existing.id === dataToSave.id);
+        if (existsIdx !== -1) {
+            demoTournaments[existsIdx] = dataToSave as Tournament;
+        } else {
+            demoTournaments.push(dataToSave as Tournament);
+        }
+        actuallyAddedIds.push(docId);
+
         if (db) {
             try {
                 const docRef = doc(db, 'tournaments', docId);
                 const dataToSet = { ...dataToSave };
                 delete (dataToSet as any).id;
-                await sanitizeFirestore(dataToSet); // validation
-                // We use setDoc here instead of batch for simplicity in mixed mode
                 const { setDoc } = await import('firebase/firestore');
                 await setDoc(docRef, dataToSet);
-                actuallyAddedIds.push(docId);
             } catch (e) {
-                console.error("Failed to save to DB, falling back to memory:", e);
-                saveToMemory(dataToSave);
-                actuallyAddedIds.push(docId);
+                console.error("Failed to save to DB, using memory");
             }
-        } else {
-            saveToMemory(dataToSave);
-            actuallyAddedIds.push(docId);
         }
     }
     
     return actuallyAddedIds;
 }
 
-function saveToMemory(t: any) {
-    const exists = demoTournaments.find(existing => existing.id === t.id);
-    if (!exists) {
-        demoTournaments.push(t as Tournament);
-    }
-}
-
 export async function getTournamentById(id: string): Promise<Tournament | undefined> {
-    // Проверка в памяти
     const fromMemory = demoTournaments.find(t => t.id === id);
     if (fromMemory) return fromMemory;
 
@@ -107,7 +100,6 @@ export async function getTournamentById(id: string): Promise<Tournament | undefi
 }
 
 export async function deleteTournamentById(id: string): Promise<void> {
-    // Удаление из памяти
     demoTournaments = demoTournaments.filter(t => t.id !== id);
 
     const db = getDb();

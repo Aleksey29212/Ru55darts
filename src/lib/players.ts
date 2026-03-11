@@ -6,6 +6,7 @@ import { sanitizeFirestore } from './utils';
 
 /**
  * ГАРАНТИЯ: Временное хранилище профилей для работы БЕЗ КЛЮЧЕЙ.
+ * Все изменения сохраняются в оперативной памяти до перезагрузки процесса.
  */
 let demoPlayers: PlayerProfile[] = [];
 
@@ -49,11 +50,14 @@ export async function getPlayerProfileById(id: string): Promise<PlayerProfile | 
 }
 
 export async function updatePlayerProfiles(players: PlayerProfile[]): Promise<void> {
-  // Обновляем память
+  // Обновляем память обязательно
   players.forEach(p => {
       const idx = demoPlayers.findIndex(existing => existing.id === p.id);
-      if (idx !== -1) demoPlayers[idx] = p;
-      else demoPlayers.push(p);
+      if (idx !== -1) {
+          demoPlayers[idx] = { ...demoPlayers[idx], ...p };
+      } else {
+          demoPlayers.push(p);
+      }
   });
 
   const db = getDb();
@@ -68,7 +72,9 @@ export async function updatePlayerProfiles(players: PlayerProfile[]): Promise<vo
         batch.set(playerDocRef, data, { merge: true });
       });
       await batch.commit();
-  } catch (e) {}
+  } catch (e) {
+      console.error("DB update error, changes kept in memory");
+  }
 }
 
 export async function clearAllPlayerProfiles(): Promise<void> {
