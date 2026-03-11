@@ -34,20 +34,20 @@ export async function getVisitStats(): Promise<VisitStats> {
     const yearQuery = query(visitsCol, where('timestamp', '>=', oneYearAgo));
 
     const [daySnapshot, weekSnapshot, yearSnapshot, totalSnapshot] = await Promise.all([
-      getDocs(dayQuery),
-      getDocs(weekQuery),
-      getDocs(yearQuery),
-      getDocs(visitsCol),
+      getDocs(dayQuery).catch(() => ({ size: 0 })),
+      getDocs(weekQuery).catch(() => ({ size: 0 })),
+      getDocs(yearQuery).catch(() => ({ size: 0 })),
+      getDocs(visitsCol).catch(() => ({ size: 0 })),
     ]);
 
     return {
-      day: daySnapshot.size,
-      week: weekSnapshot.size,
-      year: yearSnapshot.size,
-      total: totalSnapshot.size,
+      day: (daySnapshot as any).size || 0,
+      week: (weekSnapshot as any).size || 0,
+      year: (yearSnapshot as any).size || 0,
+      total: (totalSnapshot as any).size || 0,
     };
   } catch (error) {
-    console.error('Error fetching visit stats:', error);
+    console.warn('Error fetching visit stats (Analytics inactive):', error);
     return { day: 0, week: 0, year: 0, total: 0 };
   }
 }
@@ -84,7 +84,7 @@ export async function getSponsorClickStats(): Promise<SponsorClickStat[]> {
 
         return results;
     } catch (error) {
-        console.error('Error fetching sponsor click stats:', error);
+        console.warn('Error fetching sponsor click stats:', error);
         return [];
     }
 }

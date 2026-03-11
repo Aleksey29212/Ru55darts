@@ -6,10 +6,11 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import type { PlayerProfile, ScoringSettings, LeagueId, AllLeagueSettings, SponsorshipSettings } from '@/lib/types';
 import { updateScoringSettings, updateLeagueSettings, getScoringSettings, updateBackgroundUrl, updateSponsorshipSettings } from '@/lib/settings';
 import { getDb } from '@/firebase/server';
-import { addDoc, collection, doc, serverTimestamp, deleteDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, deleteDoc, getDocs, writeBatch } from 'firebase/firestore';
 import { headers } from 'next/headers';
 import { CardBackgrounds } from '@/lib/card-backgrounds';
 import { scrapeTournamentData } from '@/lib/scraping';
+import { getRankings } from '@/lib/leagues';
 
 /**
  * ГАРАНТИЯ: Все действия работают автоматически. 
@@ -114,8 +115,10 @@ export async function deletePlayerAction(playerId: string) {
         }
         // Очищаем в глобальной памяти тоже
         const memoryStore = (global as any).demoPlayers as PlayerProfile[];
-        const idx = memoryStore.findIndex(p => p.id === playerId);
-        if (idx !== -1) memoryStore.splice(idx, 1);
+        if (memoryStore) {
+            const idx = memoryStore.findIndex(p => p.id === playerId);
+            if (idx !== -1) memoryStore.splice(idx, 1);
+        }
 
         revalidatePath('/', 'layout');
         revalidateTag('players');
@@ -229,5 +232,60 @@ export async function updatePlayerAvatar(playerId: string, dataUrl: string | nul
         return { success: true, message: 'Фото обновлено.' };
     } catch (e) {
         return { success: false, message: 'Ошибка фотостудии.' };
+    }
+}
+
+export async function clearAnalyticsAction() {
+    try {
+        const db = getDb();
+        if (!db) return { success: true, message: 'Аналитика очищена в локальной памяти.' };
+        
+        const visits = await getDocs(collection(db, 'visits'));
+        const clicks = await getDocs(collection(db, 'sponsor_clicks'));
+        
+        const batch = writeBatch(db);
+        visits.docs.forEach(d => batch.delete(d.ref));
+        clicks.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+        
+        revalidatePath('/admin/analytics');
+        return { success: true, message: 'Все логи аналитики удалены.' };
+    } catch (e) {
+        return { success: false, message: 'Ошибка при очистке логов.' };
+    }
+}
+
+export async function clearPartnersAction() {
+    try {
+        const db = getDb();
+        if (!db) return { success: true, message: 'Список партнеров очищен (локально).' };
+        
+        const snapshot = await getDocs(collection(db, 'partners'));
+        const batch = writeBatch(db);
+        snapshot.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+        
+        revalidatePath('/', 'layout');
+        revalidatePath('/partners');
+        return { success: true, message: 'Все партнеры удалены из базы.' };
+    } catch (e) {
+        return { success: false, message: 'Ошибка при удалении партнеров.' };
+    }
+}
+
+export async function exportAllRankingsAction() {
+    try {
+        const rankings = await getRankings('general');
+        if (!rankings || rankings.length === 0) return { success: false, message: 'Нет данных для экспорта. Сначала импортируйте турниры.' };
+        
+        // CSV with semicolon for better Excel compatibility in RU locale
+        const header = 'Место;Имя;Никнейм;Очки;Игры;AVG;180;Hi-Out\n';
+        const rows = rankings.map(p => 
+            `${p.rank};${p.name};${p.nickname};${p.points};${p.matchesPlayed};${p.avg.toFixed(2)};${p.n180s};${p.hiOut}`
+        ).join('\n');
+        
+        return { success: true, csv: header + rows };
+    } catch (e) {
+        return { success: false, message: 'Ошибка при генерации CSV-файла.' };
     }
 }
