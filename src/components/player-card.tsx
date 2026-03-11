@@ -44,16 +44,15 @@ const StatItem = ({
     const len = valueString.length;
     const hasDecimal = valueString.includes('.') || valueString.includes(',');
     
-    // УЛЬТРА-АДАПТАЦИЯ: Динамический подбор размера для предотвращения вылета за рамку
-    // Мы используем более агрессивное уменьшение для дробных чисел и строк > 3 символов
+    // УЛЬТРА-АДАПТАЦИЯ: Динамический подбор размера для всех шаблонов
     let fontSizeClass = "text-4xl sm:text-5xl lg:text-6xl"; 
     
     if (hasDecimal || len >= 5) {
-        fontSizeClass = "text-xl sm:text-2xl lg:text-3xl"; // Компактно для 60.0 или +1250
+        fontSizeClass = "text-xl sm:text-2xl lg:text-3xl"; 
     } else if (len >= 4) {
-        fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl"; // Для 100%, +120
+        fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl"; 
     } else if (len >= 3) {
-        fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; // Для 125, 542
+        fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     }
     
     const baseClasses = "flex flex-col items-center justify-between p-2 sm:p-4 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[150px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none";
