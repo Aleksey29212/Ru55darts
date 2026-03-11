@@ -41,7 +41,7 @@ const StatItem = ({
 }) => {
     const isSmallStat = name === 'avg' || name === 'n180s' || name === 'hiOut';
     
-    const baseClasses = "flex flex-col items-center justify-between p-4 sm:p-6 rounded-[1.5rem] transition-all border border-transparent shadow-xl relative w-full h-full min-h-[140px] sm:min-h-[160px]";
+    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-5 rounded-[1.5rem] transition-all border border-transparent shadow-xl relative w-full h-full min-h-[130px] sm:min-h-[150px]";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
@@ -49,8 +49,8 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap px-1",
-        isSmallStat ? "text-xl sm:text-2xl md:text-4xl" : "text-3xl sm:text-5xl md:text-6xl",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap",
+        isSmallStat ? "text-xl sm:text-2xl md:text-3xl lg:text-4xl" : "text-3xl sm:text-4xl md:text-5xl lg:text-6xl",
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : ''
     );
@@ -66,18 +66,20 @@ const StatItem = ({
                             templateClasses[template]
                         )}
                     >
-                        <div className="w-full flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity mb-2">
-                            <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] truncate">{label}</span>
-                            <Info className="h-3 w-3 shrink-0 text-primary" />
+                        <div className="w-full flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity mb-1">
+                            <span className="text-[7px] sm:text-[9px] font-black uppercase tracking-wider text-center leading-tight">
+                                {label}
+                            </span>
+                            <Info className="h-2.5 w-2.5 shrink-0 text-primary" />
                         </div>
                         
-                        <div className="flex-1 flex items-center justify-center w-full overflow-hidden my-2 sm:my-4">
+                        <div className="flex-1 flex items-center justify-center w-full my-2">
                             <span className={valueClasses}>{value}</span>
                         </div>
 
-                        <div className="w-full mt-2">
-                            <div className="h-px w-full bg-white/10 mb-2" />
-                            <p className="text-[7px] sm:text-[9px] font-black uppercase text-primary/70 tracking-[0.2em] text-center leading-none truncate">
+                        <div className="w-full mt-1">
+                            <div className="h-px w-full bg-white/10 mb-1.5" />
+                            <p className="text-[7px] sm:text-[8px] font-black uppercase text-primary/70 tracking-widest text-center leading-tight">
                                 {caption || "СТАТ"}
                             </p>
                         </div>
@@ -417,7 +419,7 @@ export function PlayerCard({
                                 <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
                                 АНАЛИЗ РЕЗУЛЬТАТОВ
                             </h3>
-                            <div className="grid grid-cols-2 gap-3 sm:gap-5 relative z-10 mt-auto">
+                            <div className="grid grid-cols-2 gap-4 sm:gap-6 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
                                     label="БАЗОВЫЕ" 
@@ -431,7 +433,7 @@ export function PlayerCard({
                                     label="БОНУСЫ" 
                                     name="bonusPoints" 
                                     value={`+${player.bonusPoints}`} 
-                                    caption="БОНУСЫ"
+                                    caption="ЗА СТАТИСТИКУ"
                                     description="Дополнительные очки за 180, высокие чекауты и средний набор." 
                                 />
                             </div>
@@ -443,7 +445,7 @@ export function PlayerCard({
                                 <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
                                 ЛИЧНЫЕ РЕКОРДЫ
                             </h3>
-                            <div className="grid grid-cols-3 gap-2 sm:gap-4 relative z-10 mt-auto">
+                            <div className="grid grid-cols-3 gap-3 sm:gap-4 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
                                     label="СРЕДНИЙ" 
