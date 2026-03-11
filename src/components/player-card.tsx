@@ -41,10 +41,18 @@ const StatItem = ({
 }) => {
     const [isRevealed, setIsRevealed] = useState(false);
     const valueString = String(value);
+    const len = valueString.length;
     
-    // Адаптация шрифта под длину значения
-    const isLongValue = valueString.length > 3;
-    const hasDecimal = valueString.includes('.');
+    // ПРЕДЕЛЬНАЯ АДАПТАЦИЯ: Динамический выбор размера шрифта на основе длины строки
+    let fontSizeClass = "text-3xl sm:text-4xl md:text-5xl lg:text-6xl"; // Стандарт
+    
+    if (len >= 5) {
+        fontSizeClass = "text-xl sm:text-2xl md:text-3xl lg:text-4xl"; // Очень длинные (AVG 60.15)
+    } else if (len >= 4) {
+        fontSizeClass = "text-2xl sm:text-3xl md:text-4xl lg:text-5xl"; // Длинные (100%, +120)
+    } else if (len >= 3) {
+        fontSizeClass = "text-3xl sm:text-4xl md:text-4xl lg:text-5xl"; // Средние (125, 54.2)
+    }
     
     const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-5 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[140px] sm:min-h-[165px] cursor-pointer active:scale-95 select-none overflow-hidden";
     const templateClasses = {
@@ -54,10 +62,8 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 animate-in fade-in zoom-in-95 px-1 break-words",
-        (isLongValue || hasDecimal) 
-            ? "text-xl sm:text-2xl md:text-3xl lg:text-4xl" 
-            : "text-3xl sm:text-4xl md:text-5xl lg:text-6xl",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 animate-in fade-in zoom-in-95 px-0.5",
+        fontSizeClass,
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : ''
     );
@@ -88,14 +94,14 @@ const StatItem = ({
                         </TooltipTrigger>
                         <TooltipContent 
                             side="top" 
-                            className="max-w-[300px] border-primary/50 z-[100]"
+                            className="max-w-[320px] bg-black/95 backdrop-blur-3xl border-primary/50 z-[100] p-6 rounded-2xl shadow-2xl"
                         >
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3 border-b border-primary/20 pb-3">
                                     <div className="p-2 bg-primary/20 rounded-xl"><Info className="h-4 w-4 text-primary" /></div>
                                     <p className="text-xs font-headline text-white uppercase tracking-widest">{label}</p>
                                 </div>
-                                <p className="text-[11px] leading-relaxed font-bold text-white/90 italic">
+                                <p className="text-sm leading-relaxed font-bold text-white/95 italic">
                                     {description || "Профессиональная метрика игрока."}
                                 </p>
                             </div>
@@ -104,7 +110,7 @@ const StatItem = ({
                 </TooltipProvider>
             </div>
             
-            <div className="flex-1 flex items-center justify-center w-full my-2 sm:my-3">
+            <div className="flex-1 flex items-center justify-center w-full my-2 sm:my-3 overflow-visible">
                 {isRevealed ? (
                     <span className={valueClasses}>{value}</span>
                 ) : (
