@@ -92,7 +92,6 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   return (
     <FirebaseContext.Provider value={contextValue}>
       <FirebaseErrorListener />
-      {/* Теперь мы всегда рендерим children, чтобы не блокировать интерфейс */}
       {children}
     </FirebaseContext.Provider>
   );

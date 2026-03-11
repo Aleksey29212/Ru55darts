@@ -1,18 +1,19 @@
 'use server';
 
-import { getPlayerProfiles, updatePlayerProfiles, getPlayerProfileById } from '@/lib/players';
+import { getPlayerProfiles, updatePlayerProfiles, getPlayerProfileById, clearAllPlayerProfiles } from '@/lib/players';
 import { addTournaments, clearAllTournamentData, deleteTournamentById, getTournamentById } from '@/lib/tournaments';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import type { PlayerProfile, ScoringSettings, LeagueId, AllLeagueSettings, SponsorshipSettings } from '@/lib/types';
 import { updateScoringSettings, updateLeagueSettings, getScoringSettings, updateBackgroundUrl, updateSponsorshipSettings } from '@/lib/settings';
 import { getDb } from '@/firebase/server';
-import { addDoc, collection, doc, serverTimestamp, deleteDoc, getDocs, writeBatch } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, deleteDoc } from 'firebase/firestore';
 import { headers } from 'next/headers';
 import { CardBackgrounds } from '@/lib/card-backgrounds';
 import { scrapeTournamentData } from '@/lib/scraping';
 
 /**
- * ГАРАНТИЯ: Все действия работают в Демо-режиме (через либы с поддержкой памяти).
+ * ГАРАНТИЯ: Все действия работают автоматически. 
+ * Если ключи Firebase отсутствуют, данные сохраняются во временном хранилище.
  */
 
 export async function importTournament(prevState: unknown, formData: FormData) {
@@ -29,8 +30,6 @@ export async function importTournament(prevState: unknown, formData: FormData) {
   let playerProfiles = await getPlayerProfiles();
   const newPlayerProfiles: PlayerProfile[] = [];
   const errors: string[] = [];
-
-  const db = getDb();
 
   for (const input of inputs) {
     try {
@@ -88,13 +87,10 @@ export async function importTournament(prevState: unknown, formData: FormData) {
   revalidateTag('leagues');
   
   const successCount = tournamentsToCreate.length;
-  const isDemo = !db;
 
   return { 
     success: successCount > 0, 
-    message: isDemo 
-      ? `Успешно (Демо): ${successCount} турнир(ов) загружено в память. Настройте Firebase для сохранения.` 
-      : `Успешно: ${successCount} турнир(ов) сохранено в БД.`,
+    message: `Успешно: ${successCount} турнир(ов) загружено в систему.`,
     errors: errors.length > 0 ? errors : undefined
   };
 }
@@ -116,13 +112,22 @@ export async function deletePlayerAction(playerId: string) {
         if (db) {
             await deleteDoc(doc(db, 'players', playerId));
         }
-        // В либе для демо-режима удаление из памяти не реализовано для безопасности, 
-        // но здесь мы можем добавить если нужно. Пока просто ревалидируем.
         revalidatePath('/', 'layout');
         revalidateTag('players');
         return { success: true, message: 'Игрок удален.' };
     } catch (e) {
         return { success: false, message: 'Ошибка при удалении.' };
+    }
+}
+
+export async function clearAllPlayerData() {
+    try {
+        await clearAllPlayerProfiles();
+        revalidatePath('/', 'layout');
+        revalidateTag('players');
+        return { success: true, message: 'Все профили игроков удалены.' };
+    } catch (e) {
+        return { success: false, message: 'Ошибка при очистке.' };
     }
 }
 

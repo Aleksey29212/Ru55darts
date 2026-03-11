@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowRight, Calculator, Users, Wand2, Trophy, Camera, Library, Handshake, Image, BarChart, CloudDownload, Code2, AlertOctagon, Settings2, Rocket, Check, Copy, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowRight, Calculator, Users, Wand2, Trophy, Camera, Library, Handshake, Image, BarChart, CloudDownload, Code2, AlertOctagon, Settings2 } from "lucide-react";
 import { useCollection, useDoc, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection, doc } from "firebase/firestore";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,11 +15,9 @@ import { ClearPartnersButton } from "./partners/clear-partners-button";
 import { ClearAnalyticsButton } from "./analytics/clear-analytics-button";
 import { ViewModeToggle } from "@/components/view-mode-toggle";
 import { isFirebaseConfigValid } from "@/firebase/config";
-import { useState } from "react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const adminSections = [
-    { href: '/admin/source-code', title: 'Код программы (ЭТАЛОН)', icon: Code2, color: 'text-primary', description: 'Спецификации и исходные коды для других ИИ' },
+    { href: '/admin/source-code', title: 'Код программы (ЭТАЛОН)', icon: Code2, color: 'text-primary', description: 'Спецификации и исходные коды' },
     { href: '/admin/import', title: 'Импорт турниров', icon: CloudDownload, color: 'text-primary', description: 'Загрузка данных с dartsbase.ru' },
     { href: '/admin/tournaments', title: 'Архив турниров', icon: Trophy, color: 'text-primary', description: 'Просмотр и удаление результатов' },
     { href: '/admin/analytics', title: 'Аналитика', icon: BarChart, color: 'text-primary', description: 'Статистика посещений и кликов' },
@@ -57,99 +55,10 @@ function StatCard({ title, count, icon: Icon, isLoading, priority = false }: { t
     );
 }
 
-function SetupGuide() {
-    const [copiedKey, setCopiedKey] = useState<string | null>(null);
-    const [isOpen, setIsOpen] = useState(true);
-
-    const copyToClipboard = (text: string, key: string) => {
-        navigator.clipboard.writeText(text);
-        setCopiedKey(key);
-        setTimeout(() => setCopiedKey(null), 2000);
-    };
-
-    return (
-        <Collapsible open={isOpen} onOpenChange={setIsOpen} className="mb-12">
-            <Card className="glassmorphism border-primary/50 bg-primary/5 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-700">
-                <div className="flex flex-col sm:flex-row items-center justify-between bg-primary/10 border-b border-primary/20 pr-6">
-                    <CardHeader className="bg-transparent border-none">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-primary/20 rounded-2xl">
-                                <Settings2 className="h-8 w-8 text-primary animate-spin-slow" />
-                            </div>
-                            <div>
-                                <CardTitle className="text-xl md:text-2xl font-headline uppercase tracking-tight text-primary">Мастер настройки (Критично)</CardTitle>
-                                <CardDescription className="text-foreground/80">Для полноценной работы сайта на вашем сервере необходимо добавить ключи из Firebase Console.</CardDescription>
-                            </div>
-                        </div>
-                    </CardHeader>
-                    <CollapsibleTrigger asChild>
-                        <Button variant="outline" size="sm" className="rounded-xl border-primary/20 hover:bg-primary/10 gap-2 font-bold uppercase tracking-widest text-[10px] h-10 px-4 mt-4 sm:mt-0 mb-4 sm:mb-0">
-                            {isOpen ? (
-                                <>Свернуть <ChevronUp className="h-4 w-4" /></>
-                            ) : (
-                                <>Развернуть <ChevronDown className="h-4 w-4" /></>
-                            )}
-                        </Button>
-                    </CollapsibleTrigger>
-                </div>
-                <CollapsibleContent className="animate-in fade-in slide-in-from-top-1 duration-300">
-                    <CardContent className="p-8 space-y-8">
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-xs">
-                                <Rocket className="h-4 w-4" />
-                                Добавьте эти переменные в настройки вашего хостинга или в .env.local
-                            </div>
-                            <div className="grid sm:grid-cols-2 gap-3">
-                                {[
-                                    'NEXT_PUBLIC_FIREBASE_API_KEY',
-                                    'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
-                                    'NEXT_PUBLIC_FIREBASE_APP_ID',
-                                    'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
-                                    'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
-                                    'NEXT_PUBLIC_ADMIN_PASSWORD'
-                                ].map((key) => (
-                                    <div key={key} className="group flex items-center justify-between bg-black/60 rounded-xl p-3 border border-white/5 hover:border-primary/30 transition-all">
-                                        <code className="text-[9px] md:text-[10px] text-primary/80 font-bold truncate mr-2">{key}</code>
-                                        <Button 
-                                            variant="ghost" 
-                                            size="sm" 
-                                            className="h-8 px-3 text-[10px] uppercase font-bold text-muted-foreground hover:text-primary gap-2 shrink-0"
-                                            onClick={() => copyToClipboard(key, key)}
-                                        >
-                                            {copiedKey === key ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                                            {copiedKey === key ? 'Готово' : 'Копия'}
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="bg-white/5 rounded-2xl p-6 border border-white/10 flex flex-col md:flex-row items-center gap-6">
-                            <div className="flex-1 space-y-2">
-                                <h4 className="font-bold text-sm uppercase tracking-widest">Инструкция для Firebase</h4>
-                                <p className="text-xs text-muted-foreground leading-relaxed italic">
-                                    Зайдите в <strong>Project Settings</strong> &rarr; <strong>Your apps</strong> &rarr; <strong>Config</strong>. 
-                                    Скопируйте значения и вставьте их в панель управления сервером. Сайт оживет автоматически.
-                                </p>
-                            </div>
-                            <Button variant="outline" className="rounded-xl font-bold uppercase tracking-widest text-xs h-12 gap-2" asChild>
-                                <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer">
-                                    В Консоль Firebase <ExternalLink className="h-4 w-4" />
-                                </a>
-                            </Button>
-                        </div>
-                    </CardContent>
-                </CollapsibleContent>
-            </Card>
-        </Collapsible>
-    );
-}
-
 export default function AdminPage() {
   const db = useFirestore();
   const isConfigured = isFirebaseConfigValid;
   
-  // Эти запросы будут выполнены только если конфиг валиден
   const tournamentsQuery = useMemoFirebase(() => (db && isConfigured) ? collection(db, 'tournaments') : null, [db, isConfigured]);
   const { data: tournaments, isLoading: isLoadingTournaments } = useCollection(tournamentsQuery);
 
@@ -168,9 +77,6 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-12 pb-24">
-        {/* Показываем мастер настройки только если ключи не валидны */}
-        {!isConfigured && <SetupGuide />}
-
         <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard title="Турниров в базе" count={tournaments?.length || 0} icon={Trophy} isLoading={isLoadingTournaments && isConfigured} priority />
             <StatCard title="Всего игроков" count={players?.length || 0} icon={Users} isLoading={isLoadingPlayers && isConfigured} />
@@ -178,7 +84,6 @@ export default function AdminPage() {
             <StatCard title="Партнеров" count={partners?.length || 0} icon={Handshake} isLoading={isLoadingPartners && isConfigured} />
         </section>
 
-        {/* Interface Management Panel */}
         <section className="space-y-6">
             <div className="flex items-center gap-3 ml-2">
                 <Settings2 className="h-4 w-4 text-primary" />
@@ -229,33 +134,32 @@ export default function AdminPage() {
             </section>
         </div>
 
-        {/* Danger Zone */}
         <section className="space-y-6">
             <div className="flex items-center gap-3 ml-2">
                 <AlertOctagon className="h-5 w-5 text-destructive animate-pulse" />
-                <h2 className="text-sm font-headline uppercase tracking-[0.3em] text-destructive">Системное обслуживание (Danger Zone)</h2>
+                <h2 className="text-sm font-headline uppercase tracking-[0.3em] text-destructive">Системное обслуживание</h2>
             </div>
             
             <Card className="glassmorphism border-destructive/30 bg-destructive/5">
                 <CardHeader>
-                    <CardTitle className="text-xl font-headline tracking-tight text-destructive uppercase">Глобальная очистка блоков</CardTitle>
-                    <CardDescription>Используйте эти кнопки для принудительного удаления данных в каждом из разделов системы. Действия необратимы.</CardDescription>
+                    <CardTitle className="text-xl font-headline tracking-tight text-destructive uppercase">Очистка данных</CardTitle>
+                    <CardDescription>Удаление накопленной информации в демо-режиме или базе данных.</CardDescription>
                 </CardHeader>
                 <CardContent className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="p-4 rounded-xl border border-destructive/20 bg-black/20 flex flex-col gap-3">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Блок Турниров</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Турниры</span>
                         <ClearTournamentsButton />
                     </div>
                     <div className="p-4 rounded-xl border border-destructive/20 bg-black/20 flex flex-col gap-3">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Блок Игроков</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Игроки</span>
                         <ClearPlayersButton />
                     </div>
                     <div className="p-4 rounded-xl border border-destructive/20 bg-black/20 flex flex-col gap-3">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Блок Партнеров</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Партнеры</span>
                         <ClearPartnersButton />
                     </div>
                     <div className="p-4 rounded-xl border border-destructive/20 bg-black/20 flex flex-col gap-3">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Блок Аналитики</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Аналитика</span>
                         <ClearAnalyticsButton />
                     </div>
                 </CardContent>

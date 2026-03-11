@@ -1,6 +1,6 @@
 /**
- * @fileOverview Конфигурация Firebase с улучшенной валидацией.
- * ГАРАНТИЯ: Приложение поймет, если используются значения-заглушки или ключи отсутствуют.
+ * @fileOverview Конфигурация Firebase.
+ * ГАРАНТИЯ: Приложение работает автономно, если ключи не заданы.
  */
 
 export const firebaseConfig = {
@@ -12,11 +12,8 @@ export const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
 };
 
-// Проверка: ключи должны быть реальными, а не стандартными заглушками
 export const isFirebaseConfigValid = 
     !!firebaseConfig.apiKey && 
     firebaseConfig.apiKey.length > 15 && 
     !!firebaseConfig.projectId &&
-    !firebaseConfig.projectId.includes('project-id') &&
-    firebaseConfig.projectId !== 'your-project-id' &&
-    firebaseConfig.projectId !== '';
+    !firebaseConfig.projectId.includes('project-id');
