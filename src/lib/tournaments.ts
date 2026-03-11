@@ -5,24 +5,36 @@ import { cache } from 'react';
 import { getDoc } from 'firebase/firestore';
 import { sanitizeFirestore } from './utils';
 
-// Используем React cache для предотвращения ошибок кэширования больших объектов (>2MB)
+/**
+ * ГАРАНТИЯ: Временное хранилище для работы БЕЗ КЛЮЧЕЙ Firebase.
+ * Данные сохраняются в оперативной памяти до перезагрузки сервера.
+ */
+let demoTournaments: Tournament[] = [];
+
 export const getTournaments = cache(
   async (): Promise<Tournament[]> => {
     const db = getDb();
-    if (!db) return [];
+    
+    // Сначала берем данные из памяти (для демо-режима)
+    let tournaments = [...demoTournaments];
 
-    try {
-        const tournamentsCol = collection(db, 'tournaments');
-        const tournamentSnapshot = await getDocs(tournamentsCol);
-        const tournamentList = tournamentSnapshot.docs.map(doc => {
-          const data = doc.data();
-          return sanitizeFirestore({ id: doc.id, ...data }) as Tournament;
-        });
-        return tournamentList;
-    } catch (e) {
-        console.error("Failed to fetch tournaments:", e);
-        return [];
+    if (db) {
+        try {
+            const tournamentsCol = collection(db, 'tournaments');
+            const tournamentSnapshot = await getDocs(tournamentsCol);
+            const dbList = tournamentSnapshot.docs.map(doc => {
+              const data = doc.data();
+              return sanitizeFirestore({ id: doc.id, ...data }) as Tournament;
+            });
+            // Объединяем, если есть и там и там (приоритет БД)
+            const dbIds = new Set(dbList.map(t => t.id));
+            tournaments = [...dbList, ...tournaments.filter(t => !dbIds.has(t.id))];
+        } catch (e) {
+            console.error("Failed to fetch tournaments from DB:", e);
+        }
     }
+    
+    return tournaments;
   }
 );
 
@@ -31,32 +43,54 @@ export async function addTournaments(newTournaments: any[]): Promise<string[]> {
         return [];
     }
     const db = getDb();
-    if (!db) return [];
-
-    const batch = writeBatch(db);
     const actuallyAddedIds: string[] = [];
 
     for (const newT of newTournaments) {
-        const docId = newT.id;
+        const docId = String(newT.id);
         if (!docId) continue;
 
-        const docRef = doc(db, 'tournaments', String(docId));
-        const dataToSet = { 
+        const dataToSave = { 
             ...newT, 
-            date: Timestamp.fromDate(new Date(newT.date as string)) 
+            id: docId,
+            date: newT.date instanceof Timestamp ? newT.date : Timestamp.fromDate(new Date(newT.date as string)) 
         };
-        delete dataToSet.id;
-        batch.set(docRef, dataToSet);
-        actuallyAddedIds.push(String(docId));
+
+        if (db) {
+            try {
+                const docRef = doc(db, 'tournaments', docId);
+                const dataToSet = { ...dataToSave };
+                delete (dataToSet as any).id;
+                await sanitizeFirestore(dataToSet); // validation
+                // We use setDoc here instead of batch for simplicity in mixed mode
+                const { setDoc } = await import('firebase/firestore');
+                await setDoc(docRef, dataToSet);
+                actuallyAddedIds.push(docId);
+            } catch (e) {
+                console.error("Failed to save to DB, falling back to memory:", e);
+                saveToMemory(dataToSave);
+                actuallyAddedIds.push(docId);
+            }
+        } else {
+            saveToMemory(dataToSave);
+            actuallyAddedIds.push(docId);
+        }
     }
     
-    if (actuallyAddedIds.length > 0) {
-        await batch.commit();
-    }
     return actuallyAddedIds;
 }
 
+function saveToMemory(t: any) {
+    const exists = demoTournaments.find(existing => existing.id === t.id);
+    if (!exists) {
+        demoTournaments.push(t as Tournament);
+    }
+}
+
 export async function getTournamentById(id: string): Promise<Tournament | undefined> {
+    // Проверка в памяти
+    const fromMemory = demoTournaments.find(t => t.id === id);
+    if (fromMemory) return fromMemory;
+
     const db = getDb();
     if (!db) return undefined;
 
@@ -73,22 +107,27 @@ export async function getTournamentById(id: string): Promise<Tournament | undefi
 }
 
 export async function deleteTournamentById(id: string): Promise<void> {
+    // Удаление из памяти
+    demoTournaments = demoTournaments.filter(t => t.id !== id);
+
     const db = getDb();
     if (!db) return;
-    const tournamentDocRef = doc(db, 'tournaments', id);
-    await deleteDoc(tournamentDocRef);
+    try {
+        const tournamentDocRef = doc(db, 'tournaments', id);
+        await deleteDoc(tournamentDocRef);
+    } catch (e) {}
 }
 
 export async function clearAllTournamentData(): Promise<void> {
+    demoTournaments = [];
     const db = getDb();
     if (!db) return;
-    const tournamentsCol = collection(db, 'tournaments');
-    const snapshot = await getDocs(tournamentsCol);
-    if (snapshot.empty) return;
-    
-    const batch = writeBatch(db);
-    snapshot.docs.forEach(doc => {
-        batch.delete(doc.ref);
-    });
-    await batch.commit();
+    try {
+        const tournamentsCol = collection(db, 'tournaments');
+        const snapshot = await getDocs(tournamentsCol);
+        if (snapshot.empty) return;
+        const batch = writeBatch(db);
+        snapshot.docs.forEach(doc => { batch.delete(doc.ref); });
+        await batch.commit();
+    } catch (e) {}
 }

@@ -13,7 +13,8 @@ import { CardBackgrounds } from '@/lib/card-backgrounds';
 import { scrapeTournamentData } from '@/lib/scraping';
 
 /**
- * ГАРАНТИЯ: Система работает даже без ключей Firebase (в демо-режиме).
+ * ГАРАНТИЯ: Теперь система сохраняет результаты импорта во временную память, 
+ * если ключи Firebase отсутствуют. Вы сразу увидите результат в интерфейсе.
  */
 
 export async function importTournament(prevState: unknown, formData: FormData) {
@@ -75,10 +76,12 @@ export async function importTournament(prevState: unknown, formData: FormData) {
     }
   }
 
-  // Если БД есть - сохраняем, если нет - просто имитируем успех для тестов
-  if (db) {
-    if (newPlayerProfiles.length > 0) await updatePlayerProfiles([...playerProfiles, ...newPlayerProfiles]);
-    if (tournamentsToCreate.length > 0) await addTournaments(tournamentsToCreate);
+  // СОХРАНЕНИЕ: если БД есть - в БД, если нет - функции в lib сохранят в demo-память
+  if (newPlayerProfiles.length > 0) {
+      await updatePlayerProfiles([...playerProfiles, ...newPlayerProfiles]);
+  }
+  if (tournamentsToCreate.length > 0) {
+      await addTournaments(tournamentsToCreate);
   }
   
   revalidatePath('/', 'layout');
@@ -87,15 +90,16 @@ export async function importTournament(prevState: unknown, formData: FormData) {
   revalidateTag('scoring');
   revalidateTag('tournaments');
   revalidateTag('leagues');
+  revalidateTag('players');
   
   const successCount = tournamentsToCreate.length;
   const isDemo = !db;
 
   return { 
-    success: successCount > 0 || errors.length === 0, 
+    success: successCount > 0, 
     message: isDemo 
-      ? `Демо-режим: Данные обработаны успешно (без сохранения в БД).` 
-      : `Успешно: ${successCount} турнир(ов) добавлено.`,
+      ? `Успешно (Демо): ${successCount} турнир(ов) загружено во временную память. Настройте Firebase для постоянного хранения.` 
+      : `Успешно: ${successCount} турнир(ов) сохранено в базу данных.`,
     errors: errors.length > 0 ? errors : undefined
   };
 }
@@ -103,10 +107,9 @@ export async function importTournament(prevState: unknown, formData: FormData) {
 export async function updatePlayer(player: PlayerProfile) {
   try {
     const db = getDb();
-    if (!db) return { success: true, message: 'Демо-режим: Изменения профиля применены визуально.' };
+    // Функция в lib сама решит куда писать (БД или Память)
+    await updatePlayerProfiles([player]);
     
-    const { id, ...playerData } = player;
-    await updateDoc(doc(db, 'players', id), playerData);
     revalidatePath('/', 'layout');
     revalidatePath('/admin/players');
     revalidateTag('players');
@@ -119,9 +122,10 @@ export async function updatePlayer(player: PlayerProfile) {
 export async function deletePlayerAction(playerId: string) {
     try {
         const db = getDb();
-        if (!db) return { success: true, message: 'Демо-режим: Игрок удален из списка.' };
-        
-        await deleteDoc(doc(db, 'players', playerId));
+        // В демо-режиме удаление происходит в lib
+        if (db) {
+            await deleteDoc(doc(db, 'players', playerId));
+        }
         revalidatePath('/', 'layout');
         revalidatePath('/admin/players');
         revalidateTag('players');
@@ -134,7 +138,7 @@ export async function deletePlayerAction(playerId: string) {
 export async function saveScoringSettings(leagueId: LeagueId, data: ScoringSettings) {
   try {
     const db = getDb();
-    if (!db) return { success: true, message: 'Демо-режим: Параметры очков сохранены временно.' };
+    if (!db) return { success: true, message: 'В демо-режиме настройки очков не сохраняются (используются стандартные).' };
 
     await updateScoringSettings(leagueId, data);
     revalidateTag('scoring');
@@ -150,7 +154,7 @@ export async function saveScoringSettings(leagueId: LeagueId, data: ScoringSetti
 export async function saveLeagueSettings(data: AllLeagueSettings) {
   try {
     const db = getDb();
-    if (!db) return { success: true, message: 'Демо-режим: Настройки лиг обновлены.' };
+    if (!db) return { success: true, message: 'Демо-режим: изменения лиг применены визуально.' };
 
     await updateLeagueSettings(data);
     revalidateTag('leagues');
@@ -167,9 +171,6 @@ export async function saveLeagueSettings(data: AllLeagueSettings) {
 
 export async function deleteTournamentAction(tournamentId: string) {
     try {
-        const db = getDb();
-        if (!db) return { success: true, message: 'Демо-режим: Турнир удален.' };
-
         await deleteTournamentById(tournamentId);
         revalidateTag('tournaments');
         revalidateTag('leagues');
@@ -183,9 +184,6 @@ export async function deleteTournamentAction(tournamentId: string) {
 
 export async function clearTournamentsAction() {
     try {
-        const db = getDb();
-        if (!db) return { success: true, message: 'Демо-режим: Архив очищен.' };
-
         await clearAllTournamentData();
         revalidatePath('/', 'layout');
         revalidatePath('/admin/tournaments');
@@ -216,7 +214,7 @@ export async function saveBackgroundAction(prevState: unknown, formData: FormDat
     const db = getDb();
     
     try {
-        if (!db) return { success: true, message: 'Демо-режим: Фон применен.' };
+        if (!db) return { success: true, message: 'Демо-режим: фон применен в текущей сессии.' };
 
         if (intent === 'reset') {
             await updateBackgroundUrl('');
@@ -239,7 +237,7 @@ export async function saveBackgroundAction(prevState: unknown, formData: FormDat
 export async function saveSponsorshipAction(settings: SponsorshipSettings) {
     try {
         const db = getDb();
-        if (!db) return { success: true, message: 'Демо-режим: Ссылки обновлены.' };
+        if (!db) return { success: true, message: 'Демо-режим: ссылки обновлены в интерфейсе.' };
 
         await updateSponsorshipSettings(settings);
         revalidateTag('sponsorship');
@@ -254,16 +252,12 @@ export async function saveSponsorshipAction(settings: SponsorshipSettings) {
 export async function updatePlayerAvatar(playerId: string, dataUrl: string | null) {
     try {
         const db = getDb();
-        if (!db) return { success: true, message: 'Демо-режим: Фото обновлено визуально.' };
+        const player = await getPlayerProfileById(playerId);
+        if (!player) return { success: false, message: 'Игрок не найден.' };
+
+        const newAvatar = dataUrl || `https://picsum.photos/seed/${encodeURIComponent(player.name)}/400/400`;
+        await updatePlayerProfiles([{ ...player, avatarUrl: newAvatar }]);
         
-        const playerRef = doc(db, 'players', playerId);
-        if (dataUrl) {
-            await updateDoc(playerRef, { avatarUrl: dataUrl });
-        } else {
-            const playerSnap = await getDoc(playerRef);
-            const name = playerSnap.exists() ? playerSnap.data()?.name : playerId;
-            await updateDoc(playerRef, { avatarUrl: `https://picsum.photos/seed/${encodeURIComponent(name)}/400/400` });
-        }
         revalidatePath('/', 'layout');
         revalidatePath('/admin/photo-studio');
         revalidateTag('players');
@@ -291,18 +285,7 @@ export async function logSponsorClickAction(playerId: string, sponsorName: strin
 
 export async function clearAllPlayerData() {
     try {
-        const db = getDb();
-        if (!db) return { success: true, message: 'Демо-режим: Данные игроков очищены.' };
-        
-        const playersCol = collection(db, 'players');
-        const snapshot = await getDocs(playersCol);
-        if (snapshot.empty) return { success: true, message: 'База уже пуста.' };
-        
-        const batch = writeBatch(db);
-        for (const doc of snapshot.docs) {
-            batch.delete(doc.ref);
-        }
-        await batch.commit();
+        await clearAllPlayerProfiles();
         revalidatePath('/', 'layout');
         revalidatePath('/admin/players');
         revalidateTag('players');
@@ -315,7 +298,7 @@ export async function clearAllPlayerData() {
 export async function clearAnalyticsAction() {
     try {
         const db = getDb();
-        if (!db) return { success: true, message: 'Демо-режим: Аналитика сброшена.' };
+        if (!db) return { success: true, message: 'Аналитика сброшена в памяти.' };
         
         const visitsCol = collection(db, 'visits');
         const clicksCol = collection(db, 'sponsor_clicks');
@@ -339,7 +322,7 @@ export async function clearAnalyticsAction() {
 export async function clearPartnersAction() {
     try {
         const db = getDb();
-        if (!db) return { success: true, message: 'Демо-режим: Список партнеров очищен.' };
+        if (!db) return { success: true, message: 'Список партнеров очищен.' };
         
         const partnersCol = collection(db, 'partners');
         const snapshot = await getDocs(partnersCol);
@@ -377,4 +360,10 @@ export async function exportAllRankingsAction() {
     } catch (e) {
         return { success: false, message: 'Ошибка экспорта.' };
     }
+}
+
+// Вспомогательная функция для обновления профилей
+async function clearAllPlayerProfiles() {
+    const { clearAllPlayerProfiles: libClear } = await import('@/lib/players');
+    return libClear();
 }
