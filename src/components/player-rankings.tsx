@@ -44,7 +44,7 @@ function FederalHeader({ theme }: { theme: any }) {
     return (
         <div className={cn(
             "grid gap-6 px-10 opacity-60 select-none items-center font-headline text-[11px] uppercase tracking-[0.3em] font-black",
-            "sticky top-[360px] md:top-[372px] z-30 bg-background/98 backdrop-blur-2xl py-6 border-b border-white/10 -mx-4 px-10 rounded-t-3xl shadow-[0_20px_40px_rgba(0,0,0,0.4)]",
+            "sticky top-[372px] z-30 bg-background/98 backdrop-blur-2xl py-6 border-b border-white/10 -mx-4 px-10 rounded-t-3xl shadow-[0_20px_40px_rgba(0,0,0,0.4)]",
             DESKTOP_GRID_COLS
         )}>
             <span className="text-center">МЕСТО</span>

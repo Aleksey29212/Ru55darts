@@ -49,7 +49,6 @@ export function safeNumber(value: any): number {
 /**
  * Рекурсивно очищает данные Firestore для безопасной передачи в Client Components.
  * Предотвращает ошибки "Objects with toJSON methods are not supported" для объектов Timestamp.
- * Также конвертирует все даты и Timestamp в ISO-строки.
  */
 export function sanitizeFirestore(data: any): any {
   if (data === null || data === undefined) return data;
@@ -60,7 +59,6 @@ export function sanitizeFirestore(data: any): any {
       return data.toDate().toISOString();
     }
     
-    // Проверка структуры {seconds, nanoseconds}, которую часто возвращает SDK в Node.js
     if (typeof data.seconds === 'number' && typeof data.nanoseconds === 'number') {
       return new Date(data.seconds * 1000).toISOString();
     }
@@ -70,12 +68,10 @@ export function sanitizeFirestore(data: any): any {
     }
   }
 
-  // Если это массив, обрабатываем каждый элемент
   if (Array.isArray(data)) {
     return data.map(sanitizeFirestore);
   }
 
-  // Если это простой объект, обрабатываем каждое поле рекурсивно
   if (typeof data === 'object' && data !== null) {
     const proto = Object.getPrototypeOf(data);
     if (proto === null || proto === Object.prototype) {
@@ -89,6 +85,5 @@ export function sanitizeFirestore(data: any): any {
     }
   }
 
-  // Для примитивных типов возвращаем как есть
   return data;
 }

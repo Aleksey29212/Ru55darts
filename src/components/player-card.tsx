@@ -42,21 +42,20 @@ const StatItem = ({
     const [isRevealed, setIsRevealed] = useState(false);
     const valueString = String(value);
     
-    // Умный расчет адаптивности текста
+    // Адаптация шрифта под длину значения
     const isLongValue = valueString.length > 3;
     const hasDecimal = valueString.includes('.');
-    const needsCompression = isLongValue || hasDecimal;
     
     const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-5 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[140px] sm:min-h-[165px] cursor-pointer active:scale-95 select-none overflow-hidden";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
-        modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
+        modern: "bg-background/60 backdrop-blur-md border-white/5",
         dynamic: "bg-black/80 text-white border-accent/50 shadow-[0_0_30px_rgba(var(--accent-rgb),0.2)]"
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 animate-in fade-in zoom-in-95 px-1",
-        needsCompression 
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 animate-in fade-in zoom-in-95 px-1 break-words",
+        (isLongValue || hasDecimal) 
             ? "text-xl sm:text-2xl md:text-3xl lg:text-4xl" 
             : "text-3xl sm:text-4xl md:text-5xl lg:text-6xl",
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
@@ -320,7 +319,7 @@ export function PlayerCard({
             
             <div className="grid grid-cols-1 gap-10 md:gap-16">
                 {showCTA && (
-                    <div className="p-6 md:p-10 rounded-[2.5rem] bg-primary/5 border-2 border-dashed border-primary/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-inner group/sponsorship transition-all hover:bg-primary/10 animate-shimmer">
+                    <div className="p-6 md:p-10 rounded-[2.5rem] bg-primary/5 border-2 border-dashed border-primary/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-inner group/sponsorship transition-all hover:bg-primary/10">
                         <div className="flex items-center gap-5">
                             <div className="p-3 rounded-xl bg-primary/20 text-primary shadow-lg group-hover/sponsorship:rotate-12 transition-transform">
                                 <Handshake className="h-8 w-8" />
