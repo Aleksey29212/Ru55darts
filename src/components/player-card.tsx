@@ -476,7 +476,7 @@ export function PlayerCard({
                                 name="points" 
                                 value={player.points} 
                                 caption="ИТГ"
-                                description="Общее количество рейтинговых очков, заработанных во всех активных лигах." 
+                                description="Суммарный рейтинг игрока. Складывается из базовых очков за занятые места и всех заработанных бонусов во всех включенных лигах." 
                             />
                             <StatItem 
                                 template={template} 
@@ -484,7 +484,7 @@ export function PlayerCard({
                                 name="matchesPlayed" 
                                 value={player.matchesPlayed} 
                                 caption="МТЧ"
-                                description="Общее количество официальных турниров, которые посетил игрок." 
+                                description="Общий стаж игрока в системе. Показывает количество официальных турниров, в которых спортсмен принял участие." 
                             />
                             <StatItem 
                                 template={template} 
@@ -492,7 +492,7 @@ export function PlayerCard({
                                 name="wins" 
                                 value={player.wins} 
                                 caption="П-ОФ"
-                                description="Сколько раз игрок выходил в четвертьфинал или выше (плей-офф)." 
+                                description="Показатель мастерства прохождения сетки. Учитывает все выходы в 1/4 финала, полуфиналы и финалы (плей-офф стадию)." 
                             />
                             <StatItem 
                                 template={template} 
@@ -500,7 +500,7 @@ export function PlayerCard({
                                 name="losses" 
                                 value={player.losses} 
                                 caption="ВЫЛ"
-                                description="Турниры, в которых игрок завершил выступление на групповой стадии." 
+                                description="Количество турниров, в которых игрок не смог преодолеть барьер групповой стадии и выйти в основную сетку на вылет." 
                             />
                             <StatItem 
                                 template={template} 
@@ -508,7 +508,7 @@ export function PlayerCard({
                                 name="winRate" 
                                 value={winRate} 
                                 caption="ПЦТ"
-                                description="Процент выхода в плей-офф от общего количества сыгранных турниров." 
+                                description="Коэффициент результативности. Показывает процент выходов в плей-офф относительно общего количества сыгранных турниров." 
                             />
                         </div>
                     </div>
@@ -527,7 +527,7 @@ export function PlayerCard({
                                     name="basePoints" 
                                     value={player.basePoints} 
                                     caption="ЗА МЕСТА"
-                                    description="Баллы, начисленные строго за итоговую позицию в турнирной таблице." 
+                                    description="Очки за спортивный результат. Начисляются согласно официальной таблице рангов в зависимости от итогового места в туре." 
                             />
                                 <StatItem 
                                     template={template} 
@@ -535,7 +535,7 @@ export function PlayerCard({
                                     name="bonusPoints" 
                                     value={`+${player.bonusPoints}`} 
                                     caption="БОНУСЫ"
-                                    description="Дополнительные баллы за 180, высокие чекауты, средний набор и скоростные леги." 
+                                    description="Баллы за профессионализм. Сумма дополнительных начислений за 180, высокие закрытия, скорость лега и высокий средний набор." 
                                 />
                             </div>
                         </div>
@@ -553,7 +553,7 @@ export function PlayerCard({
                                     name="avg" 
                                     value={(Number(player.avg) || 0).toFixed(1)} 
                                     caption="НАБОР"
-                                    description="Средний балл за 3 дротика. Основной показатель стабильности игрока." 
+                                    description="Average (Средний набор). Ключевой индикатор класса: среднее количество очков, набираемое за один подход из 3 дротиков." 
                                 />
                                 <StatItem 
                                     template={template} 
@@ -561,7 +561,7 @@ export function PlayerCard({
                                     name="n180s" 
                                     value={player.n180s} 
                                     caption="МАКСИМУМЫ"
-                                    description="Общее количество идеальных подходов по 180 очков в официальных матчах." 
+                                    description="Максимальный набор очков. Количество случаев, когда игрок попадал всеми тремя дротиками в утроение сектора 20 за один подход." 
                                 />
                                 <StatItem 
                                     template={template} 
@@ -569,7 +569,7 @@ export function PlayerCard({
                                     name="hiOut" 
                                     value={Number(player.hiOut) || 0} 
                                     caption="ФИНИШ"
-                                    description="Самое высокое закрытие лега (максимальное количество очков за один подход на финише)." 
+                                    description="Max Out (Максимальный чекаут). Лучший результат закрытия лега одним подходом. Показывает точность игрока на финише." 
                                 />
                             </div>
                         </div>
