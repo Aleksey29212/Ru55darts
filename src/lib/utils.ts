@@ -14,10 +14,16 @@ export function formatDate(dateSource: any): string {
 
   let date: Date;
 
-  if (typeof dateSource === 'object' && dateSource !== null && typeof dateSource.toDate === 'function') {
-    date = dateSource.toDate();
-  } else if (dateSource?.seconds) {
-    date = new Date(dateSource.seconds * 1000);
+  if (typeof dateSource === 'object' && dateSource !== null) {
+    if (typeof dateSource.toDate === 'function') {
+      date = dateSource.toDate();
+    } else if (typeof dateSource.seconds === 'number') {
+      date = new Date(dateSource.seconds * 1000);
+    } else if (dateSource instanceof Date) {
+      date = dateSource;
+    } else {
+      date = new Date(dateSource);
+    }
   } else if (typeof dateSource === 'string') {
     date = new Date(dateSource);
   } else {
@@ -43,14 +49,25 @@ export function safeNumber(value: any): number {
 /**
  * Рекурсивно очищает данные Firestore для безопасной передачи в Client Components.
  * Предотвращает ошибки "Objects with toJSON methods are not supported" для объектов Timestamp.
- * Также конвертирует все даты в ISO-строки.
+ * Также конвертирует все даты и Timestamp в ISO-строки.
  */
 export function sanitizeFirestore(data: any): any {
   if (data === null || data === undefined) return data;
 
-  // Если это Firestore Timestamp или объект с методом toDate
-  if (typeof data.toDate === 'function') {
-    return data.toDate().toISOString();
+  // Если это Firestore Timestamp или объект, похожий на него
+  if (typeof data === 'object') {
+    if (typeof data.toDate === 'function') {
+      return data.toDate().toISOString();
+    }
+    
+    // Проверка структуры {seconds, nanoseconds}, которую часто возвращает SDK в Node.js
+    if (typeof data.seconds === 'number' && typeof data.nanoseconds === 'number') {
+      return new Date(data.seconds * 1000).toISOString();
+    }
+
+    if (data instanceof Date) {
+      return data.toISOString();
+    }
   }
 
   // Если это массив, обрабатываем каждый элемент
@@ -58,9 +75,8 @@ export function sanitizeFirestore(data: any): any {
     return data.map(sanitizeFirestore);
   }
 
-  // Если это объект, обрабатываем каждое поле
+  // Если это простой объект, обрабатываем каждое поле рекурсивно
   if (typeof data === 'object' && data !== null) {
-    // Проверка, что это простой объект, а не специальный класс Firebase (кроме Timestamp)
     const proto = Object.getPrototypeOf(data);
     if (proto === null || proto === Object.prototype) {
       const sanitized: any = {};

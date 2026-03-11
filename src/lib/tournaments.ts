@@ -26,7 +26,8 @@ export const getTournaments = cache(
             const tournamentSnapshot = await getDocs(tournamentsCol);
             const dbList = tournamentSnapshot.docs.map(doc => {
               const data = doc.data();
-              return sanitizeFirestore({ id: doc.id, ...data }) as Tournament;
+              // Тщательная очистка каждого документа для Client Components
+              return sanitizeFirestore({ ...data, id: doc.id }) as Tournament;
             });
             // Объединяем, если есть в БД (приоритет БД)
             const dbIds = new Set(dbList.map(t => t.id));
@@ -39,7 +40,7 @@ export const getTournaments = cache(
         }
     }
     
-    return tournaments;
+    return sanitizeFirestore(tournaments) as Tournament[];
   }
 );
 
@@ -89,7 +90,7 @@ export async function addTournaments(newTournaments: any[]): Promise<string[]> {
 export async function getTournamentById(id: string): Promise<Tournament | undefined> {
     const memoryStore = (global as any).demoTournaments as Tournament[];
     const fromMemory = memoryStore.find(t => t.id === id);
-    if (fromMemory) return fromMemory;
+    if (fromMemory) return sanitizeFirestore(fromMemory);
 
     const db = getDb();
     if (!db) return undefined;
@@ -100,7 +101,7 @@ export async function getTournamentById(id: string): Promise<Tournament | undefi
 
         if (docSnap.exists()) {
             const data = docSnap.data();
-            const tournament = sanitizeFirestore({ id: docSnap.id, ...data }) as Tournament;
+            const tournament = sanitizeFirestore({ ...data, id: docSnap.id }) as Tournament;
             // Кешируем в память
             if (!memoryStore.some(t => t.id === tournament.id)) {
                 memoryStore.push(tournament);
