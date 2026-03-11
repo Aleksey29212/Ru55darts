@@ -5,7 +5,23 @@ import type { LeagueId, Player, AllLeagueSettings, ScoringSettings, SponsorshipS
 import { LeaderboardHero } from '@/components/leaderboard-hero';
 import { PlayerRankings } from '@/components/player-rankings';
 import { cn } from '@/lib/utils';
-import { Target, Sunset, Sparkles, Wallet, Award, ShieldCheck, Trophy, CircleUser, Loader2 } from 'lucide-react';
+import { 
+    Target, 
+    Sunset, 
+    Sparkles, 
+    Wallet, 
+    Award, 
+    ShieldCheck, 
+    Trophy, 
+    CircleUser, 
+    Loader2, 
+    BarChart2, 
+    ChevronsUp, 
+    Diamond, 
+    Users, 
+    Baby,
+    Medal
+} from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import Image from 'next/image';
 import { Button } from './ui/button';
@@ -29,22 +45,30 @@ const DEFAULT_BANNER = 'https://picsum.photos/seed/darts-league/600/200';
 const leagueIcons: Record<string, any> = {
     general: Trophy,
     evening_omsk: Sunset,
-    premier: Target,
-    cricket: Target,
+    premier: ShieldCheck,
     first: Award,
+    second: BarChart2,
+    third: ChevronsUp,
+    fourth: Diamond,
+    cricket: Target,
+    senior: Users,
+    youth: Baby,
     women: CircleUser,
 };
 
 const getLeagueBaseColor = (leagueId: LeagueId) => {
     const colors: Record<string, string> = {
-        general: 'rgba(6, 182, 212, 0.6)',
-        evening_omsk: 'rgba(249, 115, 22, 0.6)',
-        premier: 'rgba(244, 63, 94, 0.6)',
-        first: 'rgba(245, 158, 11, 0.6)',
-        cricket: 'rgba(16, 185, 129, 0.6)',
-        senior: 'rgba(59, 130, 246, 0.6)',
-        youth: 'rgba(132, 204, 22, 0.6)',
-        women: 'rgba(99, 102, 241, 0.6)',
+        general: 'rgba(6, 182, 212, 0.8)',
+        evening_omsk: 'rgba(249, 115, 22, 0.8)',
+        premier: 'rgba(59, 130, 246, 0.8)',
+        first: 'rgba(245, 158, 11, 0.8)',
+        second: 'rgba(139, 92, 246, 0.8)',
+        third: 'rgba(16, 185, 129, 0.8)',
+        fourth: 'rgba(236, 72, 153, 0.8)',
+        cricket: 'rgba(34, 197, 94, 0.8)',
+        senior: 'rgba(71, 85, 105, 0.8)',
+        youth: 'rgba(163, 230, 53, 0.8)',
+        women: 'rgba(217, 70, 239, 0.8)',
     };
     return colors[leagueId] || colors.general;
 }
@@ -198,39 +222,39 @@ export function LeaguePanels({
                                 tabIndex={0}
                                 onClick={() => handleLeagueSelect(leagueId)}
                                 className={cn(
-                                    'relative min-w-[150px] md:min-w-[200px] h-12 md:h-14 rounded-[1.5rem] overflow-hidden transition-all duration-500 transform shrink-0 cursor-pointer outline-none border-2 shadow-xl',
+                                    'relative min-w-[160px] md:min-w-[220px] h-14 md:h-16 rounded-[1.5rem] overflow-hidden transition-all duration-500 transform shrink-0 cursor-pointer outline-none border-2 shadow-xl',
                                     isSelected 
                                         ? 'border-primary ring-4 ring-primary/10 scale-105 z-10 shadow-[0_0_40px_rgba(var(--primary-rgb),0.3)]' 
-                                        : 'border-white/5 opacity-50 hover:opacity-100 hover:border-primary/40'
+                                        : 'border-white/5 opacity-60 hover:opacity-100 hover:border-primary/40'
                                 )}
                             >
                                 <Image src={banner} alt="" fill className="object-cover transition-all duration-1000 group-hover:scale-125" unoptimized={banner.startsWith('data:')} />
                                 <div className={cn(
                                     "absolute inset-0 bg-gradient-to-r transition-opacity duration-700",
-                                    isSelected ? "from-black/95 via-black/70 to-transparent" : "from-black/90 via-black/50 to-transparent"
+                                    isSelected ? "from-black/95 via-black/75 to-transparent" : "from-black/90 via-black/60 to-transparent"
                                 )} />
                                 <div className="absolute inset-0 px-4 flex items-center gap-3">
                                     <div 
                                         className={cn(
-                                            "p-1.5 rounded-xl backdrop-blur-xl border border-white/20 text-white shadow-2xl transition-all duration-700",
-                                            isSelected && "scale-110 rotate-[360deg] border-white/40"
+                                            "p-2 rounded-xl backdrop-blur-xl border border-white/30 text-white shadow-2xl transition-all duration-700",
+                                            isSelected && "scale-110 rotate-[360deg] border-white/50"
                                         )}
                                         style={{ backgroundColor: baseColor }}
                                     >
                                         {isPending && isSelected && !isReallySelected ? (
-                                            <Loader2 className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
+                                            <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
                                         ) : (
-                                            <LeagueIcon className="h-3 w-3 md:h-4 md:w-4" />
+                                            <LeagueIcon className="h-4 w-4 md:h-5 md:w-5" />
                                         )}
                                     </div>
                                     <div className="flex flex-col justify-center overflow-hidden">
-                                        <p className="text-[11px] md:text-[13px] font-headline text-white uppercase tracking-tight truncate leading-none mb-1">{leagueInfo.name}</p>
+                                        <p className="text-[12px] md:text-[14px] font-headline text-white uppercase tracking-tight truncate leading-none mb-1 text-glow-white">{leagueInfo.name}</p>
                                         <div className="flex items-center gap-1.5">
                                             <div 
                                                 className={cn("h-1 w-1 rounded-full", isSelected ? "animate-pulse" : "opacity-30")} 
                                                 style={{ backgroundColor: baseColor }}
                                             />
-                                            <p className="text-[7px] md:text-[8px] text-white/60 font-black uppercase tracking-[0.25em]">
+                                            <p className="text-[8px] md:text-[9px] text-white/70 font-black uppercase tracking-[0.25em]">
                                                 {isSelected ? 'АКТИВНО' : 'СМОТРЕТЬ'}
                                             </p>
                                         </div>

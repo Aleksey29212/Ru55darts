@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, ReactNode } from 'react';
@@ -13,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { 
     Trophy, 
-    Shield, 
+    ShieldCheck, 
     Award, 
     Star, 
     Users, 
@@ -29,7 +28,11 @@ import {
     Sparkles,
     Wallet,
     Home,
-    ChevronRight
+    ChevronRight,
+    BarChart2,
+    ChevronsUp,
+    Diamond,
+    CircleUser
 } from 'lucide-react';
 import type { ScoringSettings, LeagueId, SponsorshipSettings } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
@@ -46,13 +49,16 @@ interface ScoringHelpDialogProps {
 
 const leagueIcons: Record<string, any> = {
     general: Trophy,
-    premier: Shield,
+    evening_omsk: Moon,
+    premier: ShieldCheck,
     first: Award,
-    cricket: Star,
+    second: BarChart2,
+    third: ChevronsUp,
+    fourth: Diamond,
+    cricket: Target,
     senior: Users,
     youth: Baby,
-    women: PersonStanding,
-    evening_omsk: Moon,
+    women: CircleUser,
 };
 
 const leagueBookStyles: Record<string, string> = {
@@ -221,7 +227,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 {/* Bookshelf Navigation - Two Rows */}
                 <div className="relative z-20 -mt-10 mb-12">
                     <div className="w-full px-4 flex justify-center">
-                        <TabsList className="bg-black/60 backdrop-blur-3xl p-4 border border-white/10 h-auto grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-11 gap-2 mx-auto w-fit rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                        <TabsList className="bg-black/60 backdrop-blur-3xl p-4 border border-white/10 h-auto grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-3 mx-auto w-fit rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
                             {settingsArray.map((s, idx) => {
                                 const id = s.id || 'general';
                                 const Icon = leagueIcons[id] || Trophy;
@@ -231,7 +237,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                         key={idx} 
                                         value={id} 
                                         className={cn(
-                                            "relative flex flex-col items-center justify-center w-14 h-16 sm:w-16 sm:h-20 md:w-20 md:h-24 rounded-xl border-2 transition-all duration-500",
+                                            "relative flex flex-col items-center justify-center w-16 h-20 sm:w-20 sm:h-24 md:w-24 md:h-28 rounded-xl border-2 transition-all duration-500",
                                             "bg-gradient-to-br shadow-2xl overflow-hidden",
                                             "data-[state=active]:-translate-y-2 data-[state=active]:scale-110 data-[state=active]:border-white data-[state=active]:z-10",
                                             "data-[state=inactive]:opacity-40 data-[state=inactive]:grayscale data-[state=inactive]:scale-95 data-[state=inactive]:hover:opacity-100 data-[state=inactive]:hover:grayscale-0",
@@ -239,8 +245,8 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                         )}
                                     >
                                         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        <Icon className="h-4 w-4 md:h-6 md:w-6 mb-1 text-white drop-shadow-lg" />
-                                        <span className="text-[7px] md:text-[8px] font-black uppercase tracking-tighter text-white text-center leading-tight px-1 drop-shadow-md">
+                                        <Icon className="h-5 w-5 md:h-7 md:w-7 mb-2 text-white drop-shadow-lg" />
+                                        <span className="text-[8px] md:text-[9px] font-black uppercase tracking-tighter text-white text-center leading-tight px-1 drop-shadow-md">
                                             {namesArray[idx] || 'Лига'}
                                         </span>
                                         <div className="absolute left-0.5 top-1/4 bottom-1/4 w-0.5 bg-white/20 rounded-full" />
