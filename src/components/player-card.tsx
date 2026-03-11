@@ -25,8 +25,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ScoringHelpDialog } from './scoring-help-dialog';
 
 /**
- * @fileOverview Личная карточка игрока (Версия v3.0 - Adaptive Stats).
- * ГАРАНТИЯ: Динамические рамки, которые не обрезают данные и идеально читаются.
+ * @fileOverview Личная карточка игрока (Версия v3.1 - Fixed Overlap).
+ * ГАРАНТИЯ: Никакого нахлеста данных. Сетки адаптированы под любые цифры.
  */
 
 const StatItem = ({ 
@@ -44,15 +44,18 @@ const StatItem = ({
     description?: string,
     caption?: string,
 }) => {
-    const baseClasses = "flex flex-col items-center justify-center p-4 sm:p-6 rounded-[2rem] gap-1 transition-all border border-transparent interactive-scale overflow-hidden shadow-xl relative w-full min-w-fit";
+    const baseClasses = "flex flex-col items-center justify-center p-3 sm:py-5 sm:px-2 rounded-[1.5rem] gap-1 transition-all border border-transparent interactive-scale overflow-hidden shadow-xl relative w-full";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
         dynamic: "bg-black/80 text-white border-accent/50 shadow-[0_0_30px_rgba(var(--accent-rgb),0.2)]"
     };
 
+    const isRecordBlock = name === 'avg' || name === 'n180s' || name === 'hiOut';
+
     const valueClasses = cn(
-        "text-2xl sm:text-4xl md:text-5xl font-headline tracking-tight leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap",
+        "font-headline tracking-tight leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap",
+        isRecordBlock ? "text-xl sm:text-3xl md:text-4xl" : "text-2xl sm:text-4xl md:text-5xl",
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : ''
     );
@@ -68,17 +71,17 @@ const StatItem = ({
                             templateClasses[template]
                         )}
                     >
-                        <p className="text-[10px] sm:text-[11px] font-black text-muted-foreground/80 flex items-center justify-center gap-2 text-center uppercase tracking-[0.15em] font-body leading-none mb-3 px-1 w-full">
+                        <p className="text-[9px] sm:text-[10px] font-black text-muted-foreground/80 flex items-center justify-center gap-1 text-center uppercase tracking-[0.1em] font-body leading-none mb-2 px-1 w-full">
                             <span className="truncate">{label}</span>
-                            <Info className="h-3 w-3 shrink-0 opacity-40 text-primary group-hover:opacity-100 transition-opacity" />
+                            <Info className="h-2.5 w-2.5 shrink-0 opacity-40 text-primary group-hover:opacity-100 transition-opacity" />
                         </p>
                         
                         <div className="relative w-full flex flex-col items-center justify-center py-1">
                             <p className={valueClasses}>{value}</p>
                         </div>
 
-                        <p className="text-[9px] font-black uppercase text-primary/60 tracking-widest mt-3 text-center opacity-80 group-hover:text-primary transition-colors leading-none w-full">
-                            <span className="truncate">{caption || "СТАТИСТИКА"}</span>
+                        <p className="text-[8px] font-black uppercase text-primary/60 tracking-widest mt-2 text-center opacity-80 group-hover:text-primary transition-colors leading-none w-full">
+                            <span className="truncate">{caption || "СТАТ"}</span>
                         </p>
                     </div>
                 </TooltipTrigger>
@@ -361,13 +364,13 @@ export function PlayerCard({
                             </div>
                             <h3 className="text-[12px] md:text-lg font-headline uppercase tracking-[0.4em] text-white/60">КАРЬЕРНЫЙ ДАШБОРД</h3>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-8 lg:gap-10">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-6 lg:gap-8">
                             <StatItem 
                                 template={template} 
                                 label="ОЧКИ" 
                                 name="points" 
                                 value={player.points} 
-                                caption="ВСЕГО В СЕЗОНЕ"
+                                caption="ИТОГО"
                                 description="Общее количество рейтинговых очков, заработанных во всех активных лигах." 
                             />
                             <StatItem 
@@ -375,7 +378,7 @@ export function PlayerCard({
                                 label="ТУРЫ" 
                                 name="matchesPlayed" 
                                 value={player.matchesPlayed} 
-                                caption="УЧАСТИЕ"
+                                caption="МАТЧИ"
                                 description="Общее количество официальных турниров, которые посетил игрок." 
                             />
                             <StatItem 
@@ -399,20 +402,20 @@ export function PlayerCard({
                                 label="ЭФФ." 
                                 name="winRate" 
                                 value={winRate} 
-                                caption="КОЭФФИЦИЕНТ"
+                                caption="ПРОЦЕНТ"
                                 description="Процент попадания в плей-офф от общего количества сыгранных турниров." 
                             />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 lg:gap-20">
-                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[380px] hover:border-primary/30 transition-all duration-500">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-16">
+                        <div className="glassmorphism p-8 md:p-12 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full hover:border-primary/30 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
-                            <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
+                            <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 flex items-center gap-4 relative z-10">
                                 <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
                                 АНАЛИЗ РЕЗУЛЬТАТОВ
                             </h3>
-                            <div className="grid grid-cols-2 gap-6 md:gap-8 lg:gap-10 relative z-10 mt-auto">
+                            <div className="grid grid-cols-2 gap-4 sm:gap-6 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
                                     label="БАЗОВЫЕ" 
@@ -426,19 +429,19 @@ export function PlayerCard({
                                     label="БОНУСЫ" 
                                     name="bonusPoints" 
                                     value={`+${player.bonusPoints}`} 
-                                    caption="ЗА СТАТИСТИКУ"
+                                    caption="БОНУСЫ"
                                     description="Дополнительные очки за 180, высокие чекауты и средний набор." 
                                 />
                             </div>
                         </div>
 
-                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full min-h-[380px] hover:border-accent/30 transition-all duration-500">
+                        <div className="glassmorphism p-8 md:p-12 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col group/box h-full hover:border-accent/30 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
-                            <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
+                            <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 flex items-center gap-4 relative z-10">
                                 <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
                                 ЛИЧНЫЕ РЕКОРДЫ
                             </h3>
-                            <div className="grid grid-cols-3 gap-4 md:gap-6 relative z-10 mt-auto">
+                            <div className="grid grid-cols-3 gap-3 sm:gap-4 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
                                     label="СРЕДНИЙ" 
