@@ -1,8 +1,7 @@
-
 'use client';
 
 import { useRouter } from 'next/navigation';
-import type { LeagueId, Player, AllLeagueSettings, ScoringSettings, SponsorshipSettings } from '@/lib/types';
+import type { LeagueId, Player, AllLeagueSettings, ScoringSettings, SponsorshipSettings, Partner } from '@/lib/types';
 import { LeaderboardHero } from '@/components/leaderboard-hero';
 import { PlayerRankings } from '@/components/player-rankings';
 import { cn } from '@/lib/utils';
@@ -13,6 +12,7 @@ import { Button } from './ui/button';
 import { useIsClient } from '@/hooks/use-is-client';
 import { ScoringHelpDialog } from './scoring-help-dialog';
 import { useTransition, useEffect, useState } from 'react';
+import { PartnersDisplay } from './partners-display';
 
 interface LeaguePanelsProps {
   enabledLeagues: LeagueId[];
@@ -21,6 +21,7 @@ interface LeaguePanelsProps {
   currentLeagueId: LeagueId;
   allScoringSettings: Record<LeagueId, ScoringSettings>;
   sponsorshipSettings: SponsorshipSettings;
+  partners: Partner[];
 }
 
 const DEFAULT_BANNER = 'https://picsum.photos/seed/darts-league/600/200';
@@ -128,7 +129,15 @@ function LeagueSection({
     );
 }
 
-export function LeaguePanels({ enabledLeagues, leagueSettings, currentLeagueRankings, currentLeagueId, allScoringSettings, sponsorshipSettings }: LeaguePanelsProps) {
+export function LeaguePanels({ 
+    enabledLeagues, 
+    leagueSettings, 
+    currentLeagueRankings, 
+    currentLeagueId, 
+    allScoringSettings, 
+    sponsorshipSettings,
+    partners 
+}: LeaguePanelsProps) {
     const router = useRouter();
     const isClient = useIsClient();
     const [isPending, startTransition] = useTransition();
@@ -166,8 +175,15 @@ export function LeaguePanels({ enabledLeagues, leagueSettings, currentLeagueRank
 
     return (
         <div className="w-full space-y-10">
-            <div className="sticky top-16 z-40 bg-background/80 backdrop-blur-xl pt-3 pb-1 -mx-4 px-4 border-b border-white/5">
-                <div className="flex items-center gap-2 md:gap-3 overflow-x-auto pb-3 scrollbar-hide no-scrollbar mask-fade-edges">
+            {/* Sticky Header Section combining Partners and Leagues */}
+            <div className="sticky top-16 z-40 bg-background/90 backdrop-blur-xl border-b border-white/10 -mx-4 px-4 py-2 space-y-2">
+                {/* Fixed Partners Ticker inside sticky area */}
+                <div className="max-w-full overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+                    <PartnersDisplay partners={partners} variant="compact" hideLabel />
+                </div>
+
+                {/* League Selection Scroll */}
+                <div className="flex items-center gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide no-scrollbar mask-fade-edges">
                     {enabledLeagues.map(leagueId => {
                         const leagueInfo = leagueSettings[leagueId];
                         const isSelected = optimisticLeagueId === leagueId;
@@ -183,7 +199,7 @@ export function LeaguePanels({ enabledLeagues, leagueSettings, currentLeagueRank
                                 tabIndex={0}
                                 onClick={() => handleLeagueSelect(leagueId)}
                                 className={cn(
-                                    'relative min-w-[140px] md:min-w-[180px] h-12 md:h-14 rounded-full overflow-hidden transition-all duration-300 transform shrink-0 cursor-pointer outline-none interactive-scale border shadow-md',
+                                    'relative min-w-[130px] md:min-w-[160px] h-10 md:h-12 rounded-full overflow-hidden transition-all duration-300 transform shrink-0 cursor-pointer outline-none interactive-scale border shadow-md',
                                     isSelected 
                                         ? 'border-primary ring-1 ring-primary/20 scale-105 z-10 shadow-primary/10' 
                                         : 'border-white/5 opacity-60 hover:opacity-100 hover:border-primary/30'
@@ -194,28 +210,28 @@ export function LeaguePanels({ enabledLeagues, leagueSettings, currentLeagueRank
                                     "absolute inset-0 bg-gradient-to-r transition-opacity duration-500",
                                     isSelected ? "from-black/90 via-black/60 to-transparent" : "from-black/80 via-black/40 to-transparent"
                                 )} />
-                                <div className="absolute inset-0 px-4 flex items-center gap-2.5">
+                                <div className="absolute inset-0 px-3 flex items-center gap-2">
                                     <div 
                                         className={cn(
-                                            "p-1.5 md:p-2 rounded-full backdrop-blur-md border border-white/10 text-white shadow-lg transition-transform duration-500",
+                                            "p-1 rounded-full backdrop-blur-md border border-white/10 text-white shadow-lg transition-transform duration-500",
                                             isSelected && "scale-110"
                                         )}
                                         style={{ backgroundColor: baseColor }}
                                     >
                                         {isPending && isSelected && !isReallySelected ? (
-                                            <Loader2 className="h-3 w-3 animate-spin" />
+                                            <Loader2 className="h-2.5 w-2.5 animate-spin" />
                                         ) : (
-                                            <LeagueIcon className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                                            <LeagueIcon className="h-2.5 w-2.5 md:h-3 md:w-3" />
                                         )}
                                     </div>
                                     <div className="flex flex-col justify-center overflow-hidden">
-                                        <p className="text-[11px] md:text-xs font-headline text-white uppercase tracking-tight truncate leading-none mb-0.5">{leagueInfo.name}</p>
+                                        <p className="text-[10px] md:text-[11px] font-headline text-white uppercase tracking-tight truncate leading-none mb-0.5">{leagueInfo.name}</p>
                                         <div className="flex items-center gap-1">
                                             <div 
                                                 className={cn("h-0.5 w-0.5 rounded-full", isSelected ? "animate-pulse" : "opacity-30")} 
                                                 style={{ backgroundColor: baseColor }}
                                             />
-                                            <p className="text-[7px] md:text-[8px] text-white/50 font-bold uppercase tracking-widest">
+                                            <p className="text-[6px] md:text-[7px] text-white/50 font-bold uppercase tracking-widest">
                                                 {isSelected ? 'LIVE' : 'ВЫБРАТЬ'}
                                             </p>
                                         </div>
@@ -227,7 +243,7 @@ export function LeaguePanels({ enabledLeagues, leagueSettings, currentLeagueRank
                 </div>
             </div>
             
-            <div className="w-full relative">
+            <div className="w-full relative pt-4">
                 {isPending && (
                     <div className="absolute inset-0 z-10 bg-background/20 backdrop-blur-[2px] transition-all duration-300 pointer-events-none" />
                 )}

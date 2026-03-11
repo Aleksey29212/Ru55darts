@@ -128,7 +128,15 @@ function RecruitmentCard({ variant }: { variant: 'default' | 'compact' }) {
     );
 }
 
-export function PartnersDisplay({ partners, variant = 'default' }: { partners: Partner[], variant?: 'default' | 'compact' }) {
+export function PartnersDisplay({ 
+    partners, 
+    variant = 'default',
+    hideLabel = false 
+}: { 
+    partners: Partner[], 
+    variant?: 'default' | 'compact',
+    hideLabel?: boolean 
+}) {
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -139,10 +147,12 @@ export function PartnersDisplay({ partners, variant = 'default' }: { partners: P
         const skeletonClasses = variant === 'compact' ? "h-24 w-40" : "h-40 w-40";
         return (
             <div className="w-full">
-                <div className="flex items-center gap-2 mb-4">
-                    <Handshake className="h-4 w-4 text-primary" />
-                    <Skeleton className="h-3 w-48" />
-                </div>
+                {!hideLabel && (
+                    <div className="flex items-center gap-2 mb-4">
+                        <Handshake className="h-4 w-4 text-primary" />
+                        <Skeleton className="h-3 w-48" />
+                    </div>
+                )}
                 <div className="flex gap-4 overflow-hidden">
                     {Array.from({ length: 6 }).map((_, i) => (
                         <Skeleton key={i} className={cn("rounded-lg shrink-0", skeletonClasses)} />
@@ -152,20 +162,19 @@ export function PartnersDisplay({ partners, variant = 'default' }: { partners: P
         );
     }
 
-    // Combine partners and recruitment card for the ticker
     const items = [...partners];
-    // Duplicate items to ensure seamless loop
     const tickerItems = [...items, ...items, ...items, ...items];
 
     return (
-        <div className="w-full space-y-4 overflow-hidden">
-            <div className="flex items-center gap-2 mb-2 px-1">
-                <Handshake className="h-4 w-4 text-primary" />
-                <span className="text-[10px] font-headline uppercase tracking-widest text-muted-foreground">Наши партнеры и спонсоры</span>
-            </div>
+        <div className={cn("w-full overflow-hidden", !hideLabel && "space-y-4")}>
+            {!hideLabel && (
+                <div className="flex items-center gap-2 mb-2 px-1">
+                    <Handshake className="h-4 w-4 text-primary" />
+                    <span className="text-[10px] font-headline uppercase tracking-widest text-muted-foreground">Наши партнеры и спонсоры</span>
+                </div>
+            )}
             
             <div className="relative group/ticker">
-                {/* Edge Masks for Smooth Entry/Exit */}
                 <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
                 <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
 
