@@ -88,7 +88,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
   if (!mounted) return children || null;
 
   const renderHelpPill = (label: string, val: string | number, Icon: any, colorClass: string, description?: string) => (
-    <div className="flex items-center justify-between py-1.5 px-3 rounded-xl bg-white/[0.05] border border-white/5 hover:border-primary/40 transition-all group shadow-lg active:scale-[0.98]">
+    <div className="flex items-center justify-between py-1 px-3 rounded-xl bg-white/[0.05] border border-white/5 hover:border-primary/40 transition-all group shadow-lg active:scale-[0.98]">
         <div className="flex items-center gap-2.5 min-w-0">
             <div className={cn("p-1 rounded-lg bg-black/40 border border-white/5 shrink-0", colorClass)}>
                 <Icon className="h-3.5 w-3.5" />
@@ -107,8 +107,8 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
   const renderLeagueContent = (s: ScoringSettings) => {
     if (s.isEveningOmsk) {
         return (
-            <div className="flex flex-col gap-3 pt-1">
-                <div className="p-4 md:p-5 rounded-[1.5rem] bg-gradient-to-br from-orange-500/15 to-orange-950/30 border border-orange-500/20 space-y-3 relative overflow-hidden group shadow-xl">
+            <div className="flex flex-col gap-2 pt-1 pb-4">
+                <div className="p-4 rounded-[1.5rem] bg-gradient-to-br from-orange-500/15 to-orange-950/30 border border-orange-500/20 space-y-3 relative overflow-hidden group shadow-xl">
                     <div className="absolute -top-6 -right-6 opacity-5 group-hover:scale-110 transition-transform duration-[5s]">
                         <Moon className="h-24 w-24 md:h-32 md:w-32 text-orange-500" />
                     </div>
@@ -121,9 +121,12 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                             <p className="text-[7px] uppercase font-black text-orange-300/40 tracking-widest">Вечерний Омск • Динамический расчет</p>
                         </div>
                     </div>
-                    <p className="text-[9px] md:text-[11px] text-white/70 leading-tight font-medium relative z-10">
-                        Формула: <span className="text-orange-400 font-black text-xs bg-orange-500/10 px-1.5 py-0.5 rounded-md border border-orange-500/20">AVG × Коэффициент этапа</span>
-                    </p>
+                    <div className="bg-black/40 p-2 rounded-xl border border-white/5 relative z-10">
+                        <p className="text-[10px] text-white/70 leading-tight font-medium">
+                            Формула: <span className="text-orange-400 font-black text-xs">AVG × Коэффициент этапа</span>
+                        </p>
+                        <p className="text-[8px] text-muted-foreground mt-1 uppercase tracking-tighter">В зачет идут 5 лучших туров сезона</p>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 relative z-10">
                         {renderHelpPill('Победитель', `× 1.00`, Medal, 'text-gold', '1-е место')}
                         {renderHelpPill('Финалист', `× 0.70`, Medal, 'text-silver', '2-е место')}
@@ -131,15 +134,25 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                         {renderHelpPill('1/4 финала', `× 0.25`, Target, 'text-primary', 'Четвертьфинал')}
                     </div>
                 </div>
-                <div className="p-3 md:p-4 rounded-[1.5rem] bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3 shadow-xl relative overflow-hidden group">
-                    <div className="bg-emerald-500/20 p-2 rounded-xl border border-emerald-500/20 shadow-inner relative z-10">
-                        <Wallet className="text-emerald-400 h-5 w-5 md:h-6 md:w-6 animate-pulse" />
+                
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="p-3 rounded-[1.25rem] bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2.5 shadow-xl group">
+                        <div className="bg-emerald-500/20 p-1.5 rounded-lg border border-emerald-500/20 shadow-inner">
+                            <Wallet className="text-emerald-400 h-4 w-4 animate-pulse" />
+                        </div>
+                        <div className="text-left">
+                            <h4 className="font-headline text-[8px] uppercase tracking-widest text-emerald-400">Курс балла</h4>
+                            <p className="text-[10px] text-white font-bold">{s.exchangeRate || 7} ₽</p>
+                        </div>
                     </div>
-                    <div className="text-left relative z-10">
-                        <h4 className="font-headline text-[10px] md:text-xs uppercase tracking-widest text-emerald-400">Выплаты</h4>
-                        <p className="text-[9px] md:text-[11px] text-white/90 font-bold">
-                            Курс: <span className="text-emerald-400 ml-1">{s.exchangeRate || 7} ₽ / балл</span>
-                        </p>
+                    <div className="p-3 rounded-[1.25rem] bg-blue-500/10 border border-blue-500/20 flex items-center gap-2.5 shadow-xl group">
+                        <div className="bg-blue-500/20 p-1.5 rounded-lg border border-blue-500/20 shadow-inner">
+                            <Award className="text-blue-400 h-4 w-4" />
+                        </div>
+                        <div className="text-left">
+                            <h4 className="font-headline text-[8px] uppercase tracking-widest text-blue-400">Суперфинал</h4>
+                            <p className="text-[10px] text-white font-bold">ТОП-16</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,16 +160,15 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     }
 
     return (
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 md:gap-6 pt-1 pb-6">
-            <div className="space-y-2">
-                <div className="flex items-center gap-2 px-3 border-l-2 border-orange-500 bg-white/5 py-1.5 rounded-r-xl shadow-md">
-                    <Trophy className="h-3.5 w-3.5 text-orange-500" />
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-3 md:gap-4 pt-1 pb-4">
+            <div className="space-y-1.5">
+                <div className="flex items-center gap-2 px-3 border-l-2 border-orange-500 bg-white/5 py-1 rounded-r-xl shadow-md">
+                    <Trophy className="h-3 w-3 text-orange-500" />
                     <div className="flex flex-col">
-                        <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-tight text-white leading-none">Очки за места</h4>
-                        <p className="text-[6px] font-black uppercase text-white/20 tracking-widest mt-0.5">Placement</p>
+                        <h4 className="font-headline text-[9px] uppercase tracking-tight text-white leading-none">Очки за места</h4>
                     </div>
                 </div>
-                <div className="grid gap-1.5">
+                <div className="grid gap-1">
                     {renderHelpPill('1 МЕСТО', s.pointsFor1st, Medal, 'text-gold', 'Победа')}
                     {renderHelpPill('2 МЕСТО', s.pointsFor2nd, Medal, 'text-silver', 'Финал')}
                     {renderHelpPill('3-4 МЕСТА', s.pointsFor3rd_4th, Medal, 'text-bronze', 'Полуфинал')}
@@ -166,15 +178,14 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 </div>
             </div>
 
-            <div className="space-y-2">
-                <div className="flex items-center gap-2 px-3 border-l-2 border-cyan-400 bg-white/5 py-1.5 rounded-r-xl shadow-md">
-                    <Star className="h-3.5 w-3.5 text-cyan-400" />
+            <div className="space-y-1.5">
+                <div className="flex items-center gap-2 px-3 border-l-2 border-cyan-400 bg-white/5 py-1 rounded-r-xl shadow-md">
+                    <Star className="h-3 w-3 text-cyan-400" />
                     <div className="flex flex-col">
-                        <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-tight text-white leading-none">Бонусы статистики</h4>
-                        <p className="text-[6px] font-black uppercase text-white/20 tracking-widest mt-0.5">Performance</p>
+                        <h4 className="font-headline text-[9px] uppercase tracking-tight text-white leading-none">Бонусы статистики</h4>
                     </div>
                 </div>
-                <div className="grid gap-1.5">
+                <div className="grid gap-1">
                     {s.enable180Bonus && renderHelpPill('MAX 180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'За 180')}
                     {s.enableHiOutBonus && renderHelpPill(`HI-OUT ≥ ${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'Высокое закрытие')}
                     {s.enableAvgBonus && renderHelpPill(`AVG ≥ ${s.avgThreshold}`, `+${s.avgBonus}`, TrendingUp, 'text-cyan-400', 'Высокий средний')}
@@ -183,7 +194,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                     
                     {!(s.enable180Bonus || s.enableHiOutBonus || s.enableAvgBonus || s.enableShortLegBonus || s.enable9DarterBonus) && (
                         <div className="flex flex-col items-center justify-center py-4 border border-dashed border-white/5 rounded-xl opacity-30 bg-black/10">
-                            <Zap className="h-5 w-5 text-muted-foreground mb-1" />
+                            <Zap className="h-4 w-4 text-muted-foreground mb-1" />
                             <p className="text-[7px] uppercase font-black tracking-widest">Бонусы отсутствуют</p>
                         </div>
                     )}
@@ -202,24 +213,22 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="glassmorphism max-w-4xl p-0 overflow-hidden border-white/10 rounded-[2rem] shadow-[0_0_100px_rgba(0,0,0,1)] bg-[#050505] w-[96vw] md:w-full max-h-[94dvh] flex flex-col transition-all duration-500">
+      <DialogContent className="glassmorphism max-w-4xl p-0 overflow-hidden border-white/10 rounded-[2rem] shadow-[0_0_100px_rgba(0,0,0,1)] bg-[#050505] w-[96vw] md:w-full max-h-[92dvh] flex flex-col transition-all duration-500">
         
-        <DialogHeader className="bg-gradient-to-b from-white/5 to-transparent pt-3 pb-3 px-6 relative items-center text-center shrink-0 border-b border-white/5">
-            <Button onClick={() => setOpen(false)} asChild variant="ghost" size="icon" className="absolute left-4 top-3 h-8 w-8 rounded-lg hover:bg-white/5 z-20 transition-all shadow-xl border border-white/5">
+        <DialogHeader className="bg-gradient-to-b from-white/5 to-transparent pt-2 pb-2 px-6 relative items-center text-center shrink-0 border-b border-white/5">
+            <Button onClick={() => setOpen(false)} asChild variant="ghost" size="icon" className="absolute left-4 top-2 h-8 w-8 rounded-lg hover:bg-white/5 z-20 transition-all shadow-xl border border-white/5">
                 <Link href="/">
                     <Home className="h-4 w-4 text-primary" />
                 </Link>
             </Button>
 
-            <DialogClose className="absolute right-4 top-3 h-8 w-8 rounded-lg hover:bg-red-500/10 hover:text-red-500 transition-all z-20 flex items-center justify-center border border-white/5">
+            <DialogClose className="absolute right-4 top-2 h-8 w-8 rounded-lg hover:bg-red-500/10 hover:text-red-500 transition-all z-20 flex items-center justify-center border border-white/5">
                 <X className="h-4 w-4 text-muted-foreground" />
             </DialogClose>
             
             <DialogTitle className="flex flex-col items-center">
-                <span className="text-lg md:text-2xl uppercase font-headline tracking-tighter text-white text-glow leading-tight">Регламент</span>
-                <div className="flex items-center gap-2">
-                    <span className="text-[7px] md:text-[9px] font-black uppercase tracking-[0.3em] text-primary/60">Официальные правила сезона</span>
-                </div>
+                <span className="text-base md:text-xl uppercase font-headline tracking-tighter text-white text-glow leading-tight">Регламент</span>
+                <span className="text-[7px] md:text-[8px] font-black uppercase tracking-[0.3em] text-primary/60">Правила начисления очков</span>
             </DialogTitle>
         </DialogHeader>
 
@@ -228,9 +237,9 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 defaultValue={settingsArray[0]?.id || "general"} 
                 className="w-full flex flex-col h-full"
             >
-                <div className="relative z-20 mb-3 shrink-0 px-4 md:px-6 mt-2">
+                <div className="relative z-20 mb-2 shrink-0 px-4 md:px-6 mt-2">
                     <div className="w-full overflow-x-auto no-scrollbar mask-fade-edges">
-                        <TabsList className="bg-black/90 backdrop-blur-3xl p-1 border border-white/10 h-auto flex flex-nowrap md:grid md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-1.5 mx-auto w-max md:w-full rounded-[1rem] shadow-2xl">
+                        <TabsList className="bg-black/90 backdrop-blur-3xl p-1 border border-white/10 h-auto flex flex-nowrap md:grid md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-1 mx-auto w-max md:w-full rounded-[1rem] shadow-2xl">
                             {settingsArray.map((s, idx) => {
                                 const id = s.id || 'general';
                                 const Icon = leagueIcons[id] || Trophy;
@@ -240,15 +249,15 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                         key={idx} 
                                         value={id} 
                                         className={cn(
-                                            "relative flex flex-col items-center justify-center w-12 h-14 sm:w-14 sm:h-16 md:w-full md:h-16 rounded-lg border-2 transition-all duration-500 shrink-0",
+                                            "relative flex flex-col items-center justify-center w-12 h-14 sm:w-14 sm:h-16 md:w-full md:h-14 rounded-lg border-2 transition-all duration-500 shrink-0",
                                             "bg-gradient-to-br shadow-xl overflow-hidden",
                                             "data-[state=active]:-translate-y-1 data-[state=active]:scale-105 data-[state=active]:border-white/60 data-[state=active]:z-10",
                                             "data-[state=inactive]:opacity-30 data-[state=inactive]:grayscale-[0.6] data-[state=inactive]:hover:opacity-100",
                                             style
                                         )}
                                     >
-                                        <Icon className="h-3.5 w-3.5 md:h-5 md:w-5 mb-0.5 text-white" />
-                                        <span className="text-[5px] md:text-[7px] font-black uppercase tracking-tight text-white text-center leading-none px-1 line-clamp-1">
+                                        <Icon className="h-3.5 w-3.5 md:h-4 md:w-4 mb-0.5 text-white" />
+                                        <span className="text-[5px] md:text-[6px] font-black uppercase tracking-tight text-white text-center leading-none px-1 line-clamp-1">
                                             {namesArray[idx] || 'Лига'}
                                         </span>
                                     </TabsTrigger>
@@ -258,11 +267,11 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                     </div>
                 </div>
 
-                <ScrollArea className="flex-1 px-4 md:px-10 lg:px-16">
+                <ScrollArea className="flex-1 px-4 md:px-10 lg:px-16 pb-10">
                     {settingsArray.map((s, idx) => (
                         <TabsContent key={idx} value={s.id || 'general'} className="outline-none animate-in fade-in slide-in-from-bottom-2 duration-500 mt-0">
-                            <div className="flex items-center gap-3 mb-3">
-                                <h3 className="text-base md:text-xl font-headline uppercase tracking-tight text-white/90">
+                            <div className="flex items-center gap-3 mb-2">
+                                <h3 className="text-sm md:text-lg font-headline uppercase tracking-tight text-white/90">
                                     {namesArray[idx]}
                                 </h3>
                                 <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
@@ -274,19 +283,19 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
             </Tabs>
         </div>
 
-        <div className="bg-black/95 backdrop-blur-3xl p-3 border-t border-white/5 shrink-0">
+        <div className="bg-black/95 backdrop-blur-3xl p-2 border-t border-white/5 shrink-0">
           <div className="flex flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
-                <div className="h-7 w-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-headline text-primary text-xs">D</div>
+                <div className="h-6 w-6 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-headline text-primary text-[10px]">D</div>
                 <div className="flex flex-col">
-                    <p className="text-[8px] md:text-[10px] text-white font-black uppercase tracking-widest leading-none">DartBrig Pro</p>
-                    <p className="text-[6px] md:text-[8px] text-primary/60 font-bold uppercase tracking-widest">v2.6 Stable • Ultra Compact</p>
+                    <p className="text-[8px] text-white font-black uppercase tracking-widest leading-none">DartBrig Pro</p>
+                    <p className="text-[6px] text-primary/60 font-bold uppercase tracking-widest">v2.6 Stable • Ultra Compact</p>
                 </div>
             </div>
             
-            <Button onClick={() => setOpen(false)} asChild variant="outline" className="rounded-lg font-black uppercase tracking-widest text-[8px] md:text-[10px] h-9 px-6 md:px-8 gap-2 border-white/5 bg-white/5 hover:bg-primary hover:text-primary-foreground transition-all">
+            <Button onClick={() => setOpen(false)} asChild variant="outline" className="rounded-lg font-black uppercase tracking-widest text-[8px] h-8 px-6 md:px-8 gap-2 border-white/5 bg-white/5 hover:bg-primary hover:text-primary-foreground transition-all">
                 <Link href="/">
-                    <Home className="h-3 w-3 md:h-3.5 md:w-3.5 text-primary" />
+                    <Home className="h-3 w-3 text-primary" />
                     <span>ЗАКРЫТЬ</span>
                     <ChevronRight className="h-3 w-3" />
                 </Link>
