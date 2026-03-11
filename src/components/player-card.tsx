@@ -41,7 +41,7 @@ const StatItem = ({
 }) => {
     const isSmallStat = name === 'avg' || name === 'n180s' || name === 'hiOut';
     
-    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-5 rounded-[1.5rem] transition-all border border-transparent shadow-xl relative w-full h-full min-h-[130px] sm:min-h-[150px]";
+    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-5 rounded-[1.5rem] transition-all border border-transparent shadow-xl relative w-full h-full min-h-[120px] sm:min-h-[150px]";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
@@ -73,13 +73,13 @@ const StatItem = ({
                             <Info className="h-2.5 w-2.5 shrink-0 text-primary" />
                         </div>
                         
-                        <div className="flex-1 flex items-center justify-center w-full my-2">
+                        <div className="flex-1 flex items-center justify-center w-full my-1 sm:my-2">
                             <span className={valueClasses}>{value}</span>
                         </div>
 
                         <div className="w-full mt-1">
                             <div className="h-px w-full bg-white/10 mb-1.5" />
-                            <p className="text-[7px] sm:text-[8px] font-black uppercase text-primary/70 tracking-widest text-center leading-tight">
+                            <p className="text-[7px] sm:text-[8px] font-black uppercase text-primary/70 tracking-widest text-center leading-tight truncate">
                                 {caption || "СТАТ"}
                             </p>
                         </div>
@@ -89,13 +89,13 @@ const StatItem = ({
                     side="top" 
                     className="max-w-[280px] p-5 glassmorphism border-primary/50 z-[100] shadow-[0_30px_100px_rgba(0,0,0,0.9)] rounded-[1.5rem] bg-black/95 backdrop-blur-3xl animate-in fade-in zoom-in-95 duration-200"
                 >
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         <div className="flex items-center gap-2 border-b border-primary/20 pb-2">
-                            <div className="p-1.5 bg-primary/20 rounded-lg"><Info className="h-3.5 w-3.5 text-primary" /></div>
-                            <p className="text-[10px] font-headline text-white uppercase tracking-[0.1em]">{label}</p>
+                            <div className="p-1.5 bg-primary/20 rounded-lg"><Info className="h-4 w-4 text-primary" /></div>
+                            <p className="text-xs font-headline text-white uppercase tracking-widest">{label}</p>
                         </div>
                         <p className="text-xs leading-relaxed font-bold text-white/90 italic">
-                            {description || "Профессиональные метрики игрока в официальных турнирах."}
+                            {description || "Профессиональная метрика игрока."}
                         </p>
                     </div>
                 </TooltipContent>
@@ -433,7 +433,7 @@ export function PlayerCard({
                                     label="БОНУСЫ" 
                                     name="bonusPoints" 
                                     value={`+${player.bonusPoints}`} 
-                                    caption="ЗА СТАТИСТИКУ"
+                                    caption="БОНУСЫ"
                                     description="Дополнительные очки за 180, высокие чекауты и средний набор." 
                                 />
                             </div>
@@ -445,7 +445,7 @@ export function PlayerCard({
                                 <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
                                 ЛИЧНЫЕ РЕКОРДЫ
                             </h3>
-                            <div className="grid grid-cols-3 gap-3 sm:gap-4 relative z-10 mt-auto">
+                            <div className="grid grid-cols-3 gap-2 sm:gap-4 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
                                     label="СРЕДНИЙ" 
