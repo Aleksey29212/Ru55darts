@@ -41,7 +41,7 @@ const StatItem = ({
 }) => {
     const isSmallStat = name === 'avg' || name === 'n180s' || name === 'hiOut';
     
-    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-5 rounded-[1.5rem] transition-all border border-transparent shadow-xl relative w-full h-full min-h-[120px] sm:min-h-[150px]";
+    const baseClasses = "flex flex-col items-center justify-between p-4 sm:p-6 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[140px] sm:min-h-[160px]";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
@@ -50,57 +50,60 @@ const StatItem = ({
 
     const valueClasses = cn(
         "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap",
-        isSmallStat ? "text-xl sm:text-2xl md:text-3xl lg:text-4xl" : "text-3xl sm:text-4xl md:text-5xl lg:text-6xl",
+        isSmallStat ? "text-2xl sm:text-3xl md:text-4xl" : "text-4xl sm:text-5xl md:text-6xl",
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : ''
     );
     
     return (
-        <TooltipProvider>
-            <Tooltip delayDuration={0}>
-                <TooltipTrigger asChild>
-                    <div 
-                        className={cn(
-                            "cursor-help group overflow-hidden", 
-                            baseClasses, 
-                            templateClasses[template]
-                        )}
-                    >
-                        <div className="w-full flex items-center justify-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity mb-1">
-                            <span className="text-[7px] sm:text-[9px] font-black uppercase tracking-wider text-center leading-tight">
-                                {label}
-                            </span>
-                            <Info className="h-2.5 w-2.5 shrink-0 text-primary" />
-                        </div>
-                        
-                        <div className="flex-1 flex items-center justify-center w-full my-1 sm:my-2">
-                            <span className={valueClasses}>{value}</span>
-                        </div>
+        <div 
+            className={cn(
+                "relative group overflow-hidden", 
+                baseClasses, 
+                templateClasses[template]
+            )}
+        >
+            <div className="w-full flex items-center justify-center gap-2 mb-1">
+                <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground/80 leading-tight">
+                    {label}
+                </span>
+                
+                <TooltipProvider>
+                    <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                            <div className="cursor-help p-1 -m-1 hover:text-primary transition-colors">
+                                <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 text-primary/60 hover:text-primary animate-pulse" />
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent 
+                            side="top" 
+                            className="max-w-[320px] p-6 glassmorphism border-primary/50 z-[100] shadow-[0_30px_100px_rgba(0,0,0,0.9)] rounded-[1.5rem] bg-black/95 backdrop-blur-3xl animate-in fade-in zoom-in-95 duration-200"
+                        >
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3 border-b border-primary/20 pb-3">
+                                    <div className="p-2 bg-primary/20 rounded-xl"><Info className="h-5 w-5 text-primary" /></div>
+                                    <p className="text-sm font-headline text-white uppercase tracking-widest">{label}</p>
+                                </div>
+                                <p className="text-xs leading-relaxed font-bold text-white/90 italic">
+                                    {description || "Профессиональная метрика игрока."}
+                                </p>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
+            
+            <div className="flex-1 flex items-center justify-center w-full my-2 sm:my-3">
+                <span className={valueClasses}>{value}</span>
+            </div>
 
-                        <div className="w-full mt-1">
-                            <div className="h-px w-full bg-white/10 mb-1.5" />
-                            <p className="text-[7px] sm:text-[8px] font-black uppercase text-primary/70 tracking-widest text-center leading-tight truncate">
-                                {caption || "СТАТ"}
-                            </p>
-                        </div>
-                    </div>
-                </TooltipTrigger>
-                <TooltipContent 
-                    side="top" 
-                    className="max-w-[280px] p-5 glassmorphism border-primary/50 z-[100] shadow-[0_30px_100px_rgba(0,0,0,0.9)] rounded-[1.5rem] bg-black/95 backdrop-blur-3xl animate-in fade-in zoom-in-95 duration-200"
-                >
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-2 border-b border-primary/20 pb-2">
-                            <div className="p-1.5 bg-primary/20 rounded-lg"><Info className="h-4 w-4 text-primary" /></div>
-                            <p className="text-xs font-headline text-white uppercase tracking-widest">{label}</p>
-                        </div>
-                        <p className="text-xs leading-relaxed font-bold text-white/90 italic">
-                            {description || "Профессиональная метрика игрока."}
-                        </p>
-                    </div>
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
+            <div className="w-full mt-1">
+                <div className="h-px w-full bg-white/10 mb-2" />
+                <p className="text-[8px] sm:text-[9px] font-black uppercase text-primary/70 tracking-[0.2em] text-center leading-tight">
+                    {caption || "СТАТ"}
+                </p>
+            </div>
+        </div>
     );
 }
 
@@ -168,7 +171,7 @@ export function PlayerCard({
     )}>
         <div className={cn(
             "relative overflow-hidden",
-            template === 'classic' && "h-[400px] md:h-[500px]",
+            template === 'classic' && "h-[400px] md:h-[550px]",
             template === 'modern' && "p-10 md:w-1/3 flex flex-col items-center justify-center bg-gradient-to-br from-black/80 to-transparent border-r border-white/10",
             template === 'dynamic' && "h-[350px]"
         )}>
@@ -196,7 +199,7 @@ export function PlayerCard({
                 <div className="relative shrink-0">
                     <Avatar className={cn(
                         "border-4 transition-all duration-1000 shadow-[0_0_60px_rgba(0,0,0,0.8)]",
-                        template === 'classic' && "h-40 w-40 md:h-56 md:w-56 border-primary ring-[10px] ring-primary/10",
+                        template === 'classic' && "h-40 w-40 md:h-64 md:w-64 border-primary ring-[10px] ring-primary/10",
                         template === 'modern' && "h-48 w-48 md:h-64 md:w-64 border-primary ring-[10px] ring-primary/5",
                         template === 'dynamic' && "h-44 w-44 md:h-60 md:w-60 border-accent ring-[10px] ring-accent/15"
                     )}>
