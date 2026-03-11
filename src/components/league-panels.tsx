@@ -38,6 +38,7 @@ interface LeaguePanelsProps {
   allScoringSettings: Record<LeagueId, ScoringSettings>;
   sponsorshipSettings: SponsorshipSettings;
   partners: Partner[];
+  playerCounts?: Record<string, number>;
 }
 
 const DEFAULT_BANNER = 'https://picsum.photos/seed/darts-league/600/200';
@@ -160,7 +161,8 @@ export function LeaguePanels({
     currentLeagueId, 
     allScoringSettings, 
     sponsorshipSettings,
-    partners 
+    partners,
+    playerCounts = {}
 }: LeaguePanelsProps) {
     const router = useRouter();
     const isClient = useIsClient();
@@ -211,6 +213,7 @@ export function LeaguePanels({
                         const banner = leagueInfo.bannerUrl || DEFAULT_BANNER;
                         const LeagueIcon = leagueIcons[leagueId] || Target;
                         const baseColor = getLeagueBaseColor(leagueId);
+                        const playerCount = playerCounts[leagueId] || 0;
 
                         return (
                             <div
@@ -231,29 +234,42 @@ export function LeaguePanels({
                                     isSelected ? "from-black/95 via-black/80 to-transparent" : "from-black/90 via-black/70 to-transparent"
                                 )} />
                                 <div className="absolute inset-0 px-3 flex items-center gap-2 md:gap-3">
-                                    <div 
-                                        className={cn(
-                                            "p-1.5 md:p-2 rounded-xl backdrop-blur-xl border border-white/20 text-white shadow-2xl transition-all duration-700",
-                                            isSelected && "scale-110 rotate-[360deg] border-white/40"
-                                        )}
-                                        style={{ backgroundColor: baseColor }}
-                                    >
-                                        {isPending && isSelected ? (
-                                            <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
-                                        ) : (
-                                            <LeagueIcon className="h-4 w-4 md:h-5 md:w-5" />
-                                        )}
+                                    <div className="relative">
+                                        <div 
+                                            className={cn(
+                                                "p-1.5 md:p-2 rounded-xl backdrop-blur-xl border border-white/20 text-white shadow-2xl transition-all duration-700",
+                                                isSelected && "scale-110 rotate-[360deg] border-white/40"
+                                            )}
+                                            style={{ backgroundColor: baseColor }}
+                                        >
+                                            {isPending && isSelected ? (
+                                                <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                                            ) : (
+                                                <LeagueIcon className="h-4 w-4 md:h-5 md:w-5" />
+                                            )}
+                                        </div>
+                                        {/* Счетчик игроков в углу иконки */}
+                                        <div className={cn(
+                                            "absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full flex items-center justify-center text-[8px] font-black border border-white/20 shadow-lg transition-transform duration-500",
+                                            isSelected ? "bg-primary text-primary-foreground scale-110" : "bg-black/80 text-white"
+                                        )}>
+                                            {playerCount}
+                                        </div>
                                     </div>
                                     <div className="flex flex-col justify-center overflow-hidden">
                                         <p className="text-[10px] md:text-[12px] font-headline text-white uppercase tracking-tight truncate leading-none mb-1 text-glow-white">
                                             {leagueInfo.name}
                                         </p>
-                                        {isSelected && (
-                                            <div className="flex items-center gap-1">
-                                                <div className="h-1 w-1 rounded-full bg-primary animate-pulse" />
-                                                <p className="text-[7px] md:text-[8px] text-primary font-black uppercase tracking-[0.2em]">В ЭФИРЕ</p>
-                                            </div>
-                                        )}
+                                        <div className="flex items-center gap-1">
+                                            {isSelected ? (
+                                                <>
+                                                    <div className="h-1 w-1 rounded-full bg-primary animate-pulse" />
+                                                    <p className="text-[7px] md:text-[8px] text-primary font-black uppercase tracking-[0.2em]">В ЭФИРЕ</p>
+                                                </>
+                                            ) : (
+                                                <p className="text-[7px] md:text-[8px] text-muted-foreground/60 font-bold uppercase tracking-widest">Участников: {playerCount}</p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -1,5 +1,5 @@
 import { getAllScoringSettings, getLeagueSettings, getSponsorshipSettings } from '@/lib/settings';
-import { getRankings } from '@/lib/leagues';
+import { getRankings, getRankingsSnapshot } from '@/lib/leagues';
 import type { LeagueId } from '@/lib/types';
 import { getTournaments } from '@/lib/tournaments';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,6 +32,7 @@ export default async function Home(props: {
   let partners: any[] = [];
   let allScoringSettings: any = {};
   let sponsorshipSettings: any = {};
+  let allRankings: Record<string, any[]> = {};
   
   try {
     const results = await Promise.all([
@@ -40,12 +41,14 @@ export default async function Home(props: {
       getPartners(),
       getAllScoringSettings(),
       getSponsorshipSettings(),
+      getRankingsSnapshot(),
     ]);
     leagueSettings = results[0];
     tournaments = results[1];
     partners = results[2];
     allScoringSettings = results[3];
     sponsorshipSettings = results[4];
+    allRankings = results[5];
   } catch (e) {
     console.error("Home page data fetch failed:", e);
   }
@@ -80,7 +83,13 @@ export default async function Home(props: {
   const leagueParam = searchParams?.league;
   const currentLeagueId = (leagueParam && enabledLeagues.includes(leagueParam)) ? leagueParam : enabledLeagues[0];
 
-  const currentRankings = await getRankings(currentLeagueId);
+  const currentRankings = allRankings[currentLeagueId] || [];
+  
+  // Подготовка маппинга количества участников для всех лиг
+  const playerCounts: Record<string, number> = {};
+  enabledLeagues.forEach(id => {
+      playerCounts[id] = allRankings[id]?.length || 0;
+  });
 
   return (
     <div className="flex-1 container py-8 space-y-8 animate-in fade-in duration-700">
@@ -98,6 +107,7 @@ export default async function Home(props: {
             allScoringSettings={allScoringSettings}
             sponsorshipSettings={sponsorshipSettings}
             partners={partners}
+            playerCounts={playerCounts}
         />
     </div>
   );
