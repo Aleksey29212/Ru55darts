@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
-import { Save, Edit, X, Info, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Handshake, ExternalLink, Lock, Eye, Copy, Check } from 'lucide-react';
+import { Save, Edit, X, Info, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Handshake, ExternalLink, Lock, Eye, Copy, Check, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { TemplateId } from './template-switcher';
 import { cn } from '@/lib/utils';
@@ -89,7 +89,7 @@ const StatItem = ({
                                 className="cursor-help p-1 -m-1 hover:text-primary transition-all active:scale-90 shrink-0"
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <Info className="h-3 w-3 sm:h-4 sm:w-4 text-primary/60 hover:text-primary animate-pulse" />
+                                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary/60 hover:text-primary animate-pulse" />
                             </div>
                         </TooltipTrigger>
                         <TooltipContent 
@@ -98,7 +98,7 @@ const StatItem = ({
                         >
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3 border-b border-primary/20 pb-3">
-                                    <div className="p-2 bg-primary/20 rounded-xl"><Info className="h-4 w-4 text-primary" /></div>
+                                    <div className="p-2 bg-primary/20 rounded-xl"><AlertCircle className="h-4 w-4 text-primary" /></div>
                                     <p className="text-xs font-headline text-white uppercase tracking-widest">{label}</p>
                                 </div>
                                 <p className="text-sm leading-relaxed font-bold text-white/95 italic">
@@ -425,9 +425,9 @@ export function PlayerCard({
                             <h3 className="text-[11px] md:text-base font-headline uppercase tracking-[0.3em] text-white/60">БИОГРАФИЯ</h3>
                         </div>
                         <ScoringHelpDialog settings={scoringSettings} leagueName={leagueNames} sponsorshipSettings={{ groupVkLink: 'https://vk.com/dartbrig' } as any}>
-                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-3 rounded-xl h-10 px-5 text-[10px] md:text-xs uppercase font-black tracking-widest hover:bg-primary/20 text-primary border-2 border-primary/20">
-                                <ShieldCheck className="h-5 w-5" />
-                                ПРАВИЛА
+                            <Button variant="ghost" size="sm" className="flex gap-3 rounded-xl h-10 px-5 text-[10px] md:text-xs uppercase font-black tracking-widest hover:bg-primary/20 text-primary border-2 border-primary/20">
+                                <AlertCircle className="h-5 w-5 animate-pulse" />
+                                РЕГЛАМЕНТ
                             </Button>
                         </ScoringHelpDialog>
                     </div>
@@ -492,7 +492,7 @@ export function PlayerCard({
                                 name="wins" 
                                 value={player.wins} 
                                 caption="П-ОФ"
-                                description="Сколько раз игрок выходил в четвертьфинал или выше." 
+                                description="Сколько раз игрок выходил в четвертьфинал или выше (плей-офф)." 
                             />
                             <StatItem 
                                 template={template} 
@@ -508,7 +508,7 @@ export function PlayerCard({
                                 name="winRate" 
                                 value={winRate} 
                                 caption="ПЦТ"
-                                description="Процент попадания в плей-офф от общего количества сыгранных турниров." 
+                                description="Процент выхода в плей-офф от общего количества сыгранных турниров." 
                             />
                         </div>
                     </div>
@@ -527,7 +527,7 @@ export function PlayerCard({
                                     name="basePoints" 
                                     value={player.basePoints} 
                                     caption="ЗА МЕСТА"
-                                    description="Очки, начисленные строго за итоговую позицию в турнирах." 
+                                    description="Баллы, начисленные строго за итоговую позицию в турнирной таблице." 
                             />
                                 <StatItem 
                                     template={template} 
@@ -535,7 +535,7 @@ export function PlayerCard({
                                     name="bonusPoints" 
                                     value={`+${player.bonusPoints}`} 
                                     caption="БОНУСЫ"
-                                    description="Дополнительные очки за 180, высокие чекауты и средний набор." 
+                                    description="Дополнительные баллы за 180, высокие чекауты, средний набор и скоростные леги." 
                                 />
                             </div>
                         </div>
@@ -553,7 +553,7 @@ export function PlayerCard({
                                     name="avg" 
                                     value={(Number(player.avg) || 0).toFixed(1)} 
                                     caption="НАБОР"
-                                    description="Средний балл за 3 дротика на протяжении всей карьеры." 
+                                    description="Средний балл за 3 дротика. Основной показатель стабильности игрока." 
                                 />
                                 <StatItem 
                                     template={template} 
@@ -561,7 +561,7 @@ export function PlayerCard({
                                     name="n180s" 
                                     value={player.n180s} 
                                     caption="МАКСИМУМЫ"
-                                    description="Общее количество идеальных подходов по 180 очков." 
+                                    description="Общее количество идеальных подходов по 180 очков в официальных матчах." 
                                 />
                                 <StatItem 
                                     template={template} 
@@ -569,7 +569,7 @@ export function PlayerCard({
                                     name="hiOut" 
                                     value={Number(player.hiOut) || 0} 
                                     caption="ФИНИШ"
-                                    description="Самое высокое закрытие лега в официальных матчах." 
+                                    description="Самое высокое закрытие лега (максимальное количество очков за один подход на финише)." 
                                 />
                             </div>
                         </div>
