@@ -27,7 +27,7 @@ import Image from 'next/image';
 import { Button } from './ui/button';
 import { useIsClient } from '@/hooks/use-is-client';
 import { ScoringHelpDialog } from './scoring-help-dialog';
-import { useTransition, useEffect, useState } from 'react';
+import { useTransition, useEffect, useState, useMemo } from 'react';
 import { PartnersDisplay } from './partners-display';
 
 interface LeaguePanelsProps {
@@ -165,22 +165,20 @@ export function LeaguePanels({
     const router = useRouter();
     const isClient = useIsClient();
     const [isPending, startTransition] = useTransition();
-    const [optimisticLeagueId, setOptimisticLeagueId] = useState<LeagueId>(currentLeagueId);
     
-    useEffect(() => {
-        enabledLeagues.forEach(id => {
-            router.prefetch(`/?league=${id}`);
-        });
-    }, [enabledLeagues, router]);
-
-    useEffect(() => {
-        setOptimisticLeagueId(currentLeagueId);
-    }, [currentLeagueId]);
+    // Динамический порядок: выбранная лига всегда первая
+    const orderedLeagues = useMemo(() => {
+        const sorted = [...enabledLeagues];
+        const activeIdx = sorted.indexOf(currentLeagueId);
+        if (activeIdx > -1) {
+            const [active] = sorted.splice(activeIdx, 1);
+            sorted.unshift(active);
+        }
+        return sorted;
+    }, [enabledLeagues, currentLeagueId]);
 
     const handleLeagueSelect = (leagueId: LeagueId) => {
-        if (leagueId === optimisticLeagueId) return;
-        
-        setOptimisticLeagueId(leagueId);
+        if (leagueId === currentLeagueId) return;
         startTransition(() => {
             router.push(`/?league=${leagueId}`, { scroll: false });
         });
@@ -189,7 +187,7 @@ export function LeaguePanels({
     if (!isClient) {
         return (
             <div className="space-y-12">
-                <div className="h-16 w-full bg-muted/20 rounded-[2.5rem] animate-pulse" />
+                <div className="h-32 w-full bg-muted/20 rounded-[2.5rem] animate-pulse" />
                 <Skeleton className="h-[800px] w-full rounded-[4rem]" />
             </div>
         );
@@ -200,17 +198,16 @@ export function LeaguePanels({
     return (
         <div className="w-full space-y-14">
             {/* Sticky Header Section */}
-            <div className="sticky top-16 md:top-20 z-40 bg-background/95 backdrop-blur-3xl border-b-2 border-white/10 -mx-4 px-4 py-6 space-y-8 shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-all">
+            <div className="sticky top-16 md:top-20 z-40 bg-background/95 backdrop-blur-3xl border-b-2 border-white/10 -mx-4 px-4 py-6 space-y-6 shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-all">
                 <div className="w-full">
                     <PartnersDisplay partners={partners} variant="compact" hideLabel />
                 </div>
 
-                {/* League Selection Scroll */}
-                <div className="flex items-center gap-3 md:gap-5 overflow-x-auto pb-2 scrollbar-hide no-scrollbar mask-fade-edges">
-                    {enabledLeagues.map(leagueId => {
+                {/* ДВУХРЯДНАЯ СЕТКА С ПРИОРИТЕТОМ */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-3 animate-in fade-in duration-500">
+                    {orderedLeagues.map((leagueId, idx) => {
                         const leagueInfo = leagueSettings[leagueId];
-                        const isSelected = optimisticLeagueId === leagueId;
-                        const isReallySelected = currentLeagueId === leagueId;
+                        const isSelected = currentLeagueId === leagueId;
                         const banner = leagueInfo.bannerUrl || DEFAULT_BANNER;
                         const LeagueIcon = leagueIcons[leagueId] || Target;
                         const baseColor = getLeagueBaseColor(leagueId);
@@ -222,42 +219,41 @@ export function LeaguePanels({
                                 tabIndex={0}
                                 onClick={() => handleLeagueSelect(leagueId)}
                                 className={cn(
-                                    'relative min-w-[160px] md:min-w-[220px] h-14 md:h-16 rounded-[1.5rem] overflow-hidden transition-all duration-500 transform shrink-0 cursor-pointer outline-none border-2 shadow-xl',
+                                    'relative h-14 md:h-16 rounded-2xl overflow-hidden transition-all duration-500 transform shrink-0 cursor-pointer outline-none border-2 shadow-lg group',
                                     isSelected 
-                                        ? 'border-primary ring-4 ring-primary/10 scale-105 z-10 shadow-[0_0_40px_rgba(var(--primary-rgb),0.3)]' 
-                                        : 'border-white/5 opacity-60 hover:opacity-100 hover:border-primary/40'
+                                        ? 'border-primary ring-2 ring-primary/20 scale-[1.02] z-10 shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)]' 
+                                        : 'border-white/5 opacity-70 hover:opacity-100 hover:border-primary/40 hover:scale-[1.01]'
                                 )}
                             >
-                                <Image src={banner} alt="" fill className="object-cover transition-all duration-1000 group-hover:scale-125" unoptimized={banner.startsWith('data:')} />
+                                <Image src={banner} alt="" fill className="object-cover transition-all duration-1000 group-hover:scale-110" unoptimized={banner.startsWith('data:')} />
                                 <div className={cn(
                                     "absolute inset-0 bg-gradient-to-r transition-opacity duration-700",
-                                    isSelected ? "from-black/95 via-black/75 to-transparent" : "from-black/90 via-black/60 to-transparent"
+                                    isSelected ? "from-black/95 via-black/80 to-transparent" : "from-black/90 via-black/70 to-transparent"
                                 )} />
-                                <div className="absolute inset-0 px-4 flex items-center gap-3">
+                                <div className="absolute inset-0 px-3 flex items-center gap-2 md:gap-3">
                                     <div 
                                         className={cn(
-                                            "p-2 rounded-xl backdrop-blur-xl border border-white/30 text-white shadow-2xl transition-all duration-700",
-                                            isSelected && "scale-110 rotate-[360deg] border-white/50"
+                                            "p-1.5 md:p-2 rounded-xl backdrop-blur-xl border border-white/20 text-white shadow-2xl transition-all duration-700",
+                                            isSelected && "scale-110 rotate-[360deg] border-white/40"
                                         )}
                                         style={{ backgroundColor: baseColor }}
                                     >
-                                        {isPending && isSelected && !isReallySelected ? (
+                                        {isPending && isSelected ? (
                                             <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
                                         ) : (
                                             <LeagueIcon className="h-4 w-4 md:h-5 md:w-5" />
                                         )}
                                     </div>
                                     <div className="flex flex-col justify-center overflow-hidden">
-                                        <p className="text-[12px] md:text-[14px] font-headline text-white uppercase tracking-tight truncate leading-none mb-1 text-glow-white">{leagueInfo.name}</p>
-                                        <div className="flex items-center gap-1.5">
-                                            <div 
-                                                className={cn("h-1 w-1 rounded-full", isSelected ? "animate-pulse" : "opacity-30")} 
-                                                style={{ backgroundColor: baseColor }}
-                                            />
-                                            <p className="text-[8px] md:text-[9px] text-white/70 font-black uppercase tracking-[0.25em]">
-                                                {isSelected ? 'АКТИВНО' : 'СМОТРЕТЬ'}
-                                            </p>
-                                        </div>
+                                        <p className="text-[10px] md:text-[12px] font-headline text-white uppercase tracking-tight truncate leading-none mb-1 text-glow-white">
+                                            {leagueInfo.name}
+                                        </p>
+                                        {isSelected && (
+                                            <div className="flex items-center gap-1">
+                                                <div className="h-1 w-1 rounded-full bg-primary animate-pulse" />
+                                                <p className="text-[7px] md:text-[8px] text-primary font-black uppercase tracking-[0.2em]">В ЭФИРЕ</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
