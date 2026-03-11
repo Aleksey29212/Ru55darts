@@ -3,10 +3,10 @@
 import { getPlayerProfiles, updatePlayerProfiles, getPlayerProfileById, clearAllPlayerProfiles } from '@/lib/players';
 import { addTournaments, clearAllTournamentData, deleteTournamentById, getTournamentById } from '@/lib/tournaments';
 import { revalidatePath, revalidateTag } from 'next/cache';
-import type { PlayerProfile, ScoringSettings, LeagueId, AllLeagueSettings, SponsorshipSettings } from '@/lib/types';
+import type { PlayerProfile, ScoringSettings, LeagueId, AllLeagueSettings, SponsorshipSettings, Tournament, TournamentPlayerResult } from '@/lib/types';
 import { updateScoringSettings, updateLeagueSettings, getScoringSettings, updateBackgroundUrl, updateSponsorshipSettings } from '@/lib/settings';
 import { getDb } from '@/firebase/server';
-import { addDoc, collection, doc, serverTimestamp, deleteDoc, getDocs, writeBatch } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, deleteDoc, getDocs, writeBatch, setDoc } from 'firebase/firestore';
 import { headers } from 'next/headers';
 import { CardBackgrounds } from '@/lib/card-backgrounds';
 import { scrapeTournamentData } from '@/lib/scraping';
@@ -68,6 +68,7 @@ export async function importTournament(prevState: unknown, formData: FormData) {
         date: scraped.date,
         league: league,
         players: scraped.players,
+        isManuallyEdited: false
       });
     } catch (e: any) {
       errors.push(`${input}: ${e.message}`);
@@ -94,6 +95,44 @@ export async function importTournament(prevState: unknown, formData: FormData) {
     message: successCount > 0 ? `Успешно: ${successCount} турнир(ов) загружено в систему.` : 'Турниры не были загружены.',
     errors: errors.length > 0 ? errors : undefined
   };
+}
+
+export async function updateTournamentResultsAction(tournamentId: string, players: TournamentPlayerResult[]) {
+    try {
+        const db = getDb();
+        const tournament = await getTournamentById(tournamentId);
+        if (!tournament) return { success: false, message: 'Турнир не найден.' };
+
+        const updatedTournament: Tournament = {
+            ...tournament,
+            players,
+            isManuallyEdited: true
+        };
+
+        // Update in memory
+        const memoryStore = (global as any).demoTournaments as Tournament[];
+        if (memoryStore) {
+            const idx = memoryStore.findIndex(t => t.id === tournamentId);
+            if (idx !== -1) memoryStore[idx] = updatedTournament;
+        }
+
+        // Update in DB
+        if (db) {
+            const docRef = doc(db, 'tournaments', tournamentId);
+            const dataToSet = { ...updatedTournament };
+            delete (dataToSet as any).id;
+            await setDoc(docRef, dataToSet);
+        }
+
+        revalidatePath('/', 'layout');
+        revalidatePath(`/admin/tournaments/${tournamentId}/edit-results`);
+        revalidateTag('tournaments');
+        revalidateTag('leagues');
+
+        return { success: true, message: 'Результаты турнира обновлены вручную.' };
+    } catch (e) {
+        return { success: false, message: 'Ошибка при сохранении результатов.' };
+    }
 }
 
 export async function updatePlayer(player: PlayerProfile) {

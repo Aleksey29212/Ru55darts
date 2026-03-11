@@ -13,7 +13,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2, Loader2, Calendar, Trophy } from "lucide-react";
+import { Trash2, Loader2, Calendar, Trophy, Edit3, Settings2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTransition, useMemo } from "react";
 import { deleteTournamentAction } from '@/app/actions';
@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/accordion";
 import { useIsClient } from '@/hooks/use-is-client';
 import { Skeleton } from '@/components/ui/skeleton';
+import Link from 'next/link';
 
 function DeleteTournamentButton({ tournamentId, tournamentName }: { tournamentId: string, tournamentName: string }) {
     const { toast } = useToast();
@@ -139,7 +140,12 @@ export function TournamentManagement({ tournaments, leagues }: { tournaments: To
                             <AccordionItem value={tournament.id} key={tournament.id} className="border-b border-border/50">
                                 <AccordionTrigger className="p-4 hover:bg-muted/50 hover:no-underline">
                                     <div className="flex flex-col items-start text-left gap-1">
-                                        <span className="font-medium break-words leading-tight">{tournament.name}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium break-words leading-tight">{tournament.name}</span>
+                                            {tournament.isManuallyEdited && (
+                                                <Badge variant="outline" className="text-[8px] h-4 bg-orange-500/10 text-orange-500 border-orange-500/20 px-1 font-black">РУЧНОЙ</Badge>
+                                            )}
+                                        </div>
                                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                                             <Calendar className="h-3 w-3" />
                                             {formatDate(tournament.date)}
@@ -156,7 +162,13 @@ export function TournamentManagement({ tournaments, leagues }: { tournaments: To
                                             <span className="text-muted-foreground text-xs uppercase font-bold">Участников:</span>
                                             <span className="font-mono">{tournament.players?.length || 0}</span>
                                         </div>
-                                        <div className="pt-4 border-t border-border/50 flex justify-end">
+                                        <div className="pt-4 border-t border-border/50 flex flex-col gap-2">
+                                            <Button asChild variant="outline" size="sm" className="w-full h-10 rounded-xl">
+                                                <Link href={`/admin/tournaments/${tournament.id}/edit-results`}>
+                                                    <Edit3 className="h-4 w-4 mr-2" />
+                                                    Править результаты
+                                                </Link>
+                                            </Button>
                                             <DeleteTournamentButton tournamentId={tournament.id} tournamentName={tournament.name} />
                                         </div>
                                     </div>
@@ -178,12 +190,27 @@ export function TournamentManagement({ tournaments, leagues }: { tournaments: To
                     <TableBody>
                         {sortedTournaments.map((tournament) => (
                             <TableRow key={tournament.id} className="hover:bg-muted/20 transition-colors">
-                                <TableCell className="font-medium max-w-[300px] truncate">{tournament.name}</TableCell>
+                                <TableCell className="font-medium max-w-[300px] truncate">
+                                    <div className="flex items-center gap-3">
+                                        {tournament.name}
+                                        {tournament.isManuallyEdited && (
+                                            <Badge variant="outline" className="text-[9px] bg-orange-500/10 text-orange-500 border-orange-500/20 font-black uppercase tracking-widest">Изменено вручную</Badge>
+                                        )}
+                                    </div>
+                                </TableCell>
                                 <TableCell><Badge variant="outline" className="bg-background">{leagues.find(l => l.id === tournament.league)?.name || tournament.league}</Badge></TableCell>
                                 <TableCell className="whitespace-nowrap text-muted-foreground">{formatDate(tournament.date)}</TableCell>
                                 <TableCell className="text-center font-mono">{tournament.players?.length || 0}</TableCell>
                                 <TableCell className="text-right">
-                                    <DeleteTournamentButton tournamentId={tournament.id} tournamentName={tournament.name} />
+                                    <div className="flex items-center justify-end gap-2">
+                                        <Button asChild variant="outline" size="sm" className="h-9 rounded-xl px-4" title="Редактировать результаты вручную">
+                                            <Link href={`/admin/tournaments/${tournament.id}/edit-results`}>
+                                                <Settings2 className="h-4 w-4 mr-2" />
+                                                Править
+                                            </Link>
+                                        </Button>
+                                        <DeleteTournamentButton tournamentId={tournament.id} tournamentName={tournament.name} />
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ))}

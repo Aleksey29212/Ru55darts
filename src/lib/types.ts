@@ -113,6 +113,7 @@ export type Tournament = {
   league: LeagueId;
   players: TournamentPlayerResult[];
   isFinalTour?: boolean;
+  isManuallyEdited?: boolean;
 };
 
 export type ScoringSettings = {
