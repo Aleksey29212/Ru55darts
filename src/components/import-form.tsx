@@ -37,9 +37,11 @@ export function ImportForm({ leagues }: { leagues: League[] }) {
   const [state, formAction] = useActionState(importTournament, null);
 
   useEffect(() => {
-    if (state?.message) {
+    // Показываем тост только если состояние реально изменилось и содержит сообщение
+    // Это предотвращает появление тоста при первой загрузке страницы
+    if (state && state.message) {
       toast({
-        title: state.success ? 'Успешно' : 'Ошибка',
+        title: state.success ? 'Успешно' : 'Внимание',
         description: state.message,
         variant: state.success ? 'default' : 'destructive',
       });

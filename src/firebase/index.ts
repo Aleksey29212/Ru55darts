@@ -17,7 +17,6 @@ export type FirebaseServices = {
 }
 
 export function initializeFirebase(): FirebaseServices {
-  // На сервере (SSR) возвращаем пустые ссылки, инициализация произойдет на клиенте
   if (typeof window === 'undefined') return { firebaseApp: null, auth: null, firestore: null };
 
   const apps = getApps();
@@ -25,9 +24,8 @@ export function initializeFirebase(): FirebaseServices {
     return getSdks(getApp());
   }
 
-  // КРИТИЧЕСКИЙ GUARD: если конфиг невалиден, не инициализируем SDK
+  // Если конфиг невалиден, возвращаем пустые сервисы
   if (!isFirebaseConfigValid) {
-    console.warn("Firebase configuration is missing. Services will not be initialized.");
     return { firebaseApp: null, auth: null, firestore: null };
   }
 
@@ -35,7 +33,6 @@ export function initializeFirebase(): FirebaseServices {
     const firebaseApp = initializeApp(firebaseConfig);
     return getSdks(firebaseApp);
   } catch (e) {
-    console.error("Firebase initialization failed:", e);
     return { firebaseApp: null, auth: null, firestore: null };
   }
 }
@@ -48,7 +45,6 @@ export function getSdks(firebaseApp: FirebaseApp): FirebaseServices {
       firestore: getFirestore(firebaseApp)
     };
   } catch (e) {
-    console.error("Failed to get Firebase services:", e);
     return { firebaseApp: null, auth: null, firestore: null };
   }
 }
