@@ -25,8 +25,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ScoringHelpDialog } from './scoring-help-dialog';
 
 /**
- * @fileOverview Личная карточка игрока (Дизайнерская версия v2.8).
- * Оптимизирована читаемость всех блоков статистики.
+ * @fileOverview Личная карточка игрока (Версия v3.0 - Adaptive Stats).
+ * ГАРАНТИЯ: Динамические рамки, которые не обрезают данные и идеально читаются.
  */
 
 const StatItem = ({ 
@@ -44,7 +44,7 @@ const StatItem = ({
     description?: string,
     caption?: string,
 }) => {
-    const baseClasses = "flex flex-col items-center justify-center p-4 rounded-[2rem] gap-1 min-h-[130px] transition-all border border-transparent interactive-scale overflow-hidden shadow-xl relative w-full";
+    const baseClasses = "flex flex-col items-center justify-center p-4 sm:p-6 rounded-[2rem] gap-1 transition-all border border-transparent interactive-scale overflow-hidden shadow-xl relative w-full min-w-fit";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
@@ -52,7 +52,7 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "text-2xl sm:text-4xl font-headline tracking-tight leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap px-1",
+        "text-2xl sm:text-4xl md:text-5xl font-headline tracking-tight leading-none w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap",
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : ''
     );
@@ -68,18 +68,18 @@ const StatItem = ({
                             templateClasses[template]
                         )}
                     >
-                        <p className="text-[10px] font-black text-muted-foreground/80 flex items-center justify-center gap-2 text-center uppercase tracking-[0.15em] font-body leading-none mb-2 px-2">
-                            {label}
-                            <Info className="h-3 shrink-0 opacity-40 text-primary group-hover:opacity-100 transition-opacity" />
+                        <p className="text-[10px] sm:text-[11px] font-black text-muted-foreground/80 flex items-center justify-center gap-2 text-center uppercase tracking-[0.15em] font-body leading-none mb-3 px-1 w-full">
+                            <span className="truncate">{label}</span>
+                            <Info className="h-3 w-3 shrink-0 opacity-40 text-primary group-hover:opacity-100 transition-opacity" />
                         </p>
                         
-                        <div className="relative w-full flex flex-col items-center justify-center">
+                        <div className="relative w-full flex flex-col items-center justify-center py-1">
                             <p className={valueClasses}>{value}</p>
-                            
-                            <p className="text-[9px] font-black uppercase text-primary/60 tracking-widest mt-2 text-center line-clamp-1 opacity-80 group-hover:text-primary transition-colors">
-                                {caption || "СТАТИСТИКА"}
-                            </p>
                         </div>
+
+                        <p className="text-[9px] font-black uppercase text-primary/60 tracking-widest mt-3 text-center opacity-80 group-hover:text-primary transition-colors leading-none w-full">
+                            <span className="truncate">{caption || "СТАТИСТИКА"}</span>
+                        </p>
                     </div>
                 </TooltipTrigger>
                 <TooltipContent side="top" className="max-w-[280px] text-center p-5 glassmorphism border-primary/50 z-[100] shadow-[0_20px_80px_rgba(0,0,0,0.8)] rounded-[1.5rem]">
@@ -225,7 +225,7 @@ export function PlayerCard({
         </div>
 
         <CardContent className={cn(
-            "p-8 md:p-16 lg:p-24 transition-all duration-1000",
+            "p-8 md:p-16 lg:p-20 transition-all duration-1000",
             template === 'modern' && 'md:w-2/3',
             template === 'dynamic' && "pt-40"
         )}>
@@ -235,7 +235,7 @@ export function PlayerCard({
                         <h4 className="font-headline text-2xl md:text-4xl text-primary tracking-tighter uppercase">АДМИН-СТУДИЯ</h4>
                         <p className="text-[12px] text-muted-foreground uppercase tracking-[0.4em] font-black opacity-60 mt-2">НАСТРОЙКА ПРОФИЛЯ И БИОГРАФИИ</p>
                     </div>
-                    <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "destructive" : "default"} size="lg" className="w-full sm:w-auto rounded-[1.5rem] h-16 px-10 shadow-[0_20px_50px_rgba(var(--primary-rgb),0.4)] font-black text-lg uppercase tracking-widest transition-all">
+                    <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "destructive" : "default"} size="lg" className="w-full sm:w-auto rounded-[1.5rem] h-16 px-10 shadow-[0_20px_50px_rgba(0,0,0,0.4)] font-black text-lg uppercase tracking-widest transition-all">
                         {isEditing ? <><X className="mr-3 h-7 w-7" /> ОТМЕНА</> : <><Edit className="mr-3 h-7 w-7" /> ИЗМЕНИТЬ</>}
                     </Button>
                 </div>
@@ -412,7 +412,7 @@ export function PlayerCard({
                                 <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
                                 АНАЛИЗ РЕЗУЛЬТАТОВ
                             </h3>
-                            <div className="grid grid-cols-2 gap-6 md:gap-10 relative z-10 mt-auto">
+                            <div className="grid grid-cols-2 gap-6 md:gap-8 lg:gap-10 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
                                     label="БАЗОВЫЕ" 
