@@ -5,10 +5,12 @@ import { cache } from 'react';
 import { sanitizeFirestore } from './utils';
 
 /**
- * ГАРАНТИЯ: Временное хранилище профилей для работы БЕЗ КЛЮЧЕЙ.
- * Все изменения сохраняются в оперативной памяти до перезагрузки процесса.
+ * ГАРАНТИЯ: Глобальное хранилище профилей для работы БЕЗ КЛЮЧЕЙ.
  */
-let demoPlayers: PlayerProfile[] = [];
+if (!(global as any).demoPlayers) {
+    (global as any).demoPlayers = [];
+}
+const demoPlayers: PlayerProfile[] = (global as any).demoPlayers;
 
 export const getPlayerProfiles = cache(
   async (): Promise<PlayerProfile[]> => {
@@ -50,7 +52,7 @@ export async function getPlayerProfileById(id: string): Promise<PlayerProfile | 
 }
 
 export async function updatePlayerProfiles(players: PlayerProfile[]): Promise<void> {
-  // Обновляем память обязательно
+  // Обновляем глобальную память обязательно
   players.forEach(p => {
       const idx = demoPlayers.findIndex(existing => existing.id === p.id);
       if (idx !== -1) {
@@ -78,7 +80,7 @@ export async function updatePlayerProfiles(players: PlayerProfile[]): Promise<vo
 }
 
 export async function clearAllPlayerProfiles(): Promise<void> {
-  demoPlayers = [];
+  demoPlayers.length = 0;
   const db = getDb();
   if (!db) return;
 

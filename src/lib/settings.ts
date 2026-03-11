@@ -7,14 +7,15 @@ import defaultLeagueSettingsData from './league-settings.json';
 import { sanitizeFirestore } from './utils';
 
 /**
- * ГАРАНТИЯ: Полная поддержка Демо-режима. 
- * Настройки сохраняются в памяти сервера, если Firebase не настроен.
+ * ГАРАНТИЯ: Глобальное хранилище настроек для работы БЕЗ КЛЮЧЕЙ.
  */
+if (!(global as any).memoScoringSettings) (global as any).memoScoringSettings = {};
+if (!(global as any).memoBackgroundUrl) (global as any).memoBackgroundUrl = '';
 
-let memoScoringSettings: Partial<Record<LeagueId, ScoringSettings>> = {};
-let memoLeagueSettings: AllLeagueSettings | null = null;
-let memoBackgroundUrl: string = '';
-let memoSponsorshipSettings: SponsorshipSettings | null = null;
+const memoScoringSettings: Partial<Record<LeagueId, ScoringSettings>> = (global as any).memoScoringSettings;
+let memoLeagueSettings: AllLeagueSettings | null = (global as any).memoLeagueSettings || null;
+let memoBackgroundUrl: string = (global as any).memoBackgroundUrl;
+let memoSponsorshipSettings: SponsorshipSettings | null = (global as any).memoSponsorshipSettings || null;
 
 export const getAllScoringSettings = cache(
   async (): Promise<Record<LeagueId, ScoringSettings>> => {
@@ -92,6 +93,7 @@ export const getLeagueSettings = cache(
 
 export async function updateLeagueSettings(settings: AllLeagueSettings): Promise<void> {
     memoLeagueSettings = settings;
+    (global as any).memoLeagueSettings = settings;
     const db = getDb();
     if (!db) return;
     try {
@@ -119,6 +121,7 @@ export const getBackgroundUrl = cache(
 
 export async function updateBackgroundUrl(url: string): Promise<void> {
     memoBackgroundUrl = url;
+    (global as any).memoBackgroundUrl = url;
     const db = getDb();
     if (!db) return;
     try {
@@ -165,6 +168,7 @@ export const getSponsorshipSettings = cache(
 
 export async function updateSponsorshipSettings(settings: SponsorshipSettings): Promise<void> {
     memoSponsorshipSettings = settings;
+    (global as any).memoSponsorshipSettings = settings;
     const db = getDb();
     if (!db) return;
     try {

@@ -6,16 +6,19 @@ import { getDoc } from 'firebase/firestore';
 import { sanitizeFirestore } from './utils';
 
 /**
- * ГАРАНТИЯ: Временное хранилище для работы БЕЗ КЛЮЧЕЙ Firebase.
- * Данные сохраняются в оперативной памяти до перезагрузки сервера.
+ * ГАРАНТИЯ: Глобальное хранилище для работы БЕЗ КЛЮЧЕЙ Firebase.
+ * Данные сохраняются в глобальном объекте Node.js для персистентности в рамках сессии.
  */
-let demoTournaments: Tournament[] = [];
+if (!(global as any).demoTournaments) {
+    (global as any).demoTournaments = [];
+}
+const demoTournaments: Tournament[] = (global as any).demoTournaments;
 
 export const getTournaments = cache(
   async (): Promise<Tournament[]> => {
     const db = getDb();
     
-    // Сначала берем данные из памяти (для демо-режима)
+    // Всегда начинаем с данных в памяти
     let tournaments = [...demoTournaments];
 
     if (db) {
@@ -26,7 +29,7 @@ export const getTournaments = cache(
               const data = doc.data();
               return sanitizeFirestore({ id: doc.id, ...data }) as Tournament;
             });
-            // Объединяем, если есть и там и там (приоритет БД)
+            // Объединяем, если есть в БД (приоритет БД)
             const dbIds = new Set(dbList.map(t => t.id));
             tournaments = [...dbList, ...tournaments.filter(t => !dbIds.has(t.id))];
         } catch (e) {
@@ -55,7 +58,7 @@ export async function addTournaments(newTournaments: any[]): Promise<string[]> {
             date: newT.date instanceof Timestamp ? newT.date : Timestamp.fromDate(new Date(newT.date as string)) 
         };
 
-        // Всегда сохраняем в память для демо-режима
+        // Всегда сохраняем в глобальную память
         const existsIdx = demoTournaments.findIndex(existing => existing.id === dataToSave.id);
         if (existsIdx !== -1) {
             demoTournaments[existsIdx] = dataToSave as Tournament;
@@ -100,7 +103,8 @@ export async function getTournamentById(id: string): Promise<Tournament | undefi
 }
 
 export async function deleteTournamentById(id: string): Promise<void> {
-    demoTournaments = demoTournaments.filter(t => t.id !== id);
+    const idx = demoTournaments.findIndex(t => t.id === id);
+    if (idx !== -1) demoTournaments.splice(idx, 1);
 
     const db = getDb();
     if (!db) return;
@@ -111,7 +115,7 @@ export async function deleteTournamentById(id: string): Promise<void> {
 }
 
 export async function clearAllTournamentData(): Promise<void> {
-    demoTournaments = [];
+    demoTournaments.length = 0;
     const db = getDb();
     if (!db) return;
     try {
