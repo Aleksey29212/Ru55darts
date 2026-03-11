@@ -401,42 +401,42 @@ export function PlayerCard({
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-5 lg:gap-6">
                             <StatItem 
                                 template={template} 
-                                label="ОЧКИ" 
+                                label="ОЧК" 
                                 name="points" 
                                 value={player.points} 
-                                caption="ИТОГО"
+                                caption="ИТГ"
                                 description="Общее количество рейтинговых очков, заработанных во всех активных лигах." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="ТУРЫ" 
+                                label="ТУР" 
                                 name="matchesPlayed" 
                                 value={player.matchesPlayed} 
-                                caption="МАТЧИ"
+                                caption="МТЧ"
                                 description="Общее количество официальных турниров, которые посетил игрок." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="ТОП-8" 
+                                label="Т-8" 
                                 name="wins" 
                                 value={player.wins} 
-                                caption="ПЛЕЙ-ОФФ"
+                                caption="П-ОФ"
                                 description="Сколько раз игрок выходил в четвертьфинал или выше." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="ГРУППА" 
+                                label="ГРП" 
                                 name="losses" 
                                 value={player.losses} 
-                                caption="ВЫЛЕТЫ"
+                                caption="ВЫЛ"
                                 description="Турниры, в которых игрок завершил выступление на групповой стадии." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="ЭФФ." 
+                                label="ЭФФ" 
                                 name="winRate" 
                                 value={winRate} 
-                                caption="ПРОЦЕНТ"
+                                caption="ПЦТ"
                                 description="Процент попадания в плей-офф от общего количества сыгранных турниров." 
                             />
                         </div>
@@ -452,18 +452,18 @@ export function PlayerCard({
                             <div className="grid grid-cols-2 gap-4 sm:gap-6 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
-                                    label="БАЗОВЫЕ" 
+                                    label="БАЗ" 
                                     name="basePoints" 
                                     value={player.basePoints} 
-                                    caption="ЗА МЕСТА"
+                                    caption="МСТ"
                                     description="Очки, начисленные строго за итоговую позицию в турнирах." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="БОНУСЫ" 
+                                    label="БОН" 
                                     name="bonusPoints" 
                                     value={`+${player.bonusPoints}`} 
-                                    caption="БОНУСЫ"
+                                    caption="БОН"
                                     description="Дополнительные очки за 180, высокие чекауты и средний набор." 
                                 />
                             </div>
@@ -478,26 +478,26 @@ export function PlayerCard({
                             <div className="grid grid-cols-3 gap-2 sm:gap-3 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
-                                    label="СРЕДНИЙ" 
+                                    label="СРД" 
                                     name="avg" 
                                     value={(Number(player.avg) || 0).toFixed(1)} 
-                                    caption="НАБОР"
+                                    caption="НБР"
                                     description="Средний балл за 3 дротика на протяжении всей карьеры." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="180-КИ" 
+                                    label="180" 
                                     name="n180s" 
                                     value={player.n180s} 
-                                    caption="МАКСИМУМЫ"
+                                    caption="МКС"
                                     description="Общее количество идеальных подходов по 180 очков." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="ЧЕКАУТ" 
+                                    label="ЧК" 
                                     name="hiOut" 
                                     value={Number(player.hiOut) || 0} 
-                                    caption="ФИНИШ"
+                                    caption="ФНШ"
                                     description="Самое высокое закрытие лега в официальных матчах." 
                                 />
                             </div>
