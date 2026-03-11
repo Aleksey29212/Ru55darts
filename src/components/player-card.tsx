@@ -45,6 +45,7 @@ const StatItem = ({
     const hasDecimal = valueString.includes('.') || valueString.includes(',');
     
     // УЛЬТРА-АДАПТАЦИЯ: Динамический подбор размера для всех шаблонов
+    // Приоритет: вписать число любой ценой
     let fontSizeClass = "text-4xl sm:text-5xl lg:text-6xl"; 
     
     if (hasDecimal || len >= 5) {
@@ -452,18 +453,18 @@ export function PlayerCard({
                             <div className="grid grid-cols-2 gap-4 sm:gap-6 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
-                                    label="БАЗ" 
+                                    label="БАЗОВЫЕ" 
                                     name="basePoints" 
                                     value={player.basePoints} 
-                                    caption="МСТ"
+                                    caption="ЗА МЕСТА"
                                     description="Очки, начисленные строго за итоговую позицию в турнирах." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="БОН" 
+                                    label="БОНУСЫ" 
                                     name="bonusPoints" 
                                     value={`+${player.bonusPoints}`} 
-                                    caption="БОН"
+                                    caption="БОНУСЫ"
                                     description="Дополнительные очки за 180, высокие чекауты и средний набор." 
                                 />
                             </div>
@@ -478,26 +479,26 @@ export function PlayerCard({
                             <div className="grid grid-cols-3 gap-2 sm:gap-3 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
-                                    label="СРД" 
+                                    label="СР-Й" 
                                     name="avg" 
                                     value={(Number(player.avg) || 0).toFixed(1)} 
-                                    caption="НБР"
+                                    caption="НАБОР"
                                     description="Средний балл за 3 дротика на протяжении всей карьеры." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="180" 
+                                    label="180-КИ" 
                                     name="n180s" 
                                     value={player.n180s} 
-                                    caption="МКС"
+                                    caption="МАКСИМУМЫ"
                                     description="Общее количество идеальных подходов по 180 очков." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="ЧК" 
+                                    label="ЧЕКАУТ" 
                                     name="hiOut" 
                                     value={Number(player.hiOut) || 0} 
-                                    caption="ФНШ"
+                                    caption="ФИНИШ"
                                     description="Самое высокое закрытие лега в официальных матчах." 
                                 />
                             </div>
