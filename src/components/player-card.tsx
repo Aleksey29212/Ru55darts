@@ -41,7 +41,7 @@ const StatItem = ({
 }) => {
     const isSmallStat = name === 'avg' || name === 'n180s' || name === 'hiOut';
     
-    const baseClasses = "flex flex-col items-center justify-between p-4 sm:p-6 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[140px] sm:min-h-[160px]";
+    const baseClasses = "flex flex-col items-center justify-between p-4 sm:p-5 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[150px] sm:min-h-[160px]";
     const templateClasses = {
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
@@ -64,15 +64,15 @@ const StatItem = ({
             )}
         >
             <div className="w-full flex items-center justify-center gap-2 mb-1">
-                <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground/80 leading-tight">
+                <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-normal text-muted-foreground/80 leading-tight text-center break-words max-w-[90%]">
                     {label}
                 </span>
                 
                 <TooltipProvider>
                     <Tooltip delayDuration={0}>
                         <TooltipTrigger asChild>
-                            <div className="cursor-help p-1 -m-1 hover:text-primary transition-all active:scale-90">
-                                <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 text-primary/60 hover:text-primary animate-pulse" />
+                            <div className="cursor-help p-1 -m-1 hover:text-primary transition-all active:scale-90 shrink-0">
+                                <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary/60 hover:text-primary animate-pulse" />
                             </div>
                         </TooltipTrigger>
                         <TooltipContent 
@@ -97,9 +97,9 @@ const StatItem = ({
                 <span className={valueClasses}>{value}</span>
             </div>
 
-            <div className="w-full mt-1">
+            <div className="w-full mt-auto">
                 <div className="h-px w-full bg-white/10 mb-2" />
-                <p className="text-[8px] sm:text-[9px] font-black uppercase text-primary/70 tracking-[0.2em] text-center leading-tight">
+                <p className="text-[8px] sm:text-[9px] font-black uppercase text-primary/70 tracking-tight text-center leading-tight break-words px-1">
                     {caption || "СТАТ"}
                 </p>
             </div>
