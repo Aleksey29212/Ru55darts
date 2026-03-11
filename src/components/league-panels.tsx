@@ -176,14 +176,14 @@ export function LeaguePanels({
     return (
         <div className="w-full space-y-10">
             {/* Sticky Header Section combining Partners and Leagues */}
-            <div className="sticky top-16 z-40 bg-background/90 backdrop-blur-xl border-b border-white/10 -mx-4 px-4 py-2 space-y-2">
+            <div className="sticky top-16 z-40 bg-background/95 backdrop-blur-xl border-b border-white/10 -mx-4 px-4 py-4 space-y-6 shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all">
                 {/* Fixed Partners Ticker inside sticky area */}
-                <div className="max-w-full overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+                <div className="w-full">
                     <PartnersDisplay partners={partners} variant="compact" hideLabel />
                 </div>
 
                 {/* League Selection Scroll */}
-                <div className="flex items-center gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide no-scrollbar mask-fade-edges">
+                <div className="flex items-center gap-2 md:gap-3 overflow-x-auto pb-1 scrollbar-hide no-scrollbar mask-fade-edges">
                     {enabledLeagues.map(leagueId => {
                         const leagueInfo = leagueSettings[leagueId];
                         const isSelected = optimisticLeagueId === leagueId;
