@@ -36,39 +36,39 @@
     --silver: 0 0% 75%;
     --bronze: 30 59% 51%;
     --success: 142.1 76.2% 36.3%;
-    --radius: 1.25rem;
+    --radius: 1.5rem;
   }
 
   .dark {
-    --background: 260 20% 6%;
+    --background: 240 10% 4%;
     --foreground: 0 0% 98%;
-    --card: 260 20% 8%;
+    --card: 240 10% 6%;
     --card-foreground: 0 0% 98%;
-    --popover: 260 20% 8%;
+    --popover: 240 10% 6%;
     --popover-foreground: 0 0% 98%;
-    --primary: 35 90% 60%;
-    --primary-foreground: 260 20% 6%;
-    --secondary: 260 15% 12%;
+    --primary: 38 92% 55%;
+    --primary-foreground: 240 10% 4%;
+    --secondary: 240 10% 10%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 260 15% 12%;
-    --muted-foreground: 260 10% 70%;
+    --muted: 240 10% 10%;
+    --muted-foreground: 240 5% 65%;
     --accent: 217 91% 60%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 80% 45%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 260 15% 18%;
-    --input: 260 15% 18%;
-    --ring: 35 90% 60%;
+    --border: 240 10% 15%;
+    --input: 240 10% 15%;
+    --ring: 38 92% 55%;
     --gold: 45 93% 48%;
     --silver: 220 13% 75%;
     --bronze: 28 65% 55%;
-    --success: 142 80% 45%;
+    --success: 142 76% 45%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border outline-none transition-all duration-150;
+    @apply border-border outline-none transition-all duration-200;
   }
   body {
     @apply bg-background text-foreground selection:bg-primary/30 antialiased;
@@ -78,23 +78,23 @@
 
 @layer components {
   .glassmorphism {
-    @apply bg-card/85 backdrop-blur-3xl border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.5)];
+    @apply bg-card/80 backdrop-blur-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)];
   }
 
   .text-glow {
-    text-shadow: 0 0 15px currentColor;
+    text-shadow: 0 0 20px hsla(var(--primary) / 0.6), 0 0 10px hsla(var(--primary) / 0.3);
   }
 
   .text-glow-accent {
-    text-shadow: 0 0 20px hsla(var(--accent) / 0.8), 0 0 10px hsla(var(--accent) / 0.4);
+    text-shadow: 0 0 25px hsla(var(--accent) / 0.8), 0 0 12px hsla(var(--accent) / 0.4);
   }
 
   .text-glow-white {
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 10px rgba(255, 255, 255, 0.4);
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.5), 0 0 15px rgba(255, 255, 255, 0.2);
   }
 
   .interactive-scale {
-    @apply transition-transform active:scale-95 duration-75 hover:brightness-110;
+    @apply transition-transform active:scale-95 duration-100 hover:brightness-110;
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -106,7 +106,7 @@
   }
 
   .mask-fade-edges {
-    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
   }
 
   .arena-podium-glow {
@@ -118,10 +118,10 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 80%;
-    height: 20%;
-    background: radial-gradient(ellipse at center, hsl(var(--primary) / 0.3) 0%, transparent 70%);
-    filter: blur(20px);
+    width: 90%;
+    height: 30%;
+    background: radial-gradient(ellipse at center, hsl(var(--primary) / 0.4) 0%, transparent 80%);
+    filter: blur(30px);
     z-index: -1;
   }
 }

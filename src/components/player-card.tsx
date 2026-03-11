@@ -51,18 +51,18 @@ const StatItem = ({
     const [localReveal, setLocalReveal] = useState(false);
     const isRevealed = !interactive || forcedReveal || localReveal;
     
-    const baseClasses = "flex flex-col items-center justify-center p-2 rounded-2xl gap-1 min-h-[110px] transition-all border border-transparent interactive-scale overflow-hidden shadow-lg relative";
+    const baseClasses = "flex flex-col items-center justify-center p-3 rounded-[2rem] gap-1 min-h-[130px] transition-all border border-transparent interactive-scale overflow-hidden shadow-2xl relative";
     const templateClasses = {
-        classic: "glassmorphism bg-white/5 border-white/5 hover:border-primary/30",
-        modern: "bg-background border-border shadow-inner",
-        dynamic: "bg-black/70 text-white border-accent/40 shadow-[0_0_20px_rgba(var(--accent-rgb),0.15)]"
+        classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
+        modern: "bg-background/60 backdrop-blur-md border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.05)]",
+        dynamic: "bg-black/80 text-white border-accent/50 shadow-[0_0_30px_rgba(var(--accent-rgb),0.2)]"
     };
 
     const valueClasses = cn(
-        "text-lg sm:text-xl lg:text-2xl font-headline tracking-tight leading-none mt-1 w-full text-center drop-shadow-md transition-all duration-500 whitespace-nowrap px-1",
-        (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-foreground',
+        "text-xl sm:text-2xl lg:text-4xl font-headline tracking-tight leading-none mt-2 w-full text-center drop-shadow-2xl transition-all duration-700 whitespace-nowrap px-2",
+        (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : '',
-        !isRevealed && "blur-xl scale-90 opacity-0"
+        !isRevealed && "blur-2xl scale-75 opacity-0"
     );
     
     return (
@@ -75,36 +75,36 @@ const StatItem = ({
                             "cursor-help w-full group", 
                             baseClasses, 
                             templateClasses[template],
-                            interactive && !isRevealed && "cursor-pointer hover:bg-primary/10"
+                            interactive && !isRevealed && "cursor-pointer hover:bg-primary/20 hover:border-primary/50"
                         )}
                     >
-                        <p className="text-[8px] md:text-[9px] font-bold text-muted-foreground/90 flex items-center justify-center gap-1 text-center uppercase tracking-widest font-body leading-none mb-0.5">
+                        <p className="text-[9px] md:text-[10px] font-black text-muted-foreground/60 flex items-center justify-center gap-2 text-center uppercase tracking-[0.2em] font-body leading-none mb-1">
                             {label}
-                            <Info className="h-2.5 sm:h-3 md:h-3.5 shrink-0 opacity-50 text-primary" />
+                            <Info className="h-3 sm:h-3.5 shrink-0 opacity-40 text-primary group-hover:opacity-100 transition-opacity" />
                         </p>
                         
-                        <div className="relative w-full flex flex-col items-center justify-center min-h-[45px]">
+                        <div className="relative w-full flex flex-col items-center justify-center min-h-[60px]">
                             <p className={valueClasses}>{value}</p>
                             
                             {isRevealed && (
-                                <p className="text-[7px] md:text-[8px] font-bold uppercase text-primary/60 tracking-tighter mt-1 text-center line-clamp-1 opacity-80">
-                                    {caption || "Статистика"}
+                                <p className="text-[8px] md:text-[10px] font-black uppercase text-primary/50 tracking-widest mt-2 text-center line-clamp-1 opacity-80 group-hover:text-primary/100 transition-colors">
+                                    {caption || "STATISTICS"}
                                 </p>
                             )}
 
                             {interactive && !isRevealed && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center animate-in fade-in duration-500">
-                                    <Lock className="h-3.5 w-3.5 text-primary/40 mb-0.5" />
-                                    <span className="text-[7px] font-bold uppercase tracking-tighter text-primary/60">Открыть</span>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center animate-in fade-in duration-700">
+                                    <Lock className="h-5 w-5 text-primary/30 mb-1 animate-bounce" />
+                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/50">UNFOLD</span>
                                 </div>
                             )}
                         </div>
                     </div>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-[240px] text-center p-4 glassmorphism border-primary/40 z-[100] shadow-2xl">
-                    <div className="space-y-2">
-                        <p className="text-[10px] font-headline text-primary uppercase tracking-widest">{label}</p>
-                        <p className="text-xs leading-relaxed font-semibold">{description || "Информация о достижении игрока."}</p>
+                <TooltipContent side="top" className="max-w-[280px] text-center p-5 glassmorphism border-primary/50 z-[100] shadow-[0_20px_80px_rgba(0,0,0,0.8)] rounded-[1.5rem]">
+                    <div className="space-y-3">
+                        <p className="text-[11px] font-headline text-primary uppercase tracking-[0.2em] mb-1">{label}</p>
+                        <p className="text-sm leading-relaxed font-bold text-white/90">{description || "Professional performance metrics."}</p>
                     </div>
                 </TooltipContent>
             </Tooltip>
@@ -147,7 +147,7 @@ export function PlayerCard({ player, template = 'classic', viewMode, scoringSett
   const handleSave = async () => {
     if (!db) return;
     updatePlayerProfile(db, editablePlayer);
-    toast({ title: 'Обновление', description: `Изменения сохраняются...` });
+    toast({ title: 'System Update', description: `Player profile synced successfully.` });
     setIsFormDirty(false);
     setIsEditing(false);
   }
@@ -158,121 +158,121 @@ export function PlayerCard({ player, template = 'classic', viewMode, scoringSett
   const hasOmskStats = player.cashValue && player.cashValue > 0;
 
   return (
-    <div className="space-y-6 md:space-y-10 animate-in fade-in duration-700">
+    <div className="space-y-10 md:space-y-16 animate-in fade-in duration-1000">
     <Card className={cn(
-        "glassmorphism overflow-hidden transition-all duration-700 shadow-2xl border-white/10 rounded-[2.5rem]",
+        "glassmorphism overflow-hidden transition-all duration-1000 shadow-[0_40px_120px_rgba(0,0,0,0.7)] border-white/10 rounded-[3.5rem]",
         template === 'modern' && 'flex flex-col md:flex-row',
-        template === 'dynamic' && 'border-accent/50 shadow-accent/20 border-2'
+        template === 'dynamic' && 'border-accent/60 shadow-[0_0_80px_rgba(var(--accent-rgb),0.3)] border-2'
     )}>
         {/* Hero Section */}
         <div className={cn(
             "relative overflow-hidden",
-            template === 'classic' && "h-72 md:h-96",
-            template === 'modern' && "p-10 md:w-1/3 flex flex-col items-center justify-center bg-gradient-to-br from-muted/40 to-transparent border-r border-white/10",
-            template === 'dynamic' && "h-80"
+            template === 'classic' && "h-[450px] md:h-[550px]",
+            template === 'modern' && "p-12 md:w-1/3 flex flex-col items-center justify-center bg-gradient-to-br from-black/80 to-transparent border-r border-white/10",
+            template === 'dynamic' && "h-[400px]"
         )}>
             <Image 
                 src={backgroundImageUrl}
                 alt=""
                 fill
                 className={cn(
-                    "object-cover transition-all duration-1000",
-                    template === 'classic' && "opacity-50",
+                    "object-cover transition-all duration-[3000ms]",
+                    template === 'classic' && "opacity-40 scale-110",
                     template === 'modern' && "opacity-0",
-                    template === 'dynamic' && "opacity-60"
+                    template === 'dynamic' && "opacity-50"
                 )}
                 unoptimized={backgroundImageUrl.startsWith('data:image')}
                 priority
             />
-             <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
+             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
             <div className={cn(
-                "absolute transition-all duration-700 z-10 w-full",
-                template === 'classic' && "bottom-0 left-0 p-8 md:p-12 flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-10",
-                template === 'modern' && "relative flex flex-col items-center gap-10",
+                "absolute transition-all duration-1000 z-10 w-full",
+                template === 'classic' && "bottom-0 left-0 p-10 md:p-16 flex flex-col md:flex-row items-center md:items-end gap-10 md:gap-14",
+                template === 'modern' && "relative flex flex-col items-center gap-12",
                 template === 'dynamic' && "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"
             )}>
                 <div className="relative shrink-0">
                     <Avatar className={cn(
-                        "border-4 transition-all shadow-2xl",
-                        template === 'classic' && "h-36 w-36 md:h-48 md:w-48 border-primary ring-8 ring-primary/15",
-                        template === 'modern' && "h-44 w-44 md:h-52 md:w-52 border-primary ring-8 ring-primary/10",
-                        template === 'dynamic' && "h-40 w-40 md:h-48 md:w-48 border-accent ring-8 ring-accent/20"
+                        "border-4 transition-all duration-1000 shadow-[0_0_80px_rgba(0,0,0,0.8)]",
+                        template === 'classic' && "h-44 w-44 md:h-64 md:w-64 border-primary ring-[12px] ring-primary/10",
+                        template === 'modern' && "h-52 w-52 md:h-72 md:w-72 border-primary ring-[12px] ring-primary/5",
+                        template === 'dynamic' && "h-48 w-48 md:h-64 md:w-64 border-accent ring-[12px] ring-accent/15"
                     )}>
-                        <AvatarImage src={currentPlayerData.avatarUrl} alt={currentPlayerData.name} />
-                        <AvatarFallback className="text-5xl md:text-6xl font-headline bg-muted text-muted-foreground">{currentPlayerData.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={currentPlayerData.avatarUrl} alt={currentPlayerData.name} className="object-cover" />
+                        <AvatarFallback className="text-6xl md:text-8xl font-headline bg-muted text-muted-foreground">{currentPlayerData.name.charAt(0)}</AvatarFallback>
                     </Avatar>
-                    <div className="absolute -bottom-2 -right-2 p-2.5 rounded-2xl bg-background border-2 border-primary/30 shadow-2xl">
-                        <Trophy className="h-5 w-5 md:h-6 md:w-6 text-gold" />
+                    <div className="absolute -bottom-4 -right-4 p-4 rounded-[1.5rem] bg-background border-4 border-primary/40 shadow-3xl animate-bounce duration-[4s]">
+                        <Trophy className="h-8 w-8 md:h-10 md:w-10 text-gold drop-shadow-[0_0_15px_currentColor]" />
                     </div>
                 </div>
-                 <div className={cn(template === 'modern' ? 'text-center' : 'flex flex-col items-center md:items-start gap-3 text-center md:text-left')}>
-                    <h1 className={cn("font-headline tracking-tighter text-white drop-shadow-[0_6px_20px_rgba(0,0,0,0.8)] leading-tight", template === 'classic' ? "text-4xl md:text-7xl" : "text-4xl md:text-6xl")}>{currentPlayerData.name}</h1>
-                    <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start">
-                        <Badge variant="secondary" className="font-bold uppercase tracking-[0.25em] text-[10px] md:text-[12px] py-1.5 px-4 md:py-2 md:px-6 backdrop-blur-2xl bg-white/10 text-white border-white/20 shadow-xl">{currentPlayerData.nickname}</Badge>
+                 <div className={cn(template === 'modern' ? 'text-center' : 'flex flex-col items-center md:items-start gap-5 text-center md:text-left')}>
+                    <h1 className={cn("font-headline tracking-tighter text-white text-glow-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.9)] leading-none", template === 'classic' ? "text-5xl md:text-9xl" : "text-5xl md:text-8xl")}>{currentPlayerData.name}</h1>
+                    <div className="flex items-center gap-4 flex-wrap justify-center md:justify-start">
+                        <Badge variant="secondary" className="font-black uppercase tracking-[0.4em] text-[11px] md:text-[14px] py-2.5 px-8 backdrop-blur-3xl bg-white/10 text-white border-2 border-white/20 shadow-3xl">{currentPlayerData.nickname}</Badge>
                         {player.isQualifiedForFinal && (
-                            <Badge className="bg-orange-500 text-white font-bold uppercase tracking-widest animate-pulse shadow-2xl shadow-orange-500/30 py-1.5 px-4 text-[10px] md:text-[12px]">
-                                <Award className="h-4 w-4 mr-1.5" />
-                                Qualified
+                            <Badge className="bg-orange-600 text-white font-black uppercase tracking-[0.3em] animate-pulse shadow-[0_0_40px_rgba(234,88,12,0.5)] py-2.5 px-8 text-[11px] md:text-[14px] border-2 border-orange-400/50">
+                                <Award className="h-5 w-5 mr-3" />
+                                QUALIFIED
                             </Badge>
                         )}
                     </div>
                 </div>
             </div>
 
-            <div className="absolute top-6 right-6 md:top-10 md:right-10 z-10 flex flex-col gap-4">
+            <div className="absolute top-8 right-8 md:top-14 md:right-14 z-10 flex flex-col gap-6">
                 <div className={cn(
-                    "flex flex-col items-center justify-center min-w-[90px] md:min-w-[120px] p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] backdrop-blur-3xl border-2 shadow-[0_10px_40px_rgba(0,0,0,0.4)] transition-transform hover:scale-110",
-                    template === 'dynamic' ? 'bg-accent/40 border-accent/50 text-accent' : 'bg-primary/40 border-primary/50 text-primary-foreground'
+                    "flex flex-col items-center justify-center min-w-[110px] md:min-w-[150px] p-6 md:p-8 rounded-[2.5rem] md:rounded-[3.5rem] backdrop-blur-3xl border-2 shadow-[0_20px_60px_rgba(0,0,0,0.6)] transition-all hover:scale-110 duration-500",
+                    template === 'dynamic' ? 'bg-accent/50 border-accent/60 text-accent' : 'bg-primary/50 border-primary/60 text-primary-foreground'
                 )}>
-                    <span className="text-[10px] md:text-[12px] font-bold uppercase tracking-[0.2em] opacity-90 mb-1">Rank</span>
-                    <span className="text-3xl md:text-5xl font-headline leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
-                        {currentPlayerData.rank > 0 ? `#${currentPlayerData.rank}` : 'N/A'}
+                    <span className="text-[11px] md:text-[14px] font-black uppercase tracking-[0.3em] opacity-80 mb-2">RANK</span>
+                    <span className="text-4xl md:text-7xl font-headline leading-none drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
+                        {currentPlayerData.rank > 0 ? `#${currentPlayerData.rank}` : '—'}
                     </span>
                 </div>
             </div>
         </div>
 
         <CardContent className={cn(
-            "p-6 md:p-12 lg:p-16 transition-all",
+            "p-8 md:p-16 lg:p-24 transition-all duration-1000",
             template === 'modern' && 'md:w-2/3',
-            template === 'dynamic' && "pt-32"
+            template === 'dynamic' && "pt-40"
         )}>
              {isClient && isAdmin && (
-                <div className="mb-10 md:mb-14 p-6 md:p-8 rounded-[2rem] border-2 border-primary/30 bg-primary/10 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="mb-14 md:mb-20 p-8 md:p-12 rounded-[3rem] border-2 border-primary/40 bg-primary/10 flex flex-col sm:flex-row items-center justify-between gap-10 shadow-3xl">
                     <div className="text-center sm:text-left">
-                        <h4 className="font-headline text-lg md:text-2xl text-primary tracking-tight">Режим администратора</h4>
-                        <p className="text-[11px] text-muted-foreground uppercase tracking-widest font-bold opacity-80">Настройка профиля и данных</p>
+                        <h4 className="font-headline text-2xl md:text-4xl text-primary tracking-tighter uppercase">ADMIN STUDIO</h4>
+                        <p className="text-[12px] text-muted-foreground uppercase tracking-[0.4em] font-black opacity-60 mt-2">CONFIGURE PRO PROFILE & BIOGRAPHY</p>
                     </div>
-                    <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "destructive" : "default"} size="lg" className="w-full sm:w-auto rounded-2xl h-14 px-8 shadow-2xl shadow-primary/30 font-bold text-primary-foreground">
-                        {isEditing ? <><X className="mr-2 h-6 w-6" /> Закрыть</> : <><Edit className="mr-2 h-6 w-6" /> Редактировать</>}
+                    <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "destructive" : "default"} size="lg" className="w-full sm:w-auto rounded-[1.5rem] h-16 px-10 shadow-[0_20px_50px_rgba(var(--primary-rgb),0.4)] font-black text-lg uppercase tracking-widest transition-all">
+                        {isEditing ? <><X className="mr-3 h-7 w-7" /> CANCEL</> : <><Edit className="mr-3 h-7 w-7" /> EDIT PROFILE</>}
                     </Button>
                 </div>
              )}
 
              {isEditing && (
-                <div className="mb-14 space-y-8 md:space-y-10 p-8 md:p-10 border-2 border-primary/40 rounded-[2.5rem] glassmorphism shadow-2xl animate-in zoom-in-95 duration-500">
-                    <div className="grid md:grid-cols-2 gap-8 md:gap-10">
-                        <div className="space-y-4">
-                            <Label className="text-[11px] md:text-[13px] uppercase font-bold tracking-widest text-primary ml-1">Никнейм игрока</Label>
-                            <Input name="nickname" value={editablePlayer.nickname} onChange={handleInputChange} className="rounded-2xl bg-black/30 h-14 text-lg border-white/10" />
+                <div className="mb-20 space-y-10 md:space-y-14 p-10 md:p-16 border-2 border-primary/50 rounded-[3.5rem] glassmorphism shadow-4xl animate-in zoom-in-95 duration-700">
+                    <div className="grid md:grid-cols-2 gap-10 md:gap-16">
+                        <div className="space-y-5">
+                            <Label className="text-[12px] md:text-[14px] uppercase font-black tracking-[0.3em] text-primary ml-2">PRO NICKNAME</Label>
+                            <Input name="nickname" value={editablePlayer.nickname} onChange={handleInputChange} className="rounded-2xl bg-black/50 h-16 text-xl border-white/10 px-6 font-bold" />
                         </div>
-                        <div className="space-y-4">
-                            <Label className="text-[11px] md:text-[13px] uppercase font-bold tracking-widest text-primary ml-1">Фон карточки</Label>
+                        <div className="space-y-5">
+                            <Label className="text-[12px] md:text-[14px] uppercase font-black tracking-[0.3em] text-primary ml-2">ARENA BACKGROUND</Label>
                             <Select
                                 value={editablePlayer.backgroundUrl || ''}
                                 onValueChange={(value) => { setEditablePlayer(prev => ({ ...prev, backgroundUrl: value })); setIsFormDirty(true); }}
                             >
-                                <SelectTrigger className="h-14 rounded-2xl bg-black/30 border-white/10">
-                                    <SelectValue placeholder="Выберите фон..." />
+                                <SelectTrigger className="h-16 rounded-2xl bg-black/50 border-white/10 px-6 text-xl font-bold">
+                                    <SelectValue placeholder="Select Arena..." />
                                 </SelectTrigger>
-                                <SelectContent className="max-h-96 rounded-2xl glassmorphism border-white/20">
-                                    <SelectItem value=" ">Стандартный аметист</SelectItem>
+                                <SelectContent className="max-h-[500px] rounded-3xl glassmorphism border-white/20 p-2">
+                                    <SelectItem value=" " className="rounded-xl h-12">Default Dark Theme</SelectItem>
                                     {CardBackgrounds.map(bg => (
-                                        <SelectItem key={bg.id} value={bg.url}>
-                                            <div className="flex items-center gap-4">
-                                                <div className="relative w-12 h-6 rounded-md overflow-hidden border border-white/10"><Image src={bg.url} alt="" fill className="object-cover" unoptimized /></div>
-                                                <span className="capitalize text-sm font-bold">{bg.hint}</span>
+                                        <SelectItem key={bg.id} value={bg.url} className="rounded-xl h-16">
+                                            <div className="flex items-center gap-6">
+                                                <div className="relative w-16 h-10 rounded-lg overflow-hidden border border-white/20"><Image src={bg.url} alt="" fill className="object-cover" unoptimized /></div>
+                                                <span className="capitalize text-lg font-black tracking-tight">{bg.hint}</span>
                                             </div>
                                         </SelectItem>
                                     ))}
@@ -281,189 +281,194 @@ export function PlayerCard({ player, template = 'classic', viewMode, scoringSett
                         </div>
                     </div>
                     
-                    <div className="space-y-4">
-                        <Label className="text-[11px] md:text-[13px] uppercase font-bold tracking-widest text-primary ml-1">Биография (Story)</Label>
-                        <Textarea name="bio" value={editablePlayer.bio} onChange={handleInputChange} rows={5} className="rounded-[2rem] bg-black/30 resize-none p-6 md:p-8 text-base border-white/10" />
+                    <div className="space-y-5">
+                        <Label className="text-[12px] md:text-[14px] uppercase font-black tracking-[0.3em] text-primary ml-2">PLAYER LEGEND (STORY)</Label>
+                        <Textarea name="bio" value={editablePlayer.bio} onChange={handleInputChange} rows={6} className="rounded-[2.5rem] bg-black/50 resize-none p-8 md:p-12 text-lg border-white/10 leading-relaxed font-medium" />
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-6 pt-6">
-                        <Button onClick={handleSave} className='flex-1 h-16 rounded-2xl shadow-2xl shadow-primary/40 font-bold text-lg text-primary-foreground' disabled={!isFormDirty}><Save className="mr-2 h-6 w-6" />Сохранить</Button>
-                        <Button onClick={() => { setIsEditing(false); setEditablePlayer(player); }} className='flex-1 h-16 rounded-2xl text-lg' variant="ghost"><X className="mr-2 h-6 w-6" />Отмена</Button>
+                    <div className="flex flex-col sm:flex-row gap-8 pt-8">
+                        <Button onClick={handleSave} className='flex-1 h-20 rounded-3xl shadow-[0_30px_80px_rgba(var(--primary-rgb),0.5)] font-black text-xl text-primary-foreground uppercase tracking-[0.2em]' disabled={!isFormDirty}><Save className="mr-3 h-7 w-7" />SAVE PROFILE</Button>
+                        <Button onClick={() => { setIsEditing(false); setEditablePlayer(player); }} className='flex-1 h-20 rounded-3xl text-xl font-black uppercase tracking-[0.2em]' variant="ghost"><X className="mr-3 h-7 w-7" />DISCARD</Button>
                     </div>
                 </div>
              )}
             
-            <div className="grid grid-cols-1 gap-10 md:gap-16">
-                <div className="space-y-6 md:space-y-8">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
-                        <div className="flex items-center gap-4 md:gap-5">
-                            <div className="p-2.5 rounded-xl bg-primary/15 text-primary shrink-0">
-                                <Info className="h-5 w-5 md:h-6 md:w-6" />
+            <div className="grid grid-cols-1 gap-12 md:gap-20">
+                <div className="space-y-10 md:space-y-14">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 md:gap-10">
+                        <div className="flex items-center gap-6 md:gap-8">
+                            <div className="p-4 rounded-2xl bg-primary/20 text-primary shrink-0 shadow-2xl border border-primary/30">
+                                <Info className="h-7 w-7 md:h-9 md:w-9" />
                             </div>
-                            <h3 className="text-[10px] md:text-sm font-headline uppercase tracking-[0.25em] text-muted-foreground/90">О про-игроке</h3>
+                            <h3 className="text-[12px] md:text-lg font-headline uppercase tracking-[0.4em] text-white/60">PLAYER BIO</h3>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-4">
                             <Button 
                                 onClick={() => setAreAllStatsRevealed(!revealAll)}
                                 variant="outline" 
                                 size="sm" 
-                                className="rounded-xl h-10 px-4 gap-2 border-primary/20 text-primary hover:bg-primary/10 text-[10px] md:text-xs"
+                                className="rounded-2xl h-12 px-6 gap-3 border-primary/30 text-primary hover:bg-primary/20 text-[11px] font-black uppercase tracking-widest"
                             >
-                                {revealAll ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                                {revealAll ? 'Скрыть' : 'Раскрыть всё'}
+                                {revealAll ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                {revealAll ? 'HIDE DATA' : 'REVEAL STATS'}
                             </Button>
                             <ScoringHelpDialog settings={scoringSettings} leagueName={leagueNames} sponsorshipSettings={{ groupVkLink: 'https://vk.com/dartbrig' } as any}>
-                                <Button variant="ghost" size="sm" className="hidden sm:flex gap-3 rounded-xl h-10 px-4 text-[10px] md:text-sm uppercase font-bold tracking-tight hover:bg-primary/15 text-primary border border-primary/20">
-                                    <ShieldCheck className="h-5 w-5" />
-                                    Регламент
+                                <Button variant="ghost" size="sm" className="hidden sm:flex gap-4 rounded-2xl h-12 px-6 text-[11px] md:text-sm uppercase font-black tracking-widest hover:bg-primary/20 text-primary border-2 border-primary/20">
+                                    <ShieldCheck className="h-6 w-6" />
+                                    RULES
                                 </Button>
                             </ScoringHelpDialog>
                         </div>
                     </div>
-                    <p className="text-sm md:text-xl lg:text-2xl text-foreground/95 font-body leading-relaxed italic border-l-4 border-primary/50 pl-4 md:pl-8 lg:pl-12 py-2 md:py-3 font-medium bg-white/5 rounded-r-[1.5rem] md:rounded-r-[2rem]">
-                        {currentPlayerData.bio || "История этого мастера дартса в настоящее время дополняется новыми главами. Следите за обновлениями в истории матчей."}
-                    </p>
+                    <div className="relative">
+                        <div className="absolute -left-4 top-0 bottom-0 w-2 bg-gradient-to-b from-primary via-primary/50 to-transparent rounded-full shadow-[0_0_20px_rgba(var(--primary-rgb),0.5)]" />
+                        <p className="text-lg md:text-2xl lg:text-3xl text-white/95 font-body leading-relaxed italic pl-8 md:pl-12 lg:pl-16 py-4 font-medium bg-white/[0.03] rounded-r-[3rem] shadow-inner">
+                            {currentPlayerData.bio || "This legend's story is still being written on the oche. Every match adds a new chapter to their professional career."}
+                        </p>
+                    </div>
                 </div>
 
                 {hasOmskStats && (
-                    <div className="p-6 md:p-10 lg:p-12 rounded-[2rem] md:rounded-[2.5rem] bg-orange-500/10 border-2 border-orange-500/30 relative overflow-hidden group/omsk shadow-2xl">
-                        <div className="absolute -top-10 -right-10 p-4 opacity-[0.08] group-hover/omsk:scale-110 transition-transform duration-1000">
-                            <Sunset className="h-40 w-40 md:h-64 md:w-64 text-orange-500" />
+                    <div className="p-10 md:p-16 lg:p-20 rounded-[3rem] md:rounded-[4.5rem] bg-orange-600/15 border-2 border-orange-500/40 relative overflow-hidden group/omsk shadow-4xl transition-all hover:bg-orange-600/20">
+                        <div className="absolute -top-20 -right-20 p-4 opacity-10 group-hover/omsk:scale-110 transition-all duration-[3000ms]">
+                            <Sunset className="h-64 w-64 md:h-[500px] md:w-[500px] text-orange-500" />
                         </div>
-                        <div className="flex items-center gap-4 md:gap-5 mb-4 md:mb-8 lg:mb-10 relative z-10">
-                            <div className="p-2.5 rounded-xl bg-orange-500/20 text-orange-500 border border-orange-500/30">
-                                <Wallet className="h-5 w-5 md:h-6 md:w-6" />
+                        <div className="flex items-center gap-6 md:gap-10 mb-8 md:mb-12 relative z-10">
+                            <div className="p-4 rounded-3xl bg-orange-500/30 text-orange-400 border-2 border-orange-500/40 shadow-3xl">
+                                <Wallet className="h-8 w-8 md:h-12 md:w-12" />
                             </div>
                             <div>
-                                <h3 className="text-[10px] md:text-sm font-headline uppercase tracking-[0.25em] text-orange-300">Лига «Вечерний Омск»</h3>
-                                <p className="text-[8px] md:text-[11px] text-muted-foreground font-bold uppercase tracking-widest opacity-70">Текущий финансовый баланс</p>
+                                <h3 className="text-[12px] md:text-lg font-headline uppercase tracking-[0.4em] text-orange-300">EVENING OMSK</h3>
+                                <p className="text-[10px] md:text-[13px] text-muted-foreground font-black uppercase tracking-[0.3em] opacity-60 mt-1">CURRENT FINANCIAL STANDING</p>
                             </div>
                         </div>
                         <div className="flex relative z-10">
-                            <span className="text-3xl md:text-6xl lg:text-7xl font-headline text-orange-400 drop-shadow-[0_4px_15px_rgba(0,0,0,0.5)]">{(player.cashValue || 0).toLocaleString('ru-RU')} ₽</span>
+                            <span className="text-5xl md:text-8xl lg:text-9xl font-headline text-orange-400 text-glow-accent drop-shadow-[0_10px_40px_rgba(0,0,0,0.7)]">{(player.cashValue || 0).toLocaleString('ru-RU')} ₽</span>
                         </div>
                     </div>
                 )}
 
-                <Separator className="opacity-20" />
+                <Separator className="opacity-10" />
                 
-                <div className="space-y-10 md:space-y-16 lg:space-y-20">
+                <div className="space-y-16 md:space-y-24 lg:space-y-32">
                     <div>
-                        <div className="flex items-center gap-4 md:gap-5 mb-6 md:mb-8 lg:mb-12">
-                            <div className="p-2.5 rounded-xl bg-primary/15 text-primary">
-                                <TrendingUp className="h-5 w-5 md:h-6 md:w-6" />
+                        <div className="flex items-center gap-6 md:gap-8 mb-10 md:mb-16 lg:mb-20">
+                            <div className="p-4 rounded-2xl bg-primary/20 text-primary shadow-2xl border border-primary/30">
+                                <TrendingUp className="h-7 w-7 md:h-9 md:w-9" />
                             </div>
-                            <h3 className="text-[10px] md:text-sm font-headline uppercase tracking-[0.25em] text-muted-foreground/90">Карьерный Дашборд</h3>
+                            <h3 className="text-[12px] md:text-lg font-headline uppercase tracking-[0.4em] text-white/60">CAREER DASHBOARD</h3>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4 lg:gap-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-8 lg:gap-10">
                             <StatItem 
                                 template={template} 
-                                label="Очки" 
+                                label="POINTS" 
                                 name="points" 
                                 value={player.points} 
-                                caption="Общий рейтинг"
-                                description="Сумма всех баллов, заработанных игроком во всех лигах за текущий сезон." 
+                                caption="SEASON TOTAL"
+                                description="Total aggregation of ranking points earned across all active leagues." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="Турниры" 
+                                label="TOURS" 
                                 name="matchesPlayed" 
                                 value={player.matchesPlayed} 
-                                caption="Опыт участия"
-                                description="Общее количество официальных турниров, в которых игрок принял участие." 
+                                caption="PARTICIPATION"
+                                description="Total number of official tournaments the player has attended." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="ТОП-8" 
+                                label="TOP-8" 
                                 name="wins" 
                                 value={player.wins} 
-                                caption="Выход в плей-офф"
-                                description="Количество попаданий в финальную сетку (четвертьфиналы и выше)." 
+                                caption="PLAYOFF REACH"
+                                description="Number of times the player reached the quarter-finals or higher." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="Провалы" 
+                                label="GROUP" 
                                 name="losses" 
                                 value={player.losses} 
-                                caption="Групповой этап"
-                                description="Количество турниров, завершенных на стадии группового отбора." 
+                                caption="EARLY EXITS"
+                                description="Tournaments where the player was eliminated during group stages." 
                             />
                             <StatItem 
                                 template={template} 
-                                label="Eff." 
+                                label="EFF." 
                                 name="winRate" 
                                 value={winRate} 
-                                caption="Процент побед"
-                                description="Коэффициент результативности: отношение выходов в ТОП-8 к общему количеству игр." 
+                                caption="WIN RATIO"
+                                description="Performance coefficient: percentage of playoff appearances per tournament." 
                             />
                         </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-6 md:gap-10 lg:gap-12">
-                        <div className="glassmorphism p-6 md:p-8 lg:p-10 rounded-[2rem] md:rounded-[2.5rem] border-white/10 relative overflow-hidden shadow-2xl flex flex-col h-full">
-                            <h3 className="text-[9px] md:text-[11px] font-headline uppercase tracking-[0.25em] text-muted-foreground/70 mb-6 md:mb-8 flex items-center gap-3">
-                                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                                Анализ рейтинга
+                    <div className="grid md:grid-cols-2 gap-10 md:gap-16 lg:gap-20">
+                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col h-full group/box">
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
+                            <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
+                                <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                                PERFORMANCE ANALYSIS
                             </h3>
-                            <div className="grid grid-cols-2 gap-3 md:gap-6 lg:gap-8 mt-auto">
+                            <div className="grid grid-cols-2 gap-6 md:gap-10 lg:gap-12 mt-auto relative z-10">
                                 <StatItem 
                                     template={template} 
-                                    label="Основные" 
+                                    label="BASE" 
                                     name="basePoints" 
                                     value={player.basePoints} 
-                                    caption="Баллы за места"
+                                    caption="RANK REWARDS"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
-                                    description="Очки, начисленные строго согласно занятому месту в итоговой таблице турнира." 
+                                    description="Points awarded strictly based on final tournament position." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="Бонусы" 
+                                    label="BONUS" 
                                     name="bonusPoints" 
                                     value={`+${player.bonusPoints}`} 
-                                    caption="Баллы за стат."
+                                    caption="STAT REWARDS"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
-                                    description="Дополнительные очки за 180-ки, высокие чекауты и высокий средний набор (AVG)." 
+                                    description="Extra points for 180s, high checkouts, and high averages." 
                                 />
                             </div>
                         </div>
 
-                        <div className="glassmorphism p-6 md:p-8 lg:p-10 rounded-[2rem] md:rounded-[2.5rem] border-white/10 relative overflow-hidden shadow-2xl flex flex-col h-full">
-                            <h3 className="text-[9px] md:text-[11px] font-headline uppercase tracking-[0.25em] text-muted-foreground/70 mb-6 md:mb-8 flex items-center gap-3">
-                                <div className="h-1.5 w-1.5 rounded-full bg-accent" />
-                                Личные рекорды
+                        <div className="glassmorphism p-8 md:p-12 lg:p-16 rounded-[3.5rem] border-white/10 relative overflow-hidden shadow-4xl flex flex-col h-full group/box">
+                            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000" />
+                            <h3 className="text-[11px] md:text-[14px] font-headline uppercase tracking-[0.4em] text-white/40 mb-10 md:mb-14 flex items-center gap-4 relative z-10">
+                                <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+                                PERSONAL RECORDS
                             </h3>
-                            <div className="grid grid-cols-3 gap-3 md:gap-4 lg:gap-6 mt-auto">
+                            <div className="grid grid-cols-3 gap-4 md:gap-8 lg:gap-10 mt-auto relative z-10">
                                 <StatItem 
                                     template={template} 
                                     label="AVG" 
                                     name="avg" 
                                     value={(Number(player.avg) || 0).toFixed(1)} 
-                                    caption="Сила набора"
+                                    caption="SCORING POWER"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
-                                    description="Средний балл, набираемый игроком за один подход (3 дротика) за карьеру." 
+                                    description="Average score per 3 darts thrown throughout the career." 
                                 />
                                 <StatItem 
                                     template={template} 
                                     label="180" 
                                     name="n180s" 
                                     value={player.n180s} 
-                                    caption="Максимумы"
+                                    caption="MAXIMUMS"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
-                                    description="Общее количество набранных игроком «потолков» в официальных матчах." 
+                                    description="Total count of perfect 180 scores in official matches." 
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="Hi-Out" 
+                                    label="MAX OUT" 
                                     name="hiOut" 
                                     value={Number(player.hiOut) || 0} 
-                                    caption="Топ закрытие"
+                                    caption="TOP FINISH"
                                     interactive={!revealAll} 
                                     forcedReveal={revealAll} 
-                                    description="Самое высокое количество очков, успешно закрытое в одном леге (Max Out)." 
+                                    description="Highest score successfully closed in a single leg." 
                                 />
                             </div>
                         </div>

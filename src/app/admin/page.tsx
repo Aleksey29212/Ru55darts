@@ -31,22 +31,22 @@ const adminSections = [
 function StatCard({ title, count, icon: Icon, priority = false }: { title: string, count: number, icon: any, priority?: boolean }) {
     return (
         <Card className={cn(
-            "glassmorphism border-primary/20 transition-all duration-75",
-            priority ? 'bg-primary/10 border-primary ring-1 ring-primary/20 shadow-lg shadow-primary/10' : 'bg-primary/5 hover:bg-primary/10'
+            "glassmorphism border-primary/20 transition-all duration-300 transform hover:scale-105 group cursor-default",
+            priority ? 'bg-primary/15 border-primary/40 ring-2 ring-primary/20 shadow-[0_0_40px_rgba(var(--primary-rgb),0.2)]' : 'bg-primary/5 hover:bg-primary/10'
         )}>
-            <CardContent className="p-6 flex items-center justify-between">
+            <CardContent className="p-8 flex items-center justify-between">
                 <div>
                     <p className={cn(
-                        "text-[10px] font-bold uppercase tracking-[0.2em]",
+                        "text-[11px] font-black uppercase tracking-[0.3em]",
                         priority ? 'text-primary' : 'text-muted-foreground'
                     )}>{title}</p>
-                    <p className="text-4xl font-headline mt-1 tracking-tighter">{count}</p>
+                    <p className="text-5xl font-headline mt-2 tracking-tighter text-white">{count}</p>
                 </div>
                 <div className={cn(
-                    "p-3 rounded-2xl shadow-inner",
-                    priority ? 'bg-primary/20' : 'bg-primary/10'
+                    "p-5 rounded-3xl shadow-3xl transition-all duration-500 group-hover:rotate-12",
+                    priority ? 'bg-primary/30 text-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]' : 'bg-primary/10'
                 )}>
-                    <Icon className={cn("h-8 w-8", priority ? 'text-primary' : 'text-primary/70')} />
+                    <Icon className={cn("h-10 w-10", priority ? 'text-primary' : 'text-primary/60')} />
                 </div>
             </CardContent>
         </Card>
@@ -63,90 +63,91 @@ export default async function AdminPage() {
   const enabledLeaguesCount = Object.keys(leagueSettings).filter(key => leagueSettings[key as LeagueId].enabled).length;
 
   return (
-    <div className="space-y-12 pb-24">
-        <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard title="Турниров в базе" count={tournaments?.length || 0} icon={Trophy} priority />
-            <StatCard title="Всего игроков" count={players?.length || 0} icon={Users} />
-            <StatCard title="Активных лиг" count={enabledLeaguesCount} icon={Library} />
-            <StatCard title="Партнеров" count={partners?.length || 0} icon={Handshake} />
+    <div className="space-y-16 pb-32 animate-in fade-in duration-700">
+        <section className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard title="ТУРНИРОВ В БАЗЕ" count={tournaments?.length || 0} icon={Trophy} priority />
+            <StatCard title="ВСЕГО ИГРОКОВ" count={players?.length || 0} icon={Users} />
+            <StatCard title="АКТИВНЫХ ЛИГ" count={enabledLeaguesCount} icon={Library} />
+            <StatCard title="ПАРТНЕРОВ" count={partners?.length || 0} icon={Handshake} />
         </section>
 
-        <section className="space-y-6">
-            <div className="flex items-center gap-3 ml-2">
-                <Settings2 className="h-4 w-4 text-primary" />
-                <h2 className="text-sm font-headline uppercase tracking-[0.3em] text-muted-foreground">Управление интерфейсом</h2>
+        <section className="space-y-8">
+            <div className="flex items-center gap-4 ml-2">
+                <div className="h-3 w-3 rounded-full bg-primary animate-ping" />
+                <h2 className="text-[12px] font-black uppercase tracking-[0.4em] text-white/40">INTERFACE CONTROL</h2>
             </div>
-            <Card className="glassmorphism border-primary/20 bg-primary/5">
-                <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-2xl bg-primary/10">
-                            <Settings2 className="h-6 w-6 text-primary" />
+            <Card className="glassmorphism border-primary/30 bg-primary/10 overflow-hidden relative group/toggle">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover/toggle:opacity-100 transition-opacity duration-700" />
+                <CardContent className="p-10 flex flex-col md:flex-row items-center justify-between gap-10 relative z-10">
+                    <div className="flex items-center gap-6">
+                        <div className="p-5 rounded-3xl bg-primary/20 shadow-2xl border border-primary/30">
+                            <Settings2 className="h-10 w-10 text-primary" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-lg leading-tight">Быстрое переключение вида</h3>
-                            <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold mt-1">Проверка адаптивности на лету</p>
+                            <h3 className="font-headline text-3xl tracking-tight text-white">Быстрое переключение вида</h3>
+                            <p className="text-[11px] text-muted-foreground uppercase tracking-[0.3em] font-black mt-2 opacity-60">ПРОВЕРКА АДАПТИВНОСТИ ДЛЯ РАЗНЫХ УСТРОЙСТВ</p>
                         </div>
                     </div>
-                    <ViewModeToggle showLabels className="bg-black/60 p-2" />
+                    <ViewModeToggle showLabels className="bg-black/80 p-3 scale-125" />
                 </CardContent>
             </Card>
         </section>
 
-        <div className="space-y-6">
-            <div className="flex items-center gap-3 ml-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                <h2 className="text-sm font-headline uppercase tracking-[0.3em] text-muted-foreground">Навигация по разделам</h2>
+        <div className="space-y-8">
+            <div className="flex items-center gap-4 ml-2">
+                <div className="h-3 w-3 rounded-full bg-accent animate-pulse" />
+                <h2 className="text-[12px] font-black uppercase tracking-[0.4em] text-white/40">SYSTEM MANAGEMENT</h2>
             </div>
-            <section className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <section className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {adminSections.map(section => (
                     <Button key={section.href} asChild variant="outline" className={cn(
-                        "h-auto py-8 justify-start glassmorphism border-white/5 hover:border-primary/50 group transition-all duration-75 rounded-2xl interactive-scale",
-                        section.href === '/admin/source-code' ? 'border-primary/30 bg-primary/5' : ''
+                        "h-auto py-10 justify-start glassmorphism border-white/5 hover:border-primary/60 group transition-all duration-300 rounded-[2rem] interactive-scale shadow-2xl",
+                        section.href === '/admin/source-code' ? 'border-primary/40 bg-primary/10 shadow-[0_0_30px_rgba(var(--primary-rgb),0.1)]' : ''
                     )}>
-                        <Link href={section.href} className="flex items-center gap-4 w-full text-left">
+                        <Link href={section.href} className="flex items-center gap-6 w-full text-left">
                             <div className={cn(
-                                "p-3 rounded-xl transition-colors shadow-inner",
-                                section.href === '/admin/source-code' ? 'bg-primary/20' : 'bg-muted group-hover:bg-primary/10'
+                                "p-4 rounded-2xl transition-all duration-500 shadow-3xl group-hover:scale-110",
+                                section.href === '/admin/source-code' ? 'bg-primary/30' : 'bg-muted group-hover:bg-primary/20'
                             )}>
-                                <section.icon className={cn("h-6 w-6", section.color || 'text-muted-foreground')} />
+                                <section.icon className={cn("h-8 w-8", section.color || 'text-muted-foreground/80')} />
                             </div>
                             <div className="flex flex-col flex-1 overflow-hidden">
-                                <span className="font-bold text-base tracking-tight leading-none mb-1">{section.title}</span>
-                                <span className="text-[10px] text-muted-foreground line-clamp-1 opacity-70 uppercase font-bold tracking-tight">{section.description}</span>
+                                <span className="font-headline text-xl tracking-tight leading-none mb-2 text-white group-hover:text-primary transition-colors">{section.title}</span>
+                                <span className="text-[9px] text-muted-foreground line-clamp-1 opacity-50 uppercase font-black tracking-widest">{section.description}</span>
                             </div>
-                            <ArrowRight className="h-12 w-12 text-primary transition-all translate-x-[-15px] group-hover:translate-x-0 opacity-30 group-hover:opacity-100 shrink-0" />
+                            <ArrowRight className="h-10 w-10 text-primary transition-all translate-x-[-20px] group-hover:translate-x-0 opacity-0 group-hover:opacity-100 shrink-0" />
                         </Link>
                     </Button>
                 ))}
             </section>
         </div>
 
-        <section className="space-y-6">
-            <div className="flex items-center gap-3 ml-2">
-                <AlertOctagon className="h-5 w-5 text-destructive animate-pulse" />
-                <h2 className="text-sm font-headline uppercase tracking-[0.3em] text-destructive">Системное обслуживание</h2>
+        <section className="space-y-8">
+            <div className="flex items-center gap-4 ml-2">
+                <div className="h-3 w-3 rounded-full bg-destructive animate-pulse" />
+                <h2 className="text-[12px] font-black uppercase tracking-[0.4em] text-destructive/60">MAINTENANCE ZONE</h2>
             </div>
             
-            <Card className="glassmorphism border-destructive/30 bg-destructive/5">
-                <CardHeader>
-                    <CardTitle className="text-xl font-headline tracking-tight text-destructive uppercase">Очистка данных</CardTitle>
-                    <CardDescription>Удаление накопленной информации в демо-режиме или базе данных.</CardDescription>
+            <Card className="glassmorphism border-destructive/40 bg-destructive/5 rounded-[3rem] overflow-hidden">
+                <CardHeader className="p-10 border-b border-destructive/20 bg-destructive/10">
+                    <CardTitle className="text-3xl font-headline tracking-tighter text-destructive uppercase">Опасная зона</CardTitle>
+                    <CardDescription className="text-destructive/60 font-bold uppercase tracking-widest text-[10px]">БЫСТРАЯ ОЧИСТКА БАЗЫ ДАННЫХ И ЛОГОВ</CardDescription>
                 </CardHeader>
-                <CardContent className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="p-4 rounded-xl border border-destructive/20 bg-black/20 flex flex-col gap-3">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Турниры</span>
+                <CardContent className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 p-10">
+                    <div className="p-6 rounded-3xl border border-destructive/20 bg-black/40 flex flex-col gap-4 shadow-3xl">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">ТУРНИРЫ</span>
                         <ClearTournamentsButton />
                     </div>
-                    <div className="p-4 rounded-xl border border-destructive/20 bg-black/20 flex flex-col gap-3">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Игроки</span>
+                    <div className="p-6 rounded-3xl border border-destructive/20 bg-black/40 flex flex-col gap-4 shadow-3xl">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">ПРОФИЛИ</span>
                         <ClearPlayersButton />
                     </div>
-                    <div className="p-4 rounded-xl border border-destructive/20 bg-black/20 flex flex-col gap-3">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Партнеры</span>
+                    <div className="p-6 rounded-3xl border border-destructive/20 bg-black/40 flex flex-col gap-4 shadow-3xl">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">ПАРТНЕРЫ</span>
                         <ClearPartnersButton />
                     </div>
-                    <div className="p-4 rounded-xl border border-destructive/20 bg-black/20 flex flex-col gap-3">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Аналитика</span>
+                    <div className="p-6 rounded-3xl border border-destructive/20 bg-black/40 flex flex-col gap-4 shadow-3xl">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">АНАЛИТИКА</span>
                         <ClearAnalyticsButton />
                     </div>
                 </CardContent>

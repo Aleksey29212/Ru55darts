@@ -37,14 +37,14 @@ const leagueIcons: Record<string, any> = {
 
 const getLeagueBaseColor = (leagueId: LeagueId) => {
     const colors: Record<string, string> = {
-        general: 'rgba(6, 182, 212, 0.5)',
-        evening_omsk: 'rgba(249, 115, 22, 0.5)',
-        premier: 'rgba(244, 63, 94, 0.5)',
-        first: 'rgba(245, 158, 11, 0.5)',
-        cricket: 'rgba(16, 185, 129, 0.5)',
-        senior: 'rgba(59, 130, 246, 0.5)',
-        youth: 'rgba(132, 204, 22, 0.5)',
-        women: 'rgba(99, 102, 241, 0.5)',
+        general: 'rgba(6, 182, 212, 0.6)',
+        evening_omsk: 'rgba(249, 115, 22, 0.6)',
+        premier: 'rgba(244, 63, 94, 0.6)',
+        first: 'rgba(245, 158, 11, 0.6)',
+        cricket: 'rgba(16, 185, 129, 0.6)',
+        senior: 'rgba(59, 130, 246, 0.6)',
+        youth: 'rgba(132, 204, 22, 0.6)',
+        women: 'rgba(99, 102, 241, 0.6)',
     };
     return colors[leagueId] || colors.general;
 }
@@ -65,39 +65,39 @@ function LeagueSection({
     const isEveningOmsk = leagueId === 'evening_omsk';
 
     return (
-        <div className="space-y-10 md:space-y-16 py-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+        <div className="space-y-12 md:space-y-20 py-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {isEveningOmsk && (
-                <div className="relative group overflow-hidden rounded-[3rem] p-8 md:p-16 bg-gradient-to-br from-orange-600/20 via-black/40 to-transparent border-2 border-orange-500/30 shadow-[0_30px_100px_rgba(249,115,22,0.15)] transition-all hover:border-orange-500/50">
-                    <div className="absolute -top-20 -right-20 p-4 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-[3000ms]">
-                        <Sunset className="h-64 w-64 md:h-[400px] md:w-[400px] text-orange-500" />
+                <div className="relative group overflow-hidden rounded-[3.5rem] p-8 md:p-20 bg-gradient-to-br from-orange-600/30 via-black/60 to-transparent border-2 border-orange-500/40 shadow-[0_40px_120px_rgba(249,115,22,0.25)] transition-all hover:border-orange-500/60">
+                    <div className="absolute -top-32 -right-32 p-4 opacity-15 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-[5000ms]">
+                        <Sunset className="h-[400px] w-[400px] md:h-[600px] md:w-[600px] text-orange-500" />
                     </div>
-                    <div className="flex flex-col lg:flex-row gap-12 relative z-10 items-center lg:items-start">
-                        <div className="bg-orange-500/20 p-8 rounded-[2.5rem] border-2 border-orange-500/30 h-fit animate-pulse shadow-2xl shadow-orange-500/20 group-hover:rotate-3 transition-transform">
-                            <Sparkles className="h-12 w-12 md:h-16 md:w-16 text-orange-500" />
+                    <div className="flex flex-col lg:flex-row gap-16 relative z-10 items-center lg:items-start">
+                        <div className="bg-orange-500/30 p-10 rounded-[3rem] border-2 border-orange-500/40 h-fit animate-pulse shadow-[0_0_60px_rgba(249,115,22,0.4)] group-hover:rotate-6 transition-transform">
+                            <Sparkles className="h-16 w-16 md:h-24 md:w-24 text-orange-400" />
                         </div>
-                        <div className="space-y-8 flex-1 text-center lg:text-left">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-center lg:justify-start gap-6">
-                                <h3 className="text-4xl md:text-6xl font-headline uppercase tracking-tighter text-orange-400 drop-shadow-2xl">ВЕЧЕРНИЙ ОМСК</h3>
+                        <div className="space-y-10 flex-1 text-center lg:text-left">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-center lg:justify-start gap-8">
+                                <h3 className="text-5xl md:text-8xl font-headline uppercase tracking-tighter text-orange-400 text-glow-accent drop-shadow-2xl">ВЕЧЕРНИЙ ОМСК</h3>
                                 <ScoringHelpDialog settings={scoringSettings} leagueName="Вечерний Омск" sponsorshipSettings={sponsorshipSettings}>
-                                    <Button variant="outline" className="rounded-full h-14 px-8 border-orange-500/30 text-orange-400 hover:bg-orange-500/20 font-bold uppercase tracking-widest text-xs gap-3 shadow-xl interactive-scale">
-                                        <ShieldCheck className="h-5 w-5" />
-                                        Регламент Лиги
+                                    <Button variant="outline" className="rounded-full h-16 px-10 border-orange-500/40 text-orange-400 hover:bg-orange-500/30 font-bold uppercase tracking-widest text-[11px] gap-4 shadow-2xl interactive-scale">
+                                        <ShieldCheck className="h-6 w-6" />
+                                        Официальный Регламент
                                     </Button>
                                 </ScoringHelpDialog>
                             </div>
-                            <div className="flex flex-wrap justify-center lg:justify-start gap-6 pt-6">
-                                <div className="flex items-center gap-4 px-8 py-5 rounded-full bg-black/60 border-2 border-orange-500/20 shadow-2xl hover:bg-black/80 transition-all">
-                                    <Wallet className="h-8 w-8 text-orange-500" />
+                            <div className="flex flex-wrap justify-center lg:justify-start gap-8 pt-4">
+                                <div className="flex items-center gap-6 px-10 py-6 rounded-[2rem] bg-black/80 border-2 border-orange-500/30 shadow-3xl hover:bg-black transition-all group/stat">
+                                    <Wallet className="h-10 w-10 text-orange-500 transition-transform group-hover/stat:scale-110" />
                                     <div className="flex flex-col text-left">
-                                        <span className="text-xs font-bold uppercase tracking-[0.3em] text-orange-300/60">Курс баллов</span>
-                                        <span className="text-xl md:text-2xl font-headline text-orange-300">{scoringSettings?.exchangeRate || 7} ₽ <span className="text-xs opacity-50">/ БАЛЛ</span></span>
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-orange-300/50">Стоимость балла</span>
+                                        <span className="text-2xl md:text-4xl font-headline text-orange-300">{scoringSettings?.exchangeRate || 7} ₽ <span className="text-sm opacity-40">/ PTS</span></span>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 px-8 py-5 rounded-full bg-orange-500/20 border-2 border-orange-500/40 shadow-2xl hover:scale-105 transition-all">
-                                    <Award className="h-8 w-8 text-orange-400" />
+                                <div className="flex items-center gap-6 px-10 py-6 rounded-[2rem] bg-orange-500/25 border-2 border-orange-500/50 shadow-3xl hover:scale-105 transition-all group/stat">
+                                    <Award className="h-10 w-10 text-orange-300 transition-transform group-hover/stat:scale-110" />
                                     <div className="flex flex-col text-left">
-                                        <span className="text-xs font-bold uppercase tracking-[0.3em] text-orange-100/60">Цель сезона</span>
-                                        <span className="text-xl md:text-2xl font-headline text-orange-100">ТОП-16 ФИНАЛИСТОВ</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-orange-100/50">Суперфинал сезона</span>
+                                        <span className="text-2xl md:text-4xl font-headline text-orange-100">ТОП-16 МАСТЕРОВ</span>
                                     </div>
                                 </div>
                             </div>
@@ -107,20 +107,20 @@ function LeagueSection({
             )}
             
             {activePlayers.length > 0 ? (
-                <>
+                <div className="space-y-16">
                     {topPlayers.length > 0 && <LeaderboardHero players={topPlayers} />}
                     <PlayerRankings players={activePlayers} leagueId={leagueId} />
-                </>
+                </div>
             ) : (
-                <div className="flex flex-col items-center justify-center py-20 md:py-48 glassmorphism rounded-[4rem] border-2 border-dashed border-primary/20 text-center px-10 relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent animate-pulse" />
-                    <div className="relative z-10 space-y-8">
-                        <div className="p-12 rounded-[2.5rem] bg-primary/10 mb-8 ring-[12px] ring-primary/5 inline-block group-hover:scale-110 group-hover:rotate-12 transition-all shadow-xl">
-                            <Target className="h-24 w-24 md:h-32 md:w-32 text-primary/30" />
+                <div className="flex flex-col items-center justify-center py-32 md:py-64 glassmorphism rounded-[5rem] border-2 border-dashed border-primary/25 text-center px-12 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent animate-pulse duration-[4s]" />
+                    <div className="relative z-10 space-y-10">
+                        <div className="p-16 rounded-[3.5rem] bg-primary/15 mb-8 ring-[16px] ring-primary/5 inline-block group-hover:scale-110 group-hover:rotate-12 transition-all duration-700 shadow-[0_0_80px_rgba(var(--primary-rgb),0.2)]">
+                            <Target className="h-28 w-24 md:h-40 md:w-40 text-primary/40" />
                         </div>
-                        <div className="space-y-4">
-                            <h3 className="text-3xl md:text-5xl font-headline text-muted-foreground/40 uppercase tracking-tighter leading-none">АРЕНА ГОТОВИТСЯ</h3>
-                            <p className="text-lg md:text-xl text-muted-foreground mt-4 max-w-xl mx-auto opacity-60 font-medium italic">Результаты текущего сезона еще не загружены.</p>
+                        <div className="space-y-6">
+                            <h3 className="text-4xl md:text-7xl font-headline text-muted-foreground/30 uppercase tracking-tighter leading-none">ОЖИДАНИЕ ТУРНИРА</h3>
+                            <p className="text-xl md:text-2xl text-muted-foreground/60 max-w-2xl mx-auto italic font-medium">Стадион пуст, но скоро здесь закипят страсти. Первый импорт данных заполнит эту таблицу.</p>
                         </div>
                     </div>
                 </div>
@@ -164,9 +164,9 @@ export function LeaguePanels({
 
     if (!isClient) {
         return (
-            <div className="space-y-8">
-                <div className="h-14 w-full bg-muted/20 rounded-full animate-pulse" />
-                <Skeleton className="h-[600px] w-full rounded-[3rem]" />
+            <div className="space-y-12">
+                <div className="h-16 w-full bg-muted/20 rounded-[2.5rem] animate-pulse" />
+                <Skeleton className="h-[800px] w-full rounded-[4rem]" />
             </div>
         );
     }
@@ -174,16 +174,16 @@ export function LeaguePanels({
     const currentScoring = allScoringSettings[currentLeagueId];
 
     return (
-        <div className="w-full space-y-10">
+        <div className="w-full space-y-14">
             {/* Sticky Header Section combining Partners and Leagues */}
-            <div className="sticky top-16 z-40 bg-background/95 backdrop-blur-xl border-b border-white/10 -mx-4 px-4 py-4 space-y-6 shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all">
+            <div className="sticky top-16 md:top-20 z-40 bg-background/95 backdrop-blur-3xl border-b-2 border-white/10 -mx-4 px-4 py-6 space-y-8 shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-all">
                 {/* Fixed Partners Ticker inside sticky area */}
                 <div className="w-full">
                     <PartnersDisplay partners={partners} variant="compact" hideLabel />
                 </div>
 
                 {/* League Selection Scroll */}
-                <div className="flex items-center gap-2 md:gap-3 overflow-x-auto pb-1 scrollbar-hide no-scrollbar mask-fade-edges">
+                <div className="flex items-center gap-3 md:gap-5 overflow-x-auto pb-2 scrollbar-hide no-scrollbar mask-fade-edges">
                     {enabledLeagues.map(leagueId => {
                         const leagueInfo = leagueSettings[leagueId];
                         const isSelected = optimisticLeagueId === leagueId;
@@ -199,40 +199,40 @@ export function LeaguePanels({
                                 tabIndex={0}
                                 onClick={() => handleLeagueSelect(leagueId)}
                                 className={cn(
-                                    'relative min-w-[130px] md:min-w-[160px] h-10 md:h-12 rounded-full overflow-hidden transition-all duration-300 transform shrink-0 cursor-pointer outline-none interactive-scale border shadow-md',
+                                    'relative min-w-[150px] md:min-w-[200px] h-12 md:h-14 rounded-[1.5rem] overflow-hidden transition-all duration-500 transform shrink-0 cursor-pointer outline-none border-2 shadow-xl',
                                     isSelected 
-                                        ? 'border-primary ring-1 ring-primary/20 scale-105 z-10 shadow-primary/10' 
-                                        : 'border-white/5 opacity-60 hover:opacity-100 hover:border-primary/30'
+                                        ? 'border-primary ring-4 ring-primary/10 scale-105 z-10 shadow-[0_0_40px_rgba(var(--primary-rgb),0.3)]' 
+                                        : 'border-white/5 opacity-50 hover:opacity-100 hover:border-primary/40'
                                 )}
                             >
-                                <Image src={banner} alt="" fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized={banner.startsWith('data:')} />
+                                <Image src={banner} alt="" fill className="object-cover transition-all duration-1000 group-hover:scale-125" unoptimized={banner.startsWith('data:')} />
                                 <div className={cn(
-                                    "absolute inset-0 bg-gradient-to-r transition-opacity duration-500",
-                                    isSelected ? "from-black/90 via-black/60 to-transparent" : "from-black/80 via-black/40 to-transparent"
+                                    "absolute inset-0 bg-gradient-to-r transition-opacity duration-700",
+                                    isSelected ? "from-black/95 via-black/70 to-transparent" : "from-black/90 via-black/50 to-transparent"
                                 )} />
-                                <div className="absolute inset-0 px-3 flex items-center gap-2">
+                                <div className="absolute inset-0 px-4 flex items-center gap-3">
                                     <div 
                                         className={cn(
-                                            "p-1 rounded-full backdrop-blur-md border border-white/10 text-white shadow-lg transition-transform duration-500",
-                                            isSelected && "scale-110"
+                                            "p-1.5 rounded-xl backdrop-blur-xl border border-white/20 text-white shadow-2xl transition-all duration-700",
+                                            isSelected && "scale-110 rotate-[360deg] border-white/40"
                                         )}
                                         style={{ backgroundColor: baseColor }}
                                     >
                                         {isPending && isSelected && !isReallySelected ? (
-                                            <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                                            <Loader2 className="h-3 w-3 md:h-4 md:w-4 animate-spin" />
                                         ) : (
-                                            <LeagueIcon className="h-2.5 w-2.5 md:h-3 md:w-3" />
+                                            <LeagueIcon className="h-3 w-3 md:h-4 md:w-4" />
                                         )}
                                     </div>
                                     <div className="flex flex-col justify-center overflow-hidden">
-                                        <p className="text-[10px] md:text-[11px] font-headline text-white uppercase tracking-tight truncate leading-none mb-0.5">{leagueInfo.name}</p>
-                                        <div className="flex items-center gap-1">
+                                        <p className="text-[11px] md:text-[13px] font-headline text-white uppercase tracking-tight truncate leading-none mb-1">{leagueInfo.name}</p>
+                                        <div className="flex items-center gap-1.5">
                                             <div 
-                                                className={cn("h-0.5 w-0.5 rounded-full", isSelected ? "animate-pulse" : "opacity-30")} 
+                                                className={cn("h-1 w-1 rounded-full", isSelected ? "animate-pulse" : "opacity-30")} 
                                                 style={{ backgroundColor: baseColor }}
                                             />
-                                            <p className="text-[6px] md:text-[7px] text-white/50 font-bold uppercase tracking-widest">
-                                                {isSelected ? 'LIVE' : 'ВЫБРАТЬ'}
+                                            <p className="text-[7px] md:text-[8px] text-white/60 font-black uppercase tracking-[0.25em]">
+                                                {isSelected ? 'ACTIVE NOW' : 'VIEW LEAGUE'}
                                             </p>
                                         </div>
                                     </div>
@@ -243,17 +243,17 @@ export function LeaguePanels({
                 </div>
             </div>
             
-            <div className="w-full relative pt-4">
+            <div className="w-full relative pt-6">
                 {isPending && (
-                    <div className="absolute inset-0 z-10 bg-background/20 backdrop-blur-[2px] transition-all duration-300 pointer-events-none" />
+                    <div className="absolute inset-0 z-10 bg-background/30 backdrop-blur-[3px] transition-all duration-500 pointer-events-none" />
                 )}
-                <section key={currentLeagueId} className="animate-in fade-in slide-in-from-top-2 duration-500">
-                    <div className="flex items-center gap-4 mb-10">
-                        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-primary/20" />
-                        <h2 className="text-2xl md:text-4xl font-headline uppercase tracking-tighter text-primary/80">
+                <section key={currentLeagueId} className="animate-in fade-in slide-in-from-top-4 duration-1000">
+                    <div className="flex items-center gap-6 mb-14">
+                        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/30 to-primary/50" />
+                        <h2 className="text-3xl md:text-6xl font-headline uppercase tracking-tighter text-white text-glow-white drop-shadow-2xl">
                             {leagueSettings[currentLeagueId]?.name}
                         </h2>
-                        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-primary/20" />
+                        <div className="h-px flex-1 bg-gradient-to-l from-transparent via-primary/30 to-primary/50" />
                     </div>
                     
                     <LeagueSection 
