@@ -19,15 +19,14 @@ import {
     ChevronsUp, 
     Diamond, 
     Users, 
-    Baby,
-    Medal
+    Baby
 } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import Image from 'next/image';
 import { Button } from './ui/button';
 import { useIsClient } from '@/hooks/use-is-client';
 import { ScoringHelpDialog } from './scoring-help-dialog';
-import { useTransition, useEffect, useState, useMemo } from 'react';
+import { useTransition, useMemo } from 'react';
 import { PartnersDisplay } from './partners-display';
 
 interface LeaguePanelsProps {
@@ -168,7 +167,7 @@ export function LeaguePanels({
     const isClient = useIsClient();
     const [isPending, startTransition] = useTransition();
     
-    // Динамический порядок: выбранная лига всегда первая
+    // Динамический порядок для Десктопа: выбранная лига всегда первая
     const orderedLeagues = useMemo(() => {
         const sorted = [...enabledLeagues];
         const activeIdx = sorted.indexOf(currentLeagueId);
@@ -205,8 +204,9 @@ export function LeaguePanels({
                     <PartnersDisplay partners={partners} variant="compact" hideLabel />
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-3 animate-in fade-in duration-500">
-                    {orderedLeagues.map((leagueId, idx) => {
+                {/* ДЕСКТОП: Сетка карточек */}
+                <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 animate-in fade-in duration-500">
+                    {orderedLeagues.map((leagueId) => {
                         const leagueInfo = leagueSettings[leagueId];
                         const isSelected = currentLeagueId === leagueId;
                         const banner = leagueInfo.bannerUrl || DEFAULT_BANNER;
@@ -221,10 +221,10 @@ export function LeaguePanels({
                                 tabIndex={0}
                                 onClick={() => handleLeagueSelect(leagueId)}
                                 className={cn(
-                                    'relative h-14 md:h-16 rounded-2xl overflow-hidden transition-all duration-500 transform shrink-0 cursor-pointer outline-none border-2 shadow-lg group',
+                                    'relative h-16 rounded-2xl overflow-hidden transition-all duration-500 transform cursor-pointer outline-none border-2 shadow-lg group',
                                     isSelected 
                                         ? 'border-primary ring-2 ring-primary/20 scale-[1.02] z-10 shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] animate-shimmer' 
-                                        : 'border-white/5 opacity-70 hover:opacity-100 hover:border-primary/40 hover:scale-[1.01]'
+                                        : 'border-white/5 opacity-70 hover:opacity-100 hover:border-primary/40'
                                 )}
                             >
                                 <Image src={banner} alt="" fill className="object-cover transition-all duration-1000 group-hover:scale-110" unoptimized={banner.startsWith('data:')} />
@@ -232,46 +232,107 @@ export function LeaguePanels({
                                     "absolute inset-0 bg-gradient-to-r transition-opacity duration-700",
                                     isSelected ? "from-black/95 via-black/80 to-transparent" : "from-black/90 via-black/70 to-transparent"
                                 )} />
-                                <div className="absolute inset-0 px-3 flex items-center gap-2 md:gap-3">
+                                <div className="absolute inset-0 px-3 flex items-center gap-3">
                                     <div className="relative">
                                         <div 
                                             className={cn(
-                                                "p-1.5 md:p-2 rounded-xl backdrop-blur-xl border border-white/20 text-white shadow-2xl transition-all duration-700",
+                                                "p-2 rounded-xl backdrop-blur-xl border border-white/20 text-white shadow-2xl transition-all duration-700",
                                                 isSelected && "scale-110 rotate-[360deg] border-white/40"
                                             )}
                                             style={{ backgroundColor: baseColor }}
                                         >
                                             {isPending && isSelected ? (
-                                                <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                                                <Loader2 className="h-5 w-5 animate-spin" />
                                             ) : (
-                                                <LeagueIcon className="h-4 w-4 md:h-5 md:w-5" />
+                                                <LeagueIcon className="h-5 w-5" />
                                             )}
                                         </div>
                                         <div className={cn(
-                                            "absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full flex items-center justify-center text-[8px] font-black border border-white/20 shadow-lg transition-transform duration-500",
-                                            isSelected ? "bg-primary text-primary-foreground scale-110" : "bg-black/80 text-white"
+                                            "absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full flex items-center justify-center text-[8px] font-black border border-white/20 shadow-lg",
+                                            isSelected ? "bg-primary text-primary-foreground" : "bg-black/80 text-white"
                                         )}>
                                             {playerCount}
                                         </div>
                                     </div>
                                     <div className="flex flex-col justify-center overflow-hidden">
-                                        <p className="text-[10px] md:text-[12px] font-headline text-white uppercase tracking-tight truncate leading-none mb-1 text-glow-white">
+                                        <p className="text-[12px] font-headline text-white uppercase tracking-tight truncate leading-none mb-1">
                                             {leagueInfo.name}
                                         </p>
                                         <div className="flex items-center gap-1">
                                             {isSelected ? (
                                                 <>
                                                     <div className="h-1 w-1 rounded-full bg-primary animate-pulse" />
-                                                    <p className="text-[7px] md:text-[8px] text-primary font-black uppercase tracking-[0.2em]">В ЭФИРЕ</p>
+                                                    <p className="text-[8px] text-primary font-black uppercase tracking-[0.2em]">В ЭФИРЕ</p>
                                                 </>
                                             ) : (
-                                                <p className="text-[7px] md:text-[8px] text-muted-foreground/60 font-bold uppercase tracking-widest">Участников: {playerCount}</p>
+                                                <p className="text-[8px] text-muted-foreground/60 font-bold uppercase tracking-widest">Игроков: {playerCount}</p>
                                             )}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         )
+                    })}
+                </div>
+
+                {/* МОБИЛЬНЫЙ: Стопка закладок (Bookmark Stack) */}
+                <div className="flex md:hidden overflow-x-auto no-scrollbar pt-8 pb-4 px-6 items-end h-44 mask-fade-edges">
+                    {enabledLeagues.map((leagueId, idx) => {
+                        const leagueInfo = leagueSettings[leagueId];
+                        const isSelected = currentLeagueId === leagueId;
+                        const banner = leagueInfo.bannerUrl || DEFAULT_BANNER;
+                        const LeagueIcon = leagueIcons[leagueId] || Target;
+                        const playerCount = playerCounts[leagueId] || 0;
+                        const baseColor = getLeagueBaseColor(leagueId);
+                        
+                        return (
+                            <div
+                                key={leagueId}
+                                role="button"
+                                onClick={() => handleLeagueSelect(leagueId)}
+                                className={cn(
+                                    "relative flex-shrink-0 w-28 h-32 rounded-t-[2.5rem] transition-all duration-500 ease-out border-x-2 border-t-2 shadow-2xl",
+                                    "-ml-16 first:ml-0 cursor-pointer overflow-hidden",
+                                    isSelected 
+                                        ? "z-50 -translate-y-6 scale-110 mx-4 border-primary ring-4 ring-primary/20 shadow-[0_20px_50px_rgba(var(--primary-rgb),0.4)]" 
+                                        : "z-[var(--z-idx)] border-white/10 grayscale-[0.4] hover:-translate-y-2 opacity-80"
+                                )}
+                                style={{ 
+                                    '--z-idx': isSelected ? 100 : (enabledLeagues.length - idx),
+                                    backgroundColor: baseColor 
+                                } as React.CSSProperties}
+                            >
+                                <Image src={banner} alt="" fill className="object-cover" unoptimized={banner.startsWith('data:')} />
+                                <div className={cn(
+                                    "absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent",
+                                    isSelected ? "opacity-40" : "opacity-80"
+                                )} />
+                                
+                                <div className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center">
+                                    <div className={cn(
+                                        "p-2.5 rounded-xl backdrop-blur-xl border transition-all duration-700 shadow-2xl mb-2",
+                                        isSelected ? "bg-primary text-primary-foreground border-white/40 scale-110" : "bg-black/40 text-white border-white/10"
+                                    )}>
+                                        {isPending && isSelected ? (
+                                            <Loader2 className="h-5 w-5 animate-spin" />
+                                        ) : (
+                                            <LeagueIcon className="h-5 w-5" />
+                                        )}
+                                    </div>
+                                    <span className={cn(
+                                        "text-[10px] font-headline uppercase leading-tight line-clamp-2 px-1 text-glow-white",
+                                        isSelected ? "text-primary scale-105" : "text-white/80"
+                                    )}>
+                                        {leagueInfo.name}
+                                    </span>
+                                    {playerCount > 0 && (
+                                        <div className="mt-2 bg-black/60 rounded-full px-2 py-0.5 border border-white/10">
+                                            <span className="text-[8px] font-black text-primary">#{playerCount}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
                     })}
                 </div>
             </div>
