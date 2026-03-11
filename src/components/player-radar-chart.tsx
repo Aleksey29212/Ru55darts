@@ -17,17 +17,12 @@ const chartConfig = {
 };
 
 const calculateAggregateStats = (player: Player) => {
-    const winRate = player.matchesPlayed > 0 ? (player.wins / player.matchesPlayed) * 100 : 0;
     const power = Math.min(100, (Number(player.avg) || 0) * 1.2 + (Number(player.n180s) || 0) * 2);
     const finishing = Math.min(100, (Number(player.hiOut) || 0) / 1.7);
-    const experience = Math.min(100, (Number(player.matchesPlayed) || 0) * 5);
-    const accuracy = Math.min(100, winRate * 0.8 + 20);
     const legQuality = player.bestLeg > 0 ? (100 * 36) / (player.bestLeg - 9 + 36) : 0;
 
     return [
         { subject: 'Набор', value: power, fullMark: 100 },
-        { subject: 'Опыт', value: experience, fullMark: 100 },
-        { subject: 'Успешность', value: accuracy, fullMark: 100 },
         { subject: 'Чекаут', value: finishing, fullMark: 100 },
         { subject: 'Лег', value: legQuality, fullMark: 100 },
     ];

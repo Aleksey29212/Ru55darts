@@ -63,12 +63,12 @@ export function PlayerVisualizations({ player, tournaments, viewMode }: PlayerVi
                       <span className="text-foreground">AVG + 180-ки</span>
                     </div>
                     <div className="flex justify-between border-b border-primary/10 pb-1">
-                      <span className="text-muted-foreground">Успешность:</span>
-                      <span className="text-foreground">% ТОП-8</span>
-                    </div>
-                    <div className="flex justify-between">
                       <span className="text-muted-foreground">Чекаут:</span>
                       <span className="text-foreground">Max Hi-Out</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Мастерство:</span>
+                      <span className="text-foreground">Лучший лег</span>
                     </div>
                   </div>
                 </div>
