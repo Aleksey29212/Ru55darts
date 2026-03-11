@@ -128,41 +128,57 @@ export async function deletePlayerAction(playerId: string) {
 }
 
 export async function saveScoringSettings(leagueId: LeagueId, data: ScoringSettings) {
-  await updateScoringSettings(leagueId, data);
-  revalidateTag('scoring');
-  revalidateTag('settings');
-  revalidateTag('leagues');
-  revalidatePath('/', 'layout');
-  return { success: true, message: `Настройки сохранены.` };
+  try {
+    await updateScoringSettings(leagueId, data);
+    revalidateTag('scoring');
+    revalidateTag('settings');
+    revalidateTag('leagues');
+    revalidatePath('/', 'layout');
+    return { success: true, message: `Настройки сохранены.` };
+  } catch (e) {
+    return { success: false, message: 'Ошибка сохранения.' };
+  }
 }
 
 export async function saveLeagueSettings(data: AllLeagueSettings) {
-  await updateLeagueSettings(data);
-  revalidateTag('leagues');
-  revalidateTag('settings');
-  revalidateTag('scoring');
-  revalidateTag('tournaments');
-  revalidatePath('/', 'layout');
-  revalidatePath('/admin/leagues');
-  return { success: true, message: `Настройки лиг обновлены.` };
+  try {
+    await updateLeagueSettings(data);
+    revalidateTag('leagues');
+    revalidateTag('settings');
+    revalidateTag('scoring');
+    revalidateTag('tournaments');
+    revalidatePath('/', 'layout');
+    revalidatePath('/admin/leagues');
+    return { success: true, message: `Настройки лиг обновлены.` };
+  } catch (e) {
+    return { success: false, message: 'Ошибка сохранения лиг.' };
+  }
 }
 
 export async function deleteTournamentAction(tournamentId: string) {
-    await deleteTournamentById(tournamentId);
-    revalidateTag('tournaments');
-    revalidateTag('leagues');
-    revalidatePath('/', 'layout');
-    revalidatePath('/admin/tournaments');
-    return { success: true, message: `Турнир удален.` };
+    try {
+        await deleteTournamentById(tournamentId);
+        revalidateTag('tournaments');
+        revalidateTag('leagues');
+        revalidatePath('/', 'layout');
+        revalidatePath('/admin/tournaments');
+        return { success: true, message: `Турнир удален.` };
+    } catch (e) {
+        return { success: false, message: 'Ошибка удаления турнира.' };
+    }
 }
 
 export async function clearTournamentsAction() {
-    await clearAllTournamentData();
-    revalidatePath('/', 'layout');
-    revalidatePath('/admin/tournaments');
-    revalidateTag('tournaments');
-    revalidateTag('leagues');
-    return { success: true, message: 'Архив очищен.' };
+    try {
+        await clearAllTournamentData();
+        revalidatePath('/', 'layout');
+        revalidatePath('/admin/tournaments');
+        revalidateTag('tournaments');
+        revalidateTag('leagues');
+        return { success: true, message: 'Архив очищен.' };
+    } catch (e) {
+        return { success: false, message: 'Ошибка очистки архива.' };
+    }
 }
 
 export async function logVisitAction() {
@@ -182,27 +198,35 @@ export async function saveBackgroundAction(prevState: unknown, formData: FormDat
     const url = formData.get('url') as string;
     const intent = formData.get('intent') as string;
     
-    if (intent === 'reset') {
-        await updateBackgroundUrl('');
+    try {
+        if (intent === 'reset') {
+            await updateBackgroundUrl('');
+            revalidateTag('background');
+            revalidateTag('settings');
+            revalidatePath('/', 'layout');
+            return { success: true, message: 'Фон сброшен.' };
+        }
+        
+        await updateBackgroundUrl(url);
         revalidateTag('background');
         revalidateTag('settings');
         revalidatePath('/', 'layout');
-        return { success: true, message: 'Фон сброшен.' };
+        return { success: true, message: 'Фон обновлен.' };
+    } catch (e) {
+        return { success: false, message: 'Ошибка сохранения фона.' };
     }
-    
-    await updateBackgroundUrl(url);
-    revalidateTag('background');
-    revalidateTag('settings');
-    revalidatePath('/', 'layout');
-    return { success: true, message: 'Фон обновлен.' };
 }
 
 export async function saveSponsorshipAction(settings: SponsorshipSettings) {
-    await updateSponsorshipSettings(settings);
-    revalidateTag('sponsorship');
-    revalidateTag('settings');
-    revalidatePath('/', 'layout');
-    return { success: true, message: 'Настройки спонсорства обновлены.' };
+    try {
+        await updateSponsorshipSettings(settings);
+        revalidateTag('sponsorship');
+        revalidateTag('settings');
+        revalidatePath('/', 'layout');
+        return { success: true, message: 'Настройки спонсорства обновлены.' };
+    } catch (e) {
+        return { success: false, message: 'Ошибка сохранения спонсорства.' };
+    }
 }
 
 export async function updatePlayerAvatar(playerId: string, dataUrl: string | null) {

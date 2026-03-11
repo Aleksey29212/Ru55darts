@@ -16,5 +16,7 @@ export const firebaseConfig = {
 export const isFirebaseConfigValid = 
     !!firebaseConfig.apiKey && 
     firebaseConfig.apiKey.length > 15 && 
+    !!firebaseConfig.projectId &&
     !firebaseConfig.projectId.includes('project-id') &&
+    firebaseConfig.projectId !== 'your-project-id' &&
     firebaseConfig.projectId !== '';

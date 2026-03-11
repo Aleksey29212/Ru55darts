@@ -147,24 +147,24 @@ function SetupGuide() {
 
 export default function AdminPage() {
   const db = useFirestore();
+  const isConfigured = isFirebaseConfigValid;
   
-  const tournamentsQuery = useMemoFirebase(() => db ? collection(db, 'tournaments') : null, [db]);
+  // Эти запросы будут выполнены только если конфиг валиден
+  const tournamentsQuery = useMemoFirebase(() => (db && isConfigured) ? collection(db, 'tournaments') : null, [db, isConfigured]);
   const { data: tournaments, isLoading: isLoadingTournaments } = useCollection(tournamentsQuery);
 
-  const playersQuery = useMemoFirebase(() => db ? collection(db, 'players') : null, [db]);
+  const playersQuery = useMemoFirebase(() => (db && isConfigured) ? collection(db, 'players') : null, [db, isConfigured]);
   const { data: players, isLoading: isLoadingPlayers } = useCollection(playersQuery);
 
-  const partnersQuery = useMemoFirebase(() => db ? collection(db, 'partners') : null, [db]);
+  const partnersQuery = useMemoFirebase(() => (db && isConfigured) ? collection(db, 'partners') : null, [db, isConfigured]);
   const { data: partners, isLoading: isLoadingPartners } = useCollection(partnersQuery);
 
-  const leagueSettingsRef = useMemoFirebase(() => db ? doc(db, 'app_settings', 'leagues') : null, [db]);
+  const leagueSettingsRef = useMemoFirebase(() => (db && isConfigured) ? doc(db, 'app_settings', 'leagues') : null, [db, isConfigured]);
   const { data: leagueSettings, isLoading: isLoadingLeagues } = useDoc<AllLeagueSettings>(leagueSettingsRef);
 
   const enabledLeaguesCount = leagueSettings 
     ? (Object.keys(leagueSettings) as LeagueId[]).filter(key => leagueSettings[key].enabled).length 
-    : 1;
-
-  const isConfigured = isFirebaseConfigValid;
+    : (isConfigured ? 1 : 0);
 
   return (
     <div className="space-y-12 pb-24">
@@ -172,10 +172,10 @@ export default function AdminPage() {
         {!isConfigured && <SetupGuide />}
 
         <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard title="Турниров в базе" count={tournaments?.length || 0} icon={Trophy} isLoading={isLoadingTournaments} priority />
-            <StatCard title="Всего игроков" count={players?.length || 0} icon={Users} isLoading={isLoadingPlayers} />
-            <StatCard title="Активных лиг" count={enabledLeaguesCount} icon={Library} isLoading={isLoadingLeagues} />
-            <StatCard title="Партнеров" count={partners?.length || 0} icon={Handshake} isLoading={isLoadingPartners} />
+            <StatCard title="Турниров в базе" count={tournaments?.length || 0} icon={Trophy} isLoading={isLoadingTournaments && isConfigured} priority />
+            <StatCard title="Всего игроков" count={players?.length || 0} icon={Users} isLoading={isLoadingPlayers && isConfigured} />
+            <StatCard title="Активных лиг" count={enabledLeaguesCount} icon={Library} isLoading={isLoadingLeagues && isConfigured} />
+            <StatCard title="Партнеров" count={partners?.length || 0} icon={Handshake} isLoading={isLoadingPartners && isConfigured} />
         </section>
 
         {/* Interface Management Panel */}
