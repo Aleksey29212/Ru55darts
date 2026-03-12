@@ -29,9 +29,16 @@ export const DartboardIcon = React.forwardRef<SVGSVGElement, React.SVGProps<SVGS
       {/* Клюв: острый и решительный */}
       <path d="M11 16.5l1 2.5 1-2.5z" fill="currentColor" stroke="none" />
       
-      {/* Детализация: ушки-кисточки */}
-      <path d="M7.5 5.5l0.5 1.5" className="opacity-60" />
-      <path d="M16.5 5.5l-0.5 1.5" className="opacity-60" />
+      {/* РЕАЛИСТИЧНЫЕ КИСТОЧКИ НА УШАХ: придают характерный вид филину */}
+      {/* Левое ухо */}
+      <path d="M5 3l-0.8-2M5 3l0.2-2.5M5 3l1-1.8" className="text-primary" strokeWidth="1" />
+      
+      {/* Правое ухо */}
+      <path d="M19 3l0.8-2M19 3l-0.2-2.5M19 3l-1-1.8" className="text-primary" strokeWidth="1" />
+
+      {/* Внутренняя детализация: перья */}
+      <path d="M7.5 5.5l0.5 1.5" className="opacity-40" strokeWidth="1" />
+      <path d="M16.5 5.5l-0.5 1.5" className="opacity-40" strokeWidth="1" />
     </svg>
   )
 );
