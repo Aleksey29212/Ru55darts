@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { Player, PlayerProfile, ScoringSettings, SponsorTemplateId, PlayerSponsor } from '@/lib/types';
@@ -44,8 +43,6 @@ const StatItem = ({
     const valueString = String(value);
     const len = valueString.length;
     
-    // ГАРАНТИЯ: Интеллектуальный масштаб. Чем больше знаков, тем меньше шрифт.
-    // whitespace-nowrap предотвращает "стекание" цифр вниз.
     let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
     if (len >= 7) {
@@ -90,7 +87,6 @@ const StatItem = ({
             )}
             onClick={() => setIsRevealed(!isRevealed)}
         >
-            {/* Заголовок статы */}
             <div className="w-full flex items-center justify-center gap-1 mb-2 relative z-10">
                 <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-wider text-muted-foreground/90 leading-none truncate max-w-[75%]">
                     {label}
@@ -122,7 +118,6 @@ const StatItem = ({
                 </Popover>
             </div>
             
-            {/* Центральная цифра - ГАРАНТИЯ ЧИТАЕМОСТИ */}
             <div className="flex-1 flex items-center justify-center w-full my-1 overflow-hidden relative z-10 min-h-[60px]">
                 {isRevealed ? (
                     <span className={valueClasses}>{value}</span>
@@ -136,7 +131,6 @@ const StatItem = ({
                 )}
             </div>
 
-            {/* Подвал статы */}
             <div className="w-full mt-auto relative z-10">
                 <div className="h-px w-full bg-white/10 mb-2" />
                 <p className="text-[8px] sm:text-[9px] font-black uppercase text-primary/70 tracking-widest text-center leading-none truncate px-1">
@@ -584,7 +578,7 @@ export function PlayerCard({
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-5 lg:gap-6">
                             <StatItem 
                                 template={template} 
-                                label="ОЧК" 
+                                label="ОЧ." 
                                 name="points" 
                                 value={player.points} 
                                 caption="ИТГ"
@@ -608,7 +602,7 @@ export function PlayerCard({
                             />
                             <StatItem 
                                 template={template} 
-                                label="ГРП" 
+                                label="ГР." 
                                 name="losses" 
                                 value={player.losses} 
                                 caption="ВЫЛ"
