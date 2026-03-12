@@ -43,18 +43,21 @@ const StatItem = ({
     const valueString = String(value);
     const len = valueString.length;
     
-    // ИНТЕЛЛЕКТУАЛЬНЫЙ МАСШТАБ: цифры не должны выходить за рамки (v5.0 Stable)
+    // УЛЬТРА-АДАПТИВНЫЙ МАСШТАБ ЦИФР
     let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
     if (len >= 7) {
-        fontSizeClass = "text-lg sm:text-xl lg:text-2xl"; 
+        fontSizeClass = "text-sm sm:text-base lg:text-xl"; 
     } else if (len >= 5) {
-        fontSizeClass = "text-xl sm:text-2xl lg:text-3xl"; 
+        fontSizeClass = "text-base sm:text-lg lg:text-2xl"; 
     } else if (len >= 4) {
-        fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl"; 
+        fontSizeClass = "text-lg sm:text-xl lg:text-3xl"; 
+    } else if (len >= 3) {
+        // Для 3-значных (Hi-Out 100+ или 59.1) делаем еще компактнее на мобилках
+        fontSizeClass = "text-xl sm:text-2xl lg:text-4xl";
     }
     
-    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-4 rounded-[2rem] transition-all border shadow-2xl relative w-full h-full min-h-[150px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none overflow-hidden bg-black/40";
+    const baseClasses = "flex flex-col items-center justify-between p-1.5 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] transition-all border shadow-2xl relative w-full h-full min-h-[120px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none overflow-hidden bg-black/40";
     
     const templateClasses = {
         classic: "glassmorphism border-white/10 hover:border-primary/40",
@@ -70,7 +73,7 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-500 tabular-nums whitespace-nowrap px-1",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-500 tabular-nums whitespace-nowrap px-0.5",
         fontSizeClass,
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : '',
@@ -88,18 +91,18 @@ const StatItem = ({
             )}
             onClick={() => setIsRevealed(!isRevealed)}
         >
-            <div className="w-full flex items-center justify-center gap-1 mb-2 relative z-10">
-                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-muted-foreground/90 leading-none truncate max-w-[85%]">
+            <div className="w-full flex items-center justify-center gap-0.5 mb-1 relative z-10 px-1">
+                <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-tighter text-muted-foreground/90 leading-none">
                     {label}
                 </span>
                 
                 <Popover>
                     <PopoverTrigger asChild>
                         <button 
-                            className="p-1 hover:text-primary transition-all active:scale-90 shrink-0 outline-none"
+                            className="p-0.5 hover:text-primary transition-all active:scale-90 shrink-0 outline-none"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <AlertCircle className="h-3.5 w-3.5 text-primary/50 hover:text-primary" />
+                            <AlertCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-primary/40 hover:text-primary" />
                         </button>
                     </PopoverTrigger>
                     <PopoverContent 
@@ -119,22 +122,22 @@ const StatItem = ({
                 </Popover>
             </div>
             
-            <div className="flex-1 flex items-center justify-center w-full my-1 overflow-hidden relative z-10 min-h-[60px]">
+            <div className="flex-1 flex items-center justify-center w-full my-1 overflow-hidden relative z-10 min-h-[40px] sm:min-h-[60px]">
                 {isRevealed ? (
                     <span className={valueClasses}>{value}</span>
                 ) : (
-                    <div className="flex flex-col items-center gap-2 animate-in fade-in duration-500">
-                        <div className="p-2.5 sm:p-3 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform">
-                            <Lock className="h-5 w-5 sm:h-7 sm:w-7 text-primary opacity-60 group-hover:opacity-100" />
+                    <div className="flex flex-col items-center gap-1.5 animate-in fade-in duration-500">
+                        <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform">
+                            <Lock className="h-3.5 w-3.5 sm:h-7 sm:w-7 text-primary opacity-60 group-hover:opacity-100" />
                         </div>
-                        <span className="text-[7px] font-black uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary/60">OPEN</span>
+                        <span className="text-[5px] sm:text-[6px] font-black uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary/60">OPEN</span>
                     </div>
                 )}
             </div>
 
             <div className="w-full mt-auto relative z-10">
-                <div className="h-px w-full bg-white/10 mb-2" />
-                <p className="text-[8px] sm:text-[9px] font-black uppercase text-primary/70 tracking-widest text-center leading-none truncate px-1">
+                <div className="h-px w-full bg-white/10 mb-1.5" />
+                <p className="text-[7px] sm:text-[9px] font-black uppercase text-primary/60 tracking-[0.15em] text-center leading-none truncate px-0.5">
                     {caption || "METRIC"}
                 </p>
             </div>
