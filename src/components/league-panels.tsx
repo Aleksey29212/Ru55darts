@@ -59,17 +59,17 @@ const leagueIcons: Record<string, any> = {
 
 const getLeagueBaseColor = (leagueId: LeagueId) => {
     const colors: Record<string, string> = {
-        general: 'rgba(6, 182, 212, 0.8)',
-        evening_omsk: 'rgba(249, 115, 22, 0.8)',
-        premier: 'rgba(59, 130, 246, 0.8)',
-        first: 'rgba(245, 158, 11, 0.8)',
-        second: 'rgba(139, 92, 246, 0.8)',
-        third: 'rgba(16, 185, 129, 0.8)',
-        fourth: 'rgba(236, 72, 153, 0.8)',
-        cricket: 'rgba(34, 197, 94, 0.8)',
-        senior: 'rgba(71, 85, 105, 0.8)',
-        youth: 'rgba(163, 230, 53, 0.8)',
-        women: 'rgba(217, 70, 239, 0.8)',
+        general: 'rgba(6, 182, 212, 0.9)',
+        evening_omsk: 'rgba(249, 115, 22, 0.9)',
+        premier: 'rgba(59, 130, 246, 0.9)',
+        first: 'rgba(245, 158, 11, 0.9)',
+        second: 'rgba(139, 92, 246, 0.9)',
+        third: 'rgba(16, 185, 129, 0.9)',
+        fourth: 'rgba(236, 72, 153, 0.9)',
+        cricket: 'rgba(34, 197, 94, 0.9)',
+        senior: 'rgba(71, 85, 105, 0.9)',
+        youth: 'rgba(163, 230, 53, 0.9)',
+        women: 'rgba(217, 70, 239, 0.9)',
     };
     return colors[leagueId] || colors.general;
 }
@@ -95,7 +95,7 @@ function LeagueSection({
     return (
         <div className="space-y-12 md:space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* UNIFIED LEAGUE HERO SECTION */}
-            <div className="relative group overflow-hidden rounded-[3rem] border-2 border-white/5 shadow-2xl transition-all hover:border-primary/20">
+            <div className="relative group overflow-hidden rounded-[3rem] border-2 border-white/10 shadow-2xl transition-all hover:border-primary/20">
                 <div className="absolute inset-0 z-0">
                     <Image src={banner} alt="" fill className="object-cover opacity-30 transition-transform duration-[10s] group-hover:scale-110" unoptimized={banner.startsWith('data:')} />
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
@@ -211,14 +211,13 @@ export function LeaguePanels({
                 </div>
 
                 {/* ДЕСКТОП: Сетка карточек */}
-                <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 animate-in fade-in duration-500">
+                <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 animate-in fade-in duration-500">
                     {orderedLeagues.map((leagueId) => {
                         const leagueInfo = leagueSettings[leagueId];
                         const isSelected = currentLeagueId === leagueId;
                         const banner = leagueInfo.bannerUrl || DEFAULT_BANNER;
                         const LeagueIcon = leagueIcons[leagueId] || Target;
                         const baseColor = getLeagueBaseColor(leagueId);
-                        const playerCount = playerCounts[leagueId] || 0;
 
                         return (
                             <div
@@ -227,10 +226,10 @@ export function LeaguePanels({
                                 tabIndex={0}
                                 onClick={() => handleLeagueSelect(leagueId)}
                                 className={cn(
-                                    'relative h-14 rounded-xl overflow-hidden transition-all duration-500 transform cursor-pointer outline-none border shadow-lg group',
+                                    'relative h-16 rounded-2xl overflow-hidden transition-all duration-500 transform cursor-pointer outline-none border shadow-xl group',
                                     isSelected 
-                                        ? 'border-primary ring-2 ring-primary/20 scale-[1.02] z-10 shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] animate-shimmer' 
-                                        : 'border-white/5 opacity-70 hover:opacity-100 hover:border-primary/40'
+                                        ? 'border-primary border-2 ring-4 ring-primary/20 scale-[1.03] z-10 shadow-[0_0_40px_rgba(var(--primary-rgb),0.4)] animate-shimmer' 
+                                        : 'border-white/15 opacity-80 hover:opacity-100 hover:border-primary/50'
                                 )}
                             >
                                 <Image src={banner} alt="" fill className="object-cover transition-all duration-1000 group-hover:scale-110" unoptimized={banner.startsWith('data:')} />
@@ -238,12 +237,12 @@ export function LeaguePanels({
                                     "absolute inset-0 bg-gradient-to-r transition-opacity duration-700",
                                     isSelected ? "from-black/95 via-black/80 to-transparent" : "from-black/90 via-black/70 to-transparent"
                                 )} />
-                                <div className="absolute inset-0 px-3 flex items-center gap-3">
+                                <div className="absolute inset-0 px-4 flex items-center gap-3">
                                     <div className="relative">
                                         <div 
                                             className={cn(
-                                                "p-1.5 rounded-lg backdrop-blur-xl border border-white/20 text-white shadow-2xl transition-all duration-700",
-                                                isSelected && "scale-110 rotate-[360deg] border-white/40"
+                                                "p-2 rounded-xl backdrop-blur-xl border-2 border-white/30 text-white shadow-2xl transition-all duration-700",
+                                                isSelected && "scale-110 rotate-[360deg] border-white/50"
                                             )}
                                             style={{ backgroundColor: baseColor }}
                                         >
@@ -260,7 +259,7 @@ export function LeaguePanels({
                                         </p>
                                         {isSelected && (
                                             <div className="flex items-center gap-1">
-                                                <div className="h-1 w-1 rounded-full bg-primary animate-pulse" />
+                                                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
                                                 <p className="text-[7px] text-primary font-black uppercase tracking-[0.2em]">В ЭФИРЕ</p>
                                             </div>
                                         )}
@@ -286,11 +285,11 @@ export function LeaguePanels({
                                 role="button"
                                 onClick={() => handleLeagueSelect(leagueId)}
                                 className={cn(
-                                    "relative flex-shrink-0 w-24 h-24 rounded-t-[2rem] transition-all duration-500 ease-out border-x border-t shadow-2xl",
+                                    "relative flex-shrink-0 w-24 h-24 rounded-t-[2rem] transition-all duration-500 ease-out border-x-2 border-t-2 shadow-2xl",
                                     "-ml-12 first:ml-0 cursor-pointer overflow-hidden",
                                     isSelected 
-                                        ? "z-50 -translate-y-4 scale-110 mx-2 border-primary ring-2 ring-primary/20 shadow-[0_10px_30px_rgba(var(--primary-rgb),0.4)]" 
-                                        : "z-[var(--z-idx)] border-white/10 grayscale-[0.4] opacity-80"
+                                        ? "z-50 -translate-y-4 scale-110 mx-2 border-primary ring-4 ring-primary/20 shadow-[0_15px_40px_rgba(var(--primary-rgb),0.5)]" 
+                                        : "z-[var(--z-idx)] border-white/20 grayscale-[0.3] opacity-90"
                                 )}
                                 style={{ 
                                     '--z-idx': isSelected ? 100 : (enabledLeagues.length - idx),
@@ -305,8 +304,8 @@ export function LeaguePanels({
                                 
                                 <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center">
                                     <div className={cn(
-                                        "p-2 rounded-lg backdrop-blur-xl border transition-all duration-700 shadow-2xl mb-1",
-                                        isSelected ? "bg-primary text-primary-foreground border-white/40 scale-110" : "bg-black/40 text-white border-white/10"
+                                        "p-2.5 rounded-xl backdrop-blur-xl border-2 transition-all duration-700 shadow-2xl mb-1",
+                                        isSelected ? "bg-primary text-primary-foreground border-white/50 scale-110" : "bg-black/40 text-white border-white/20"
                                     )}>
                                         {isPending && isSelected ? (
                                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -316,7 +315,7 @@ export function LeaguePanels({
                                     </div>
                                     <span className={cn(
                                         "text-[8px] font-headline uppercase leading-tight line-clamp-2 px-1",
-                                        isSelected ? "text-primary" : "text-white/80"
+                                        isSelected ? "text-primary text-glow-white" : "text-white/90"
                                     )}>
                                         {leagueInfo.name}
                                     </span>
