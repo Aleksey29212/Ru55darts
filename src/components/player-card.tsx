@@ -43,32 +43,34 @@ const StatItem = ({
     const valueString = String(value);
     const len = valueString.length;
     
-    // Единый базовый размер как в AVG, с адаптацией под длинные числа
+    // ГАРАНТИЯ: Интеллектуальный масштаб для предотвращения выхода за рамки
     let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
-    if (len >= 6) {
+    if (len >= 8) {
+        fontSizeClass = "text-lg sm:text-xl lg:text-2xl"; 
+    } else if (len >= 6) {
         fontSizeClass = "text-xl sm:text-2xl lg:text-3xl"; 
     } else if (len >= 4) {
         fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl"; 
     }
     
-    const baseClasses = "flex flex-col items-center justify-between p-2 sm:p-4 rounded-[2rem] transition-all border shadow-2xl relative w-full h-full min-h-[150px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none overflow-hidden";
+    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-4 rounded-[2rem] transition-all border shadow-2xl relative w-full h-full min-h-[160px] sm:min-h-[190px] cursor-pointer active:scale-95 select-none overflow-hidden bg-black/40";
     
     const templateClasses = {
-        classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
-        modern: "bg-background/60 backdrop-blur-md border-white/5",
-        dynamic: "bg-black/80 text-white border-accent/50 shadow-[0_0_30px_rgba(var(--accent-rgb),0.2)]",
+        classic: "glassmorphism border-white/10 hover:border-primary/40",
+        modern: "bg-background/60 backdrop-blur-md border-white/10",
+        dynamic: "bg-black/80 border-accent/50 shadow-[0_0_30px_rgba(var(--accent-rgb),0.2)]",
         elite: "bg-gradient-to-br from-neutral-900 to-black border-gold/30 shadow-[0_0_40px_rgba(255,215,0,0.15)]",
-        cyber: "bg-[#0a0a0f] border-cyan-500/40 border-l-4 rounded-none skew-x-[-2deg]",
-        retro: "bg-[#1a1a1a] border-4 border-pink-500 rounded-none shadow-[4px_4px_0_0_rgba(236,72,153,1)]",
-        impact: "bg-black/40 backdrop-blur-xl border-white/20",
-        minimal: "bg-white/[0.02] border-white/10 rounded-xl",
-        arena: "bg-gradient-to-t from-primary/20 to-transparent border-white/5 rounded-t-[3rem]",
-        stealth: "bg-neutral-950 border-white/[0.03] shadow-none"
+        cyber: "bg-[#0a0a0f] border-cyan-500/40 border-l-4 rounded-none",
+        retro: "bg-[#1a1a1a] border-4 border-pink-500 rounded-none",
+        impact: "bg-black/60 backdrop-blur-xl border-white/20",
+        minimal: "bg-white/[0.02] border-white/10 rounded-2xl",
+        arena: "bg-gradient-to-t from-primary/20 to-transparent border-white/10 rounded-t-[3rem]",
+        stealth: "bg-neutral-950 border-white/[0.05]"
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-700 animate-in fade-in zoom-in-95 px-0.5",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-500 tabular-nums break-all px-1",
         fontSizeClass,
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : '',
@@ -86,18 +88,19 @@ const StatItem = ({
             )}
             onClick={() => setIsRevealed(!isRevealed)}
         >
-            <div className="w-full flex items-center justify-center gap-1 mb-1">
-                <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-tight text-muted-foreground/80 leading-tight text-center break-words max-w-[85%]">
+            {/* Заголовок статы */}
+            <div className="w-full flex items-center justify-center gap-1.5 mb-2 relative z-10">
+                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-muted-foreground/90 leading-none truncate max-w-[80%]">
                     {label}
                 </span>
                 
                 <Popover>
                     <PopoverTrigger asChild>
                         <button 
-                            className="p-1 -m-1 hover:text-primary transition-all active:scale-90 shrink-0 outline-none"
+                            className="p-1 hover:text-primary transition-all active:scale-90 shrink-0 outline-none"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary/60 hover:text-primary animate-pulse" />
+                            <AlertCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary/50 hover:text-primary" />
                         </button>
                     </PopoverTrigger>
                     <PopoverContent 
@@ -117,23 +120,25 @@ const StatItem = ({
                 </Popover>
             </div>
             
-            <div className="flex-1 flex items-center justify-center w-full my-1 sm:my-2 overflow-visible">
+            {/* Центральная цифра */}
+            <div className="flex-1 flex items-center justify-center w-full my-2 overflow-hidden relative z-10">
                 {isRevealed ? (
                     <span className={valueClasses}>{value}</span>
                 ) : (
-                    <div className="flex flex-col items-center gap-2 animate-in fade-in duration-500">
-                        <div className="p-2.5 sm:p-3 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform">
+                    <div className="flex flex-col items-center gap-3 animate-in fade-in duration-500">
+                        <div className="p-3 sm:p-4 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform">
                             <Lock className="h-6 w-6 sm:h-8 sm:w-8 text-primary opacity-60 group-hover:opacity-100" />
                         </div>
-                        <span className="text-[6px] sm:text-[7px] font-black uppercase tracking-widest text-primary/40 group-hover:text-primary/60">ОТКРЫТЬ</span>
+                        <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary/60">ОТКРЫТЬ</span>
                     </div>
                 )}
             </div>
 
-            <div className="w-full mt-auto">
-                <div className="h-px w-full bg-white/10 mb-1 sm:mb-1.5" />
-                <p className="text-[7px] sm:text-[9px] font-black uppercase text-primary/70 tracking-tight text-center leading-tight break-words px-0.5">
-                    {caption || "СТАТ"}
+            {/* Подвал статы */}
+            <div className="w-full mt-auto relative z-10">
+                <div className="h-px w-full bg-white/10 mb-2" />
+                <p className="text-[8px] sm:text-[9px] font-black uppercase text-primary/70 tracking-widest text-center leading-none truncate">
+                    {caption || "STATISTICS"}
                 </p>
             </div>
         </div>
@@ -283,7 +288,6 @@ export function PlayerCard({
   };
 
   const nameLength = currentPlayerData.name.length;
-  // Adaptive font size for the name based on template and length
   const nameSizeClass = cn(
     "font-headline tracking-tighter text-white drop-shadow-[0_8px_30px_rgba(0,0,0,0.9)] leading-tight break-words hyphens-auto",
     template === 'classic' && (nameLength > 20 ? "text-3xl md:text-6xl" : "text-4xl md:text-8xl"),
@@ -308,7 +312,6 @@ export function PlayerCard({
             "relative overflow-hidden shrink-0",
             headerHeight[template]
         )}>
-            {/* Background Image Logic */}
             {(template !== 'modern' && template !== 'minimal' && template !== 'retro') && (
                 <Image 
                     src={backgroundImageUrl}
@@ -361,7 +364,6 @@ export function PlayerCard({
                         <AvatarFallback className="text-5xl md:text-7xl font-headline bg-muted text-muted-foreground">{currentPlayerData.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     
-                    {/* Badge Trophy */}
                     <div className={cn(
                         "absolute p-3 rounded-[1.25rem] bg-background border-4 shadow-3xl animate-bounce duration-[4s]",
                         template === 'elite' ? 'border-gold -top-4 -left-4' : '-bottom-2 -right-2 border-primary/40'
@@ -394,20 +396,19 @@ export function PlayerCard({
                 </div>
             </div>
 
-            {/* Rank Plaque */}
             <div className={cn(
                 "absolute z-10 flex flex-col gap-4",
                 template === 'cyber' ? 'top-0 right-0' : 'top-6 right-6 md:top-10 md:right-10'
             )}>
                 <div className={cn(
-                    "flex flex-col items-center justify-center min-w-[100px] md:min-w-[130px] p-5 md:p-7 backdrop-blur-3xl border-2 shadow-[0_15px_50px_rgba(0,0,0,0.6)] transition-all hover:scale-110 duration-500",
+                    "flex flex-col items-center justify-center min-w-[100px] md:min-w-[130px] p-5 md:p-7 backdrop-blur-3xl border-2 shadow-[0_15px_50px_rgba(0,0,0,0.6)] transition-all hover:scale-110 duration-500 overflow-hidden",
                     template === 'dynamic' ? 'bg-accent/50 border-accent/60 text-accent' : 'bg-primary/50 border-primary/60 text-primary-foreground',
                     template === 'elite' ? 'bg-black/80 border-gold rounded-full h-32 w-32 md:h-48 md:w-48' : 'rounded-[2rem] md:rounded-[3rem]',
                     template === 'cyber' ? 'bg-[#0a0a0f] border-cyan-500 rounded-none' : '',
                     template === 'retro' ? 'bg-pink-500 border-black rounded-none h-24 w-24' : ''
                 )}>
                     <span className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] opacity-80 mb-1">МЕСТО</span>
-                    <span className={cn("text-3xl md:text-6xl font-headline leading-none drop-shadow-[0_4px_15px_rgba(0,0,0,0.6)]", template === 'elite' ? 'text-gold' : '')}>
+                    <span className={cn("text-3xl md:text-6xl font-headline leading-none drop-shadow-[0_4px_15px_rgba(0,0,0,0.6)] truncate w-full text-center", template === 'elite' ? 'text-gold' : '')}>
                         {currentPlayerData.rank > 0 ? `#${currentPlayerData.rank}` : '—'}
                     </span>
                 </div>
@@ -560,8 +561,10 @@ export function PlayerCard({
                                 <p className="text-[9px] md:text-[12px] text-muted-foreground font-black uppercase tracking-[0.2em] opacity-60 mt-0.5">ТЕКУЩИЙ БАЛАНС</p>
                             </div>
                         </div>
-                        <div className="flex relative z-10">
-                            <span className="text-4xl md:text-7xl lg:text-8xl font-headline text-orange-400 text-glow-accent drop-shadow-[0_8px_30px_rgba(0,0,0,0.7)]">{(player.cashValue || 0).toLocaleString('ru-RU')} ₽</span>
+                        <div className="flex relative z-10 overflow-hidden">
+                            <span className="text-4xl md:text-7xl lg:text-8xl font-headline text-orange-400 text-glow-accent drop-shadow-[0_8px_30px_rgba(0,0,0,0.7)] break-all leading-tight">
+                                {(player.cashValue || 0).toLocaleString('ru-RU')} ₽
+                            </span>
                         </div>
                     </div>
                 )}
@@ -622,7 +625,7 @@ export function PlayerCard({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 lg:gap-12">
                         <div className={cn(
-                            "p-6 md:p-10 border-white/10 relative shadow-4xl flex flex-col group/box h-full transition-all duration-500",
+                            "p-6 md:p-10 border-white/10 relative shadow-4xl flex flex-col group/box h-full transition-all duration-500 overflow-hidden",
                             template === 'retro' ? "border-4 border-yellow-400 bg-black rounded-none" : "glassmorphism rounded-[3rem] hover:border-primary/30"
                         )}>
                             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000 rounded-[3rem]" />
@@ -651,7 +654,7 @@ export function PlayerCard({
                         </div>
 
                         <div className={cn(
-                            "p-6 md:p-10 border-white/10 relative shadow-4xl flex flex-col group/box h-full transition-all duration-500",
+                            "p-6 md:p-10 border-white/10 relative shadow-4xl flex flex-col group/box h-full transition-all duration-500 overflow-hidden",
                             template === 'retro' ? "border-4 border-cyan-400 bg-black rounded-none" : "glassmorphism rounded-[3rem] hover:border-accent/30"
                         )}>
                             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000 rounded-[3rem]" />
