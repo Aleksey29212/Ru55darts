@@ -31,7 +31,9 @@ import {
     BarChart2,
     ChevronsUp,
     Diamond,
-    CircleUser
+    CircleUser,
+    ListOrdered,
+    History
 } from 'lucide-react';
 import type { ScoringSettings, LeagueId, SponsorshipSettings } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
@@ -255,6 +257,15 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                     </TabsTrigger>
                                 )
                             })}
+                            
+                            {/* Новая вкладка ранжирования */}
+                            <TabsTrigger 
+                                value="ranking-logic"
+                                className="relative flex flex-col items-center justify-center w-14 h-14 md:w-full md:h-14 rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-900 border-indigo-400/50 data-[state=active]:-translate-y-1.5 data-[state=active]:scale-105 data-[state=active]:border-white/60"
+                            >
+                                <ListOrdered className="h-4 w-4 md:h-5 md:w-5 mb-1 text-white" />
+                                <span className="text-[6px] md:text-[7px] font-black uppercase tracking-tight text-white">МЕСТА</span>
+                            </TabsTrigger>
                         </TabsList>
                     </div>
                 </div>
@@ -277,6 +288,31 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                             {renderLeagueContent(s)}
                         </TabsContent>
                     ))}
+
+                    {/* Контент вкладки Ранжирования */}
+                    <TabsContent value="ranking-logic" className="outline-none animate-in fade-in slide-in-from-bottom-4 duration-700 mt-0">
+                        <div className="flex items-center gap-4 mb-4 mt-6">
+                            <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                            <h3 className="text-sm md:text-lg font-headline uppercase tracking-tight text-white/95 text-glow-white">
+                                Основа распределения мест в лигах
+                            </h3>
+                            <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent" />
+                        </div>
+
+                        <div className="space-y-3 pb-20">
+                            {renderHelpPill('1. Сумма баллов', 'Основа', Trophy, 'text-gold', 'Главный критерий. Суммируются все очки за места и заработанные бонусы.')}
+                            {renderHelpPill('2. Средний набор (AVG)', 'Набор', Zap, 'text-yellow-400', 'При равных баллах выше стоит игрок с более высоким качеством игры.')}
+                            {renderHelpPill('3. Max Out (Hi-Out)', 'Финиш', Target, 'text-pink-500', 'Если баллы и AVG равны, учитывается хладнокровие на решающем закрытии.')}
+                            {renderHelpPill('4. Количество 180-к', 'Снайпер', Star, 'text-orange-500', 'Следующий этап отбора — частота попадания всеми дротиками в утроение 20.')}
+                            {renderHelpPill('5. Количество турниров', 'Опыт', History, 'text-blue-400', 'При полном равенстве выше стоит игрок, принявший участие в большем числе туров.')}
+                            
+                            <div className="p-6 rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 mt-6 shadow-2xl">
+                                <p className="text-xs text-indigo-200/80 leading-relaxed italic font-medium">
+                                    Данная многоуровневая система (tie-breakers) гарантирует максимально честное и прозрачное распределение позиций в таблице лидеров DartBrig Pro.
+                                </p>
+                            </div>
+                        </div>
+                    </TabsContent>
                     
                     <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#050505] to-transparent z-10 pointer-events-none" />
                 </ScrollArea>
@@ -290,7 +326,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 <div className="h-8 w-8 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center font-headline text-primary text-xs shadow-inner">D</div>
                 <div className="flex flex-col">
                     <p className="text-[10px] text-white font-black uppercase tracking-widest leading-none">DartBrig Pro</p>
-                    <p className="text-[7px] text-primary/50 font-bold uppercase tracking-[0.3em] mt-1">v2.6 Stable • Mobile Feed Edition</p>
+                    <p className="text-[7px] text-primary/50 font-bold uppercase tracking-[0.3em] mt-1">v2.8 Stable • Regulations Update</p>
                 </div>
             </div>
             
