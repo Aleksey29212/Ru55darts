@@ -154,6 +154,7 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
                             <FormControl>
                                 <Input 
                                     {...field} 
+                                    value={field.value ?? ''}
                                     disabled={!form.watch(`${leagueId}.enabled`)} 
                                     className="bg-background/50 border-white/5 rounded-xl h-12"
                                 />
@@ -173,6 +174,7 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
                                 <FormControl>
                                     <Input 
                                         {...field} 
+                                        value={field.value ?? ''}
                                         disabled={!form.watch(`${leagueId}.enabled`)} 
                                         placeholder="https://images.unsplash.com/..."
                                         className="bg-background/50 border-white/5 rounded-xl h-12"

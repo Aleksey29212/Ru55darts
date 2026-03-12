@@ -20,14 +20,18 @@ export default function LeaguesPage() {
     
     const result = { ...defaults };
     (Object.keys(defaults) as LeagueId[]).forEach(key => {
-      if (fromDb[key]) {
-        result[key] = {
-          ...defaults[key],
-          ...fromDb[key],
-          // Ensure name is never an empty string if we have a default to prevent validation errors
-          name: fromDb[key].name || defaults[key].name 
-        };
-      }
+      const dbEntry = fromDb[key] || {};
+      const defEntry = defaults[key] || {};
+      
+      result[key] = {
+        ...defEntry,
+        ...dbEntry,
+        // Гарантируем, что обязательные строковые поля никогда не будут undefined
+        name: dbEntry.name || defEntry.name || '',
+        bannerUrl: dbEntry.bannerUrl || defEntry.bannerUrl || '',
+        enabled: dbEntry.enabled ?? defEntry.enabled ?? false,
+        includeInGeneralRanking: dbEntry.includeInGeneralRanking ?? defEntry.includeInGeneralRanking ?? false
+      };
     });
     return result;
   }, [leagueSettingsFromDb]);
