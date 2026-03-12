@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { Player, PlayerProfile, ScoringSettings, SponsorTemplateId, PlayerSponsor } from '@/lib/types';
@@ -12,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
-import { Save, Edit, X, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Handshake, ExternalLink, Lock, Eye, Copy, Check, AlertCircle, Sparkles, Target, Star } from 'lucide-react';
+import { Save, Edit, X, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Handshake, ExternalLink, Lock, Eye, Copy, Check, AlertCircle, Target, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { TemplateId } from './template-switcher';
 import { cn } from '@/lib/utils';
@@ -92,7 +91,6 @@ const StatItem = ({
                     {label}
                 </span>
                 
-                {/* Popover для гарантированной работы на мобильных (Touch Friendly) */}
                 <Popover>
                     <PopoverTrigger asChild>
                         <button 
@@ -291,7 +289,7 @@ export function PlayerCard({
         containerClasses[template]
     )}>
         <div className={cn(
-            "relative overflow-hidden",
+            "relative overflow-hidden shrink-0",
             headerHeight[template]
         )}>
             {/* Background Image Logic */}
@@ -329,21 +327,21 @@ export function PlayerCard({
                 template === 'arena' && "bottom-0 p-16 flex flex-col items-center gap-10",
                 template === 'stealth' && "bottom-0 left-0 p-10 flex flex-row items-center gap-10"
             )}>
-                <div className="relative shrink-0">
+                <div className="relative shrink-0 flex items-center justify-center">
                     <Avatar className={cn(
-                        "border-4 transition-all duration-1000 shadow-[0_0_60px_rgba(0,0,0,0.8)]",
-                        template === 'classic' && "h-40 w-40 md:h-64 md:w-64 border-primary ring-[10px] ring-primary/10",
-                        template === 'modern' && "h-48 w-48 md:h-64 md:w-64 border-primary ring-[10px] ring-primary/5",
-                        template === 'dynamic' && "h-44 w-44 md:h-60 md:w-60 border-accent ring-[10px] ring-accent/15",
-                        template === 'elite' && "h-56 w-56 md:h-80 md:w-80 border-gold ring-[15px] ring-gold/10",
-                        template === 'cyber' && "h-32 w-32 md:h-48 md:w-48 border-cyan-400 rounded-none skew-x-[-10deg]",
+                        "transition-all duration-1000 shadow-[0_0_60px_rgba(0,0,0,0.8)] aspect-square shrink-0",
+                        template === 'classic' && "h-40 w-40 md:h-64 md:w-64 border-4 border-primary ring-[10px] ring-primary/10",
+                        template === 'modern' && "h-48 w-48 md:h-64 md:w-64 border-4 border-primary ring-[10px] ring-primary/5",
+                        template === 'dynamic' && "h-44 w-44 md:h-60 md:w-60 border-4 border-accent ring-[10px] ring-accent/15",
+                        template === 'elite' && "h-56 w-56 md:h-80 md:w-80 border-4 border-gold ring-[15px] ring-gold/10",
+                        template === 'cyber' && "h-32 w-32 md:h-48 md:w-48 border-4 border-cyan-400 rounded-none skew-x-[-10deg]",
                         template === 'retro' && "h-32 w-32 md:h-48 md:w-48 border-4 border-yellow-400 rounded-none",
-                        template === 'impact' && "h-64 w-64 md:h-96 md:w-96 border-white/40 ring-[20px] ring-black/40",
-                        template === 'minimal' && "h-32 w-32 md:h-48 md:w-48 border-white/10",
-                        template === 'arena' && "h-56 w-56 md:h-[28rem] md:w-[28rem] border-primary/40 ring-[20px] ring-primary/5",
-                        template === 'stealth' && "h-40 w-40 md:h-56 md:w-56 border-neutral-800"
+                        template === 'impact' && "h-64 w-64 md:h-96 md:w-96 border-4 border-white/40 ring-[20px] ring-black/40",
+                        template === 'minimal' && "h-32 w-32 md:h-48 md:w-48 border-4 border-white/10",
+                        template === 'arena' && "h-56 w-56 md:h-[28rem] md:w-[28rem] border-4 border-primary/40 ring-[20px] ring-primary/5",
+                        template === 'stealth' && "h-40 w-40 md:h-56 md:w-56 border-4 border-neutral-800"
                     )}>
-                        <AvatarImage src={currentPlayerData.avatarUrl} alt={currentPlayerData.name} className="object-cover" />
+                        <AvatarImage src={currentPlayerData.avatarUrl} alt={currentPlayerData.name} className="object-cover w-full h-full" />
                         <AvatarFallback className="text-5xl md:text-7xl font-headline bg-muted text-muted-foreground">{currentPlayerData.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     
@@ -357,6 +355,7 @@ export function PlayerCard({
                 </div>
 
                  <div className={cn(
+                    "shrink-0",
                     template === 'modern' || template === 'elite' || template === 'impact' || template === 'minimal' || template === 'arena' 
                         ? 'text-center' 
                         : 'flex flex-col items-center md:items-start gap-4 text-center md:text-left'
