@@ -43,6 +43,7 @@ const StatItem = ({
     const valueString = String(value);
     const len = valueString.length;
     
+    // ИНТЕЛЛЕКТУАЛЬНЫЙ МАСШТАБ: цифры не должны выходить за рамки (v5.0 Stable)
     let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
     if (len >= 7) {
@@ -69,7 +70,7 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-500 tabular-nums whitespace-nowrap overflow-hidden text-ellipsis px-1",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-500 tabular-nums whitespace-nowrap px-1",
         fontSizeClass,
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : '',
@@ -88,7 +89,7 @@ const StatItem = ({
             onClick={() => setIsRevealed(!isRevealed)}
         >
             <div className="w-full flex items-center justify-center gap-1 mb-2 relative z-10">
-                <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-wider text-muted-foreground/90 leading-none truncate max-w-[75%]">
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-muted-foreground/90 leading-none truncate max-w-[85%]">
                     {label}
                 </span>
                 
@@ -98,7 +99,7 @@ const StatItem = ({
                             className="p-1 hover:text-primary transition-all active:scale-90 shrink-0 outline-none"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary/50 hover:text-primary" />
+                            <AlertCircle className="h-3.5 w-3.5 text-primary/50 hover:text-primary" />
                         </button>
                     </PopoverTrigger>
                     <PopoverContent 
@@ -586,7 +587,7 @@ export function PlayerCard({
                             />
                             <StatItem 
                                 template={template} 
-                                label="ТУР" 
+                                label="ТУР." 
                                 name="matchesPlayed" 
                                 value={player.matchesPlayed} 
                                 caption="МТЧ"
@@ -610,7 +611,7 @@ export function PlayerCard({
                             />
                             <StatItem 
                                 template={template} 
-                                label="ЭФФ" 
+                                label="ЭФФ." 
                                 name="winRate" 
                                 value={winRate} 
                                 caption="ПЦТ"
