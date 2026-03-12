@@ -230,10 +230,10 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 defaultValue={settingsArray[0]?.id || "general"} 
                 className="w-full flex flex-col h-full"
             >
-                {/* Фиксированная панель навигации */}
-                <div className="relative z-20 shrink-0 px-4 md:px-8 mt-4 mb-2">
-                    <div className="w-full overflow-x-auto no-scrollbar mask-fade-edges pb-2">
-                        <TabsList className="bg-black/80 backdrop-blur-3xl p-1.5 border border-white/10 h-auto flex flex-nowrap md:grid md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 mx-auto w-max md:w-full rounded-2xl shadow-2xl">
+                {/* Фиксированная панель навигации с увеличенными отступами */}
+                <div className="relative z-20 shrink-0 px-6 md:px-12 mt-6 mb-4">
+                    <div className="w-full overflow-x-auto no-scrollbar mask-fade-edges pb-4 px-4">
+                        <TabsList className="bg-black/80 backdrop-blur-3xl p-2 border border-white/10 h-auto flex flex-nowrap md:grid md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 mx-auto w-max md:w-full rounded-[1.5rem] shadow-2xl">
                             {settingsArray.map((s, idx) => {
                                 const id = s.id || 'general';
                                 const Icon = leagueIcons[id] || Trophy;
@@ -243,35 +243,35 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                         key={idx} 
                                         value={id} 
                                         className={cn(
-                                            "relative flex flex-col items-center justify-center w-14 h-14 md:w-full md:h-14 rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg",
+                                            "relative flex flex-col items-center justify-center w-16 h-16 md:w-full md:h-16 rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg",
                                             "bg-gradient-to-br overflow-hidden",
                                             "data-[state=active]:-translate-y-1.5 data-[state=active]:scale-105 data-[state=active]:border-white/60 data-[state=active]:z-10 data-[state=active]:shadow-2xl",
                                             "data-[state=inactive]:opacity-30 data-[state=inactive]:grayscale-[0.6] data-[state=inactive]:hover:opacity-100",
                                             style
                                         )}
                                     >
-                                        <Icon className="h-4 w-4 md:h-5 md:w-5 mb-1 text-white drop-shadow-md" />
-                                        <span className="text-[6px] md:text-[7px] font-black uppercase tracking-tight text-white text-center leading-none px-1 line-clamp-1">
+                                        <Icon className="h-5 w-5 md:h-6 md:w-6 mb-1 text-white drop-shadow-md" />
+                                        <span className="text-[7px] md:text-[8px] font-black uppercase tracking-tight text-white text-center leading-none px-1 line-clamp-1">
                                             {namesArray[idx] || 'Лига'}
                                         </span>
                                     </TabsTrigger>
                                 )
                             })}
                             
-                            {/* Новая вкладка ранжирования */}
+                            {/* Вкладка ранжирования */}
                             <TabsTrigger 
                                 value="ranking-logic"
-                                className="relative flex flex-col items-center justify-center w-14 h-14 md:w-full md:h-14 rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-900 border-indigo-400/50 data-[state=active]:-translate-y-1.5 data-[state=active]:scale-105 data-[state=active]:border-white/60"
+                                className="relative flex flex-col items-center justify-center w-16 h-16 md:w-full md:h-16 rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-900 border-indigo-400/50 data-[state=active]:-translate-y-1.5 data-[state=active]:scale-105 data-[state=active]:border-white/60"
                             >
-                                <ListOrdered className="h-4 w-4 md:h-5 md:w-5 mb-1 text-white" />
-                                <span className="text-[6px] md:text-[7px] font-black uppercase tracking-tight text-white">МЕСТА</span>
+                                <ListOrdered className="h-5 w-5 md:h-6 md:w-6 mb-1 text-white" />
+                                <span className="text-[7px] md:text-[8px] font-black uppercase tracking-tight text-white">МЕСТА</span>
                             </TabsTrigger>
                         </TabsList>
                     </div>
                 </div>
 
                 {/* Основная область прокрутки (Лента) */}
-                <ScrollArea className="flex-1 px-4 md:px-12 lg:px-20 scroll-smooth">
+                <ScrollArea className="flex-1 px-6 md:px-12 lg:px-20 scroll-smooth">
                     <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-[#050505] to-transparent z-10 pointer-events-none" />
                     
                     {settingsArray.map((s, idx) => (
