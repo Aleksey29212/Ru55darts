@@ -667,7 +667,7 @@ export function PlayerCard({
                             <div className="grid grid-cols-3 gap-2 sm:gap-3 relative z-10 mt-auto">
                                 <StatItem 
                                     template={template} 
-                                    label="СР-Й" 
+                                    label="AVG" 
                                     name="avg" 
                                     value={(Number(player.avg) || 0).toFixed(1)} 
                                     caption="НАБОР"
@@ -675,7 +675,7 @@ export function PlayerCard({
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="180-КИ" 
+                                    label="180" 
                                     name="n180s" 
                                     value={player.n180s} 
                                     caption="МАКСИМУМЫ"
@@ -683,7 +683,7 @@ export function PlayerCard({
                                 />
                                 <StatItem 
                                     template={template} 
-                                    label="ЧЕКАУТ" 
+                                    label="Hi-Out" 
                                     name="hiOut" 
                                     value={Number(player.hiOut) || 0} 
                                     caption="ФИНИШ"
