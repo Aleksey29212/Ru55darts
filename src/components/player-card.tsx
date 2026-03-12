@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Player, PlayerProfile, ScoringSettings, SponsorTemplateId, PlayerSponsor } from '@/lib/types';
@@ -11,13 +12,13 @@ import { useState, useEffect } from 'react';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
-import { Save, Edit, X, Info, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Handshake, ExternalLink, Lock, Eye, Copy, Check, AlertCircle, Sparkles, Target, Star } from 'lucide-react';
+import { Save, Edit, X, Zap, Trophy, Wallet, Award, Sunset, TrendingUp, ShieldCheck, Handshake, ExternalLink, Lock, Eye, Copy, Check, AlertCircle, Sparkles, Target, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { TemplateId } from './template-switcher';
 import { cn } from '@/lib/utils';
 import { useIsClient } from '@/hooks/use-is-client';
 import { Label } from './ui/label';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { useFirestore } from '@/firebase';
 import { updatePlayerProfile } from '@/firebase/players';
 import { CardBackgrounds } from '@/lib/card-backgrounds';
@@ -43,6 +44,7 @@ const StatItem = ({
     const valueString = String(value);
     const len = valueString.length;
     
+    // Единый базовый размер как в AVG, с адаптацией под длинные числа
     let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
     if (len >= 6) {
@@ -90,32 +92,31 @@ const StatItem = ({
                     {label}
                 </span>
                 
-                <TooltipProvider>
-                    <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                            <div 
-                                className="cursor-help p-1 -m-1 hover:text-primary transition-all active:scale-90 shrink-0"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary/60 hover:text-primary animate-pulse" />
-                            </div>
-                        </TooltipTrigger>
-                        <TooltipContent 
-                            side="top" 
-                            className="max-w-[320px] bg-black/95 backdrop-blur-3xl border-primary/50 z-[100] p-6 rounded-2xl shadow-2xl"
+                {/* Popover для гарантированной работы на мобильных (Touch Friendly) */}
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <button 
+                            className="p-1 -m-1 hover:text-primary transition-all active:scale-90 shrink-0 outline-none"
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-3 border-b border-primary/20 pb-3">
-                                    <div className="p-2 bg-primary/20 rounded-xl"><AlertCircle className="h-4 w-4 text-primary" /></div>
-                                    <p className="text-xs font-headline text-white uppercase tracking-widest">{label}</p>
-                                </div>
-                                <p className="text-sm leading-relaxed font-bold text-white/95 italic">
-                                    {description || "Профессиональная метрика игрока."}
-                                </p>
+                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary/60 hover:text-primary animate-pulse" />
+                        </button>
+                    </PopoverTrigger>
+                    <PopoverContent 
+                        side="top" 
+                        className="max-w-[280px] bg-black/95 backdrop-blur-3xl border-primary/50 z-[100] p-5 rounded-2xl shadow-2xl"
+                    >
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2 border-b border-primary/20 pb-2">
+                                <AlertCircle className="h-4 w-4 text-primary" />
+                                <p className="text-[10px] font-headline text-white uppercase tracking-widest">{label}</p>
                             </div>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                            <p className="text-xs leading-relaxed font-bold text-white/95 italic">
+                                {description || "Профессиональная метрика игрока."}
+                            </p>
+                        </div>
+                    </PopoverContent>
+                </Popover>
             </div>
             
             <div className="flex-1 flex items-center justify-center w-full my-1 sm:my-2 overflow-visible">
@@ -509,13 +510,13 @@ export function PlayerCard({
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-8">
                         <div className="flex items-center gap-5 md:gap-6">
                             <div className="p-3 rounded-xl bg-primary/20 text-primary shrink-0 shadow-xl border border-primary/30">
-                                <Info className="h-6 w-6 md:h-8 md:w-8" />
+                                <Zap className="h-6 w-6 md:h-8 md:w-8" />
                             </div>
                             <h3 className="text-[11px] md:text-base font-headline uppercase tracking-[0.3em] text-white/60">БИОГРАФИЯ</h3>
                         </div>
                         <ScoringHelpDialog settings={scoringSettings} leagueName={leagueNames} sponsorshipSettings={{ groupVkLink: 'https://vk.com/dartbrig' } as any}>
                             <Button variant="ghost" size="sm" className="flex gap-3 rounded-xl h-10 px-5 text-[10px] md:text-xs uppercase font-black tracking-widest hover:bg-primary/20 text-primary border-2 border-primary/20">
-                                <AlertCircle className="h-5 w-5 animate-pulse" />
+                                <Trophy className="h-5 w-5 animate-pulse" />
                                 РЕГЛАМЕНТ
                             </Button>
                         </ScoringHelpDialog>
@@ -574,7 +575,7 @@ export function PlayerCard({
                                 name="points" 
                                 value={player.points} 
                                 caption="ИТГ"
-                                description="Суммарный рейтинг игрока в этой лиге. Складывается из базовых очков за занятые места и всех заработанных бонусов (180, чекауты и др.)." 
+                                description="Суммарный рейтинг игрока в этой лиге. Складывается из базовых очков за занятые места и всех заработанных бонусов (180, чекауты и др.) за текущий сезон." 
                             />
                             <StatItem 
                                 template={template} 
