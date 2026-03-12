@@ -1,5 +1,17 @@
 import type { Timestamp } from 'firebase/firestore';
 
+export type TemplateId = 
+    | 'classic' 
+    | 'modern' 
+    | 'dynamic' 
+    | 'elite' 
+    | 'cyber' 
+    | 'retro' 
+    | 'impact' 
+    | 'minimal' 
+    | 'arena' 
+    | 'stealth';
+
 export type LeagueId = 'general' | 'premier' | 'first' | 'cricket' | 'second' | 'third' | 'fourth' | 'senior' | 'youth' | 'women' | 'evening_omsk';
 
 export type League = {
@@ -29,10 +41,16 @@ export type PlayerProfile = {
   bio: string;
   imageHint: string;
   backgroundUrl?: string;
+  cardTemplateId?: TemplateId;
   backgroundImageHint?: string;
   sponsors?: PlayerSponsor[];
   sponsorshipCallToAction?: string;
   showSponsorshipCallToAction?: boolean;
+};
+
+export type AppearanceSettings = {
+    globalDefaultTemplate: TemplateId;
+    theme?: any;
 };
 
 export type Player = PlayerProfile & {

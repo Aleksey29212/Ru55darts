@@ -5,13 +5,15 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useAdmin } from '@/context/admin-context';
-import { TemplateSwitcher, type TemplateId } from '@/components/template-switcher';
-import { useState } from 'react';
-import type { Player, PlayerTournamentHistory, ScoringSettings, SponsorTemplateId } from '@/lib/types';
+import { TemplateSwitcher } from '@/components/template-switcher';
+import { useState, useTransition } from 'react';
+import type { Player, PlayerTournamentHistory, ScoringSettings, SponsorTemplateId, TemplateId } from '@/lib/types';
 import { TournamentHistory } from '@/components/tournament-history';
 import { useIsClient } from '@/hooks/use-is-client';
 import { ShareButtons } from '@/components/share-buttons';
 import { PlayerVisualizations } from '@/components/player-visualizations';
+import { updatePlayer } from '@/app/actions';
+import { useToast } from '@/hooks/use-toast';
 
 export function PlayerPageClient({
   player,
@@ -39,8 +41,23 @@ export function PlayerPageClient({
   callToActionSlogans?: string[];
 }) {
   const { isAdmin } = useAdmin();
-  const [template, setTemplate] = useState<TemplateId>('classic');
+  const [template, setTemplate] = useState<TemplateId>(player.cardTemplateId || 'classic');
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
   const isClient = useIsClient();
+
+  const handleTemplateChange = (newTemplate: TemplateId) => {
+      setTemplate(newTemplate);
+      // Если админ меняет шаблон на странице игрока, сохраняем это изменение в профиль
+      if (isAdmin) {
+          startTransition(async () => {
+              const result = await updatePlayer({ ...player, cardTemplateId: newTemplate });
+              if (result.success) {
+                  toast({ title: 'Шаблон сохранен', description: `Профиль игрока обновлен стилем "${newTemplate}".` });
+              }
+          });
+      }
+  };
 
   const backLink = viewMode === 'single' && contextId ? `/tournaments/${contextId}` : '/';
   const backText = viewMode === 'single' ? 'Назад к турниру' : 'Назад к рейтингам';
@@ -50,7 +67,7 @@ export function PlayerPageClient({
       <div className="flex justify-between items-start mb-8">
         <Button asChild variant="outline">
           <Link href={backLink}>
-            <ArrowLeft />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             {backText}
           </Link>
         </Button>
@@ -66,7 +83,7 @@ export function PlayerPageClient({
       <div className="grid lg:grid-cols-5 gap-8 items-start">
         <div className="lg:col-span-3">
           <PlayerCard 
-            player={player} 
+            player={{ ...player, cardTemplateId: template }} 
             template={template} 
             viewMode={viewMode} 
             showSponsors={showSponsors} 
@@ -78,7 +95,12 @@ export function PlayerPageClient({
           />
         </div>
         <div className="lg:col-span-2 space-y-8 lg:sticky lg:top-24">
-          {isClient && isAdmin && <TemplateSwitcher selectedTemplate={template} onTemplateChange={setTemplate} />}
+          {isClient && isAdmin && (
+              <TemplateSwitcher 
+                selectedTemplate={template} 
+                onTemplateChange={handleTemplateChange} 
+              />
+          )}
           
           <PlayerVisualizations 
             player={player} 

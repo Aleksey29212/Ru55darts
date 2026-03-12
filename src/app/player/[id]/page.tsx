@@ -2,29 +2,33 @@ import { getPlayerProfileById } from '@/lib/players';
 import { getTournaments } from '@/lib/tournaments';
 import { notFound } from 'next/navigation';
 import { PlayerPageClient } from './player-page-client';
-import type { Player, ScoringSettings, LeagueId } from '@/lib/types';
+import type { Player, ScoringSettings, LeagueId, TemplateId } from '@/lib/types';
 import { getRankings } from '@/lib/leagues';
 import { Timestamp } from 'firebase/firestore';
-import { getLeagueSettings, getSponsorshipSettings, getAllScoringSettings } from '@/lib/settings';
+import { getLeagueSettings, getSponsorshipSettings, getAllScoringSettings, getAppearanceSettings } from '@/lib/settings';
 import { calculatePlayerPoints } from '@/lib/scoring';
 
 /**
- * @fileOverview Серверный компонент страницы игрока.
- * ГАРАНТИЯ: Адаптация под Next.js 15 (Async Params & SearchParams).
+ * @fileOverview Страница игрока.
+ * Приоритет шаблона: Игрок -> Глобальный Default -> Classic.
  */
 
 export default async function PlayerPage(props: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ tournamentId?: string; leagueId?: LeagueId }>;
 }) {
-  const params = await props.params; // NEXT.JS 15: Must await params
-  const searchParams = await props.searchParams; // NEXT.JS 15: Must await searchParams
+  const params = await props.params;
+  const searchParams = await props.searchParams;
   
   const playerId = decodeURIComponent(params.id);
   const tournamentId = searchParams?.tournamentId;
   const leagueContextId = searchParams?.leagueId;
 
-  const basePlayerProfile = await getPlayerProfileById(playerId);
+  const [basePlayerProfile, appearanceSettings] = await Promise.all([
+      getPlayerProfileById(playerId),
+      getAppearanceSettings()
+  ]);
+
   if (!basePlayerProfile) {
     notFound();
   }
@@ -36,7 +40,6 @@ export default async function PlayerPage(props: {
 
   const viewMode: 'aggregate' | 'single' = tournamentId ? 'single' : 'aggregate';
 
-  // 1. Определение контекста лиги (приоритет: параметр URL -> турнир -> Глобальный)
   let currentLeagueId: LeagueId = leagueContextId || 'general';
   
   if (viewMode === 'single' && tournamentId) {
@@ -46,11 +49,9 @@ export default async function PlayerPage(props: {
       }
   }
 
-  // 2. Получение агрегированных данных игрока в выбранной лиге
   const leagueRankings = await getRankings(currentLeagueId);
   const foundPlayerInLeague = leagueRankings.find(p => p.id === playerId);
 
-  // 3. Формирование истории турниров строго по критериям лиги
   const historyTournamentsMatchCriteria = allTournaments.filter(t => {
       const lInfo = leagueSettings[t.league];
       if (!lInfo || (!lInfo.enabled && t.league !== 'general')) return false;
@@ -88,11 +89,14 @@ export default async function PlayerPage(props: {
         return getTime(b.tournamentDate) - getTime(a.tournamentDate);
     });
 
+  // ОПРЕДЕЛЕНИЕ ШАБЛОНА
+  const templateToUse: TemplateId = basePlayerProfile.cardTemplateId || appearanceSettings.globalDefaultTemplate || 'classic';
+
   let playerForCard: Player;
   if (!foundPlayerInLeague) {
-      // Игрок еще не участвовал в этой лиге
       playerForCard = {
         ...basePlayerProfile,
+        cardTemplateId: templateToUse,
         rank: 0, points: 0, basePoints: 0, bonusPoints: 0,
         matchesPlayed: playerTournaments.length,
         wins: 0, losses: 0, avg: 0, n180s: 0, hiOut: 0, bestLeg: 0,
@@ -104,12 +108,12 @@ export default async function PlayerPage(props: {
   } else {
       playerForCard = {
           ...foundPlayerInLeague,
+          cardTemplateId: templateToUse,
           viewContextName: leagueSettings[currentLeagueId]?.name || 'Общий рейтинг',
           isAggregatedView: currentLeagueId === 'general'
       };
   }
 
-  // 4. Подготовка справок по очкам для модального окна
   let scoringSettingsForHelp: ScoringSettings[] = [];
   let leagueNamesForHelp: string[] = [];
 

@@ -3,8 +3,8 @@
 import { getPlayerProfiles, updatePlayerProfiles, getPlayerProfileById, clearAllPlayerProfiles } from '@/lib/players';
 import { addTournaments, clearAllTournamentData, deleteTournamentById, getTournamentById } from '@/lib/tournaments';
 import { revalidatePath, revalidateTag } from 'next/cache';
-import type { PlayerProfile, ScoringSettings, LeagueId, AllLeagueSettings, SponsorshipSettings, Tournament, TournamentPlayerResult } from '@/lib/types';
-import { updateScoringSettings, updateLeagueSettings, getScoringSettings, updateBackgroundUrl, updateSponsorshipSettings } from '@/lib/settings';
+import type { PlayerProfile, ScoringSettings, LeagueId, AllLeagueSettings, SponsorshipSettings, Tournament, TournamentPlayerResult, TemplateId } from '@/lib/types';
+import { updateScoringSettings, updateLeagueSettings, getScoringSettings, updateBackgroundUrl, updateSponsorshipSettings, updateAppearanceSettings } from '@/lib/settings';
 import { getDb } from '@/firebase/server';
 import { addDoc, collection, doc, serverTimestamp, deleteDoc, getDocs, writeBatch, setDoc } from 'firebase/firestore';
 import { headers } from 'next/headers';
@@ -310,12 +310,37 @@ export async function exportAllRankingsAction() {
         if (!rankings || rankings.length === 0) return { success: false, message: 'Нет данных для экспорта. Сначала импортируйте турниры.' };
         
         const header = 'Место;Имя;Никнейм;Очки;Игры;AVG;180;Hi-Out\n';
-        const rows = rankings.map(p => 
+        const rankingsToExport = Array.isArray(rankings) ? rankings : [];
+        const rows = rankingsToExport.map(p => 
             `${p.rank};${p.name};${p.nickname};${p.points};${p.matchesPlayed};${p.avg.toFixed(2)};${p.n180s};${p.hiOut}`
         ).join('\n');
         
         return { success: true, csv: header + rows };
     } catch (e) {
         return { success: false, message: 'Ошибка при генерации CSV-файла.' };
+    }
+}
+
+export async function updateAllPlayersTemplateAction(templateId: TemplateId) {
+    try {
+        const players = await getPlayerProfiles();
+        const updatedPlayers = players.map(p => ({ ...p, cardTemplateId: templateId }));
+        await updatePlayerProfiles(updatedPlayers);
+        
+        revalidatePath('/', 'layout');
+        revalidateTag('players');
+        return { success: true, message: `Шаблон "${templateId}" успешно применен ко всем игрокам (${players.length}).` };
+    } catch (e) {
+        return { success: false, message: 'Ошибка массового обновления шаблонов.' };
+    }
+}
+
+export async function saveGlobalTemplateAction(templateId: TemplateId) {
+    try {
+        await updateAppearanceSettings({ globalDefaultTemplate: templateId });
+        revalidatePath('/', 'layout');
+        return { success: true, message: 'Глобальный шаблон по умолчанию обновлен.' };
+    } catch (e) {
+        return { success: false, message: 'Ошибка сохранения глобальных настроек.' };
     }
 }

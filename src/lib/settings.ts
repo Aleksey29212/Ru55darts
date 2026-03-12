@@ -1,6 +1,6 @@
 import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 import { getDb } from '@/firebase/server';
-import type { ScoringSettings, AllLeagueSettings, LeagueId, SponsorshipSettings } from './types';
+import type { ScoringSettings, AllLeagueSettings, LeagueId, SponsorshipSettings, AppearanceSettings, TemplateId } from './types';
 import { cache } from 'react';
 import defaultScoringSettingsData from './scoring-settings.json';
 import defaultLeagueSettingsData from './league-settings.json';
@@ -14,6 +14,7 @@ if (!(global as any).memoScoringSettings) (global as any).memoScoringSettings = 
 if (!(global as any).memoLeagueSettings) (global as any).memoLeagueSettings = null;
 if (!(global as any).memoSponsorshipSettings) (global as any).memoSponsorshipSettings = null;
 if (!(global as any).memoBackgroundUrl) (global as any).memoBackgroundUrl = '';
+if (!(global as any).memoAppearance) (global as any).memoAppearance = null;
 
 export const getAllScoringSettings = cache(
   async (): Promise<Record<LeagueId, ScoringSettings>> => {
@@ -181,5 +182,40 @@ export async function updateSponsorshipSettings(settings: SponsorshipSettings): 
     try {
         const docRef = doc(db, 'app_settings', 'sponsorship');
         await setDoc(docRef, settings, { merge: true });
+    } catch (e) {}
+}
+
+export const getAppearanceSettings = cache(
+    async (): Promise<AppearanceSettings> => {
+        const defaults: AppearanceSettings = {
+            globalDefaultTemplate: 'classic'
+        };
+        const db = getDb();
+        let current = (global as any).memoAppearance || defaults;
+
+        if (db) {
+            try {
+                const docRef = doc(db, 'app_settings', 'appearance');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    current = { ...defaults, ...sanitizeFirestore(docSnap.data()) };
+                    (global as any).memoAppearance = current;
+                }
+            } catch (e) {}
+        }
+        return current;
+    }
+);
+
+export async function updateAppearanceSettings(settings: Partial<AppearanceSettings>): Promise<void> {
+    const current = await getAppearanceSettings();
+    const updated = { ...current, ...settings };
+    (global as any).memoAppearance = updated;
+    
+    const db = getDb();
+    if (!db) return;
+    try {
+        const docRef = doc(db, 'app_settings', 'appearance');
+        await setDoc(docRef, updated, { merge: true });
     } catch (e) {}
 }
