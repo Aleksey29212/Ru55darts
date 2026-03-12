@@ -58,7 +58,7 @@ const StatItem = ({
         classic: "glassmorphism bg-white/5 border-white/10 hover:border-primary/40",
         modern: "bg-background/60 backdrop-blur-md border-white/5",
         dynamic: "bg-black/80 text-white border-accent/50 shadow-[0_0_30px_rgba(var(--accent-rgb),0.2)]",
-        elite: "bg-gradient-to-br from-neutral-900 to-black border-gold/30 shadow-[0_0_40px_rgba(255,215,0,0.1)]",
+        elite: "bg-gradient-to-br from-neutral-900 to-black border-gold/30 shadow-[0_0_40px_rgba(255,215,0,0.15)]",
         cyber: "bg-[#0a0a0f] border-cyan-500/40 border-l-4 rounded-none skew-x-[-2deg]",
         retro: "bg-[#1a1a1a] border-4 border-pink-500 rounded-none shadow-[4px_4px_0_0_rgba(236,72,153,1)]",
         impact: "bg-black/40 backdrop-blur-xl border-white/20",
@@ -282,6 +282,22 @@ export function PlayerCard({
     stealth: "h-[300px] md:h-[400px]"
   };
 
+  const nameLength = currentPlayerData.name.length;
+  // Adaptive font size for the name based on template and length
+  const nameSizeClass = cn(
+    "font-headline tracking-tighter text-white drop-shadow-[0_8px_30px_rgba(0,0,0,0.9)] leading-tight break-words hyphens-auto",
+    template === 'classic' && (nameLength > 20 ? "text-3xl md:text-6xl" : "text-4xl md:text-8xl"),
+    template === 'modern' && (nameLength > 20 ? "text-3xl md:text-5xl" : "text-4xl md:text-7xl"),
+    template === 'dynamic' && (nameLength > 20 ? "text-3xl md:text-5xl" : "text-4xl md:text-7xl"),
+    template === 'elite' && (nameLength > 15 ? "text-4xl md:text-7xl text-gold text-glow-white mb-4" : "text-5xl md:text-9xl text-gold text-glow-white mb-4"),
+    template === 'cyber' && (nameLength > 20 ? "text-3xl md:text-5xl italic text-cyan-400" : "text-4xl md:text-7xl italic text-cyan-400"),
+    template === 'retro' && (nameLength > 20 ? "text-3xl md:text-5xl text-yellow-400 font-black italic" : "text-4xl md:text-7xl text-yellow-400 font-black italic"),
+    template === 'impact' && (nameLength > 15 ? "text-4xl md:text-7xl" : "text-5xl md:text-8xl"),
+    template === 'minimal' && (nameLength > 20 ? "text-3xl md:text-5xl" : "text-4xl md:text-7xl"),
+    template === 'arena' && (nameLength > 15 ? "text-4xl md:text-7xl text-glow-white opacity-90" : "text-5xl md:text-[9rem] text-glow-white opacity-90"),
+    template === 'stealth' && (nameLength > 20 ? "text-3xl md:text-5xl" : "text-4xl md:text-7xl"),
+  );
+
   return (
     <div className="space-y-8 md:space-y-12 animate-in fade-in duration-1000">
     <Card className={cn(
@@ -355,19 +371,12 @@ export function PlayerCard({
                 </div>
 
                  <div className={cn(
-                    "shrink-0",
+                    "flex-1 w-full min-w-0",
                     template === 'modern' || template === 'elite' || template === 'impact' || template === 'minimal' || template === 'arena' 
                         ? 'text-center' 
                         : 'flex flex-col items-center md:items-start gap-4 text-center md:text-left'
                  )}>
-                    <h1 className={cn(
-                        "font-headline tracking-tighter text-white drop-shadow-[0_8px_30px_rgba(0,0,0,0.9)] leading-none", 
-                        template === 'classic' ? "text-4xl md:text-8xl" : "text-4xl md:text-7xl",
-                        template === 'elite' ? "text-gold text-glow-white md:text-9xl mb-4" : "",
-                        template === 'cyber' ? "italic text-cyan-400" : "",
-                        template === 'retro' ? "text-yellow-400 font-black italic" : "",
-                        template === 'arena' ? "md:text-[10rem] text-glow-white opacity-90" : ""
-                    )}>{currentPlayerData.name}</h1>
+                    <h1 className={nameSizeClass}>{currentPlayerData.name}</h1>
                     
                     <div className="flex items-center gap-3 flex-wrap justify-center md:justify-start">
                         <Badge variant="secondary" className={cn(
