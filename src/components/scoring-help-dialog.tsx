@@ -230,9 +230,9 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 defaultValue={settingsArray[0]?.id || "general"} 
                 className="w-full flex flex-col h-full"
             >
-                {/* Фиксированная панель навигации: 6 колонок, по центру */}
-                <div className="relative z-20 shrink-0 px-6 md:px-12 mt-6 mb-4 flex justify-center">
-                    <TabsList className="bg-black/80 backdrop-blur-3xl p-3 border border-white/10 h-auto grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 mx-auto w-fit rounded-[1.5rem] shadow-2xl">
+                {/* Интеллектуальная панель навигации: лиги стремятся к центру, до 6 в ряд */}
+                <div className="relative z-20 shrink-0 px-6 md:px-12 mt-6 mb-4 flex justify-center w-full">
+                    <TabsList className="bg-black/80 backdrop-blur-3xl p-3 border border-white/10 h-auto flex flex-wrap justify-center gap-3 mx-auto max-w-[850px] rounded-[1.5rem] shadow-2xl">
                         {settingsArray.map((s, idx) => {
                             const id = s.id || 'general';
                             const Icon = leagueIcons[id] || Trophy;
@@ -242,7 +242,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                     key={idx} 
                                     value={id} 
                                     className={cn(
-                                        "relative flex flex-col items-center justify-center w-16 h-16 md:w-24 md:h-16 rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg",
+                                        "relative flex flex-col items-center justify-center w-[calc(33.33%-12px)] sm:w-24 h-16 md:w-28 md:h-16 rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg",
                                         "bg-gradient-to-br overflow-hidden",
                                         "data-[state=active]:-translate-y-1.5 data-[state=active]:scale-105 data-[state=active]:border-white/60 data-[state=active]:z-10 data-[state=active]:shadow-2xl",
                                         "data-[state=inactive]:opacity-30 data-[state=inactive]:grayscale-[0.6] data-[state=inactive]:hover:opacity-100",
@@ -260,7 +260,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                         {/* Вкладка ранжирования */}
                         <TabsTrigger 
                             value="ranking-logic"
-                            className="relative flex flex-col items-center justify-center w-16 h-16 md:w-24 md:h-16 rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-900 border-indigo-400/50 data-[state=active]:-translate-y-1.5 data-[state=active]:scale-105 data-[state=active]:border-white/60"
+                            className="relative flex flex-col items-center justify-center w-[calc(33.33%-12px)] sm:w-24 h-16 md:w-28 md:h-16 rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-900 border-indigo-400/50 data-[state=active]:-translate-y-1.5 data-[state=active]:scale-105 data-[state=active]:border-white/60"
                         >
                             <ListOrdered className="h-5 w-5 md:h-6 md:w-6 mb-1 text-white" />
                             <span className="text-[7px] md:text-[8px] font-black uppercase tracking-tight text-white">МЕСТА</span>
