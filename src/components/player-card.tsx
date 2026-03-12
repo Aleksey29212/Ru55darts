@@ -53,11 +53,10 @@ const StatItem = ({
     } else if (len >= 4) {
         fontSizeClass = "text-lg sm:text-xl lg:text-3xl"; 
     } else if (len >= 3) {
-        // Для 3-значных (Hi-Out 100+ или 59.1) делаем еще компактнее на мобилках
         fontSizeClass = "text-xl sm:text-2xl lg:text-4xl";
     }
     
-    const baseClasses = "flex flex-col items-center justify-between p-1.5 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] transition-all border shadow-2xl relative w-full h-full min-h-[120px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none overflow-hidden bg-black/40";
+    const baseClasses = "flex flex-col items-center justify-between p-1.5 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] transition-transform border shadow-2xl relative w-full h-full min-h-[120px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none overflow-hidden bg-black/40 duration-75";
     
     const templateClasses = {
         classic: "glassmorphism border-white/10 hover:border-primary/40",
@@ -73,7 +72,7 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-500 tabular-nums whitespace-nowrap px-0.5",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-150 tabular-nums whitespace-nowrap px-0.5",
         fontSizeClass,
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : '',
@@ -99,7 +98,7 @@ const StatItem = ({
                 <Popover>
                     <PopoverTrigger asChild>
                         <button 
-                            className="p-0.5 hover:text-primary transition-all active:scale-90 shrink-0 outline-none"
+                            className="p-0.5 hover:text-primary transition-colors duration-150 active:scale-90 shrink-0 outline-none"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <AlertCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-primary/40 hover:text-primary" />
@@ -126,8 +125,8 @@ const StatItem = ({
                 {isRevealed ? (
                     <span className={valueClasses}>{value}</span>
                 ) : (
-                    <div className="flex flex-col items-center gap-1.5 animate-in fade-in duration-500">
-                        <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform">
+                    <div className="flex flex-col items-center gap-1.5 animate-in fade-in duration-150">
+                        <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform duration-150">
                             <Lock className="h-3.5 w-3.5 sm:h-7 sm:w-7 text-primary opacity-60 group-hover:opacity-100" />
                         </div>
                         <span className="text-[5px] sm:text-[6px] font-black uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary/60">OPEN</span>
@@ -162,40 +161,40 @@ function SponsorWidget({ sponsor, template }: { sponsor: PlayerSponsor, template
 
     return (
         <div className={cn(
-            "group/sponsor relative h-24 w-full overflow-hidden shadow-xl transition-all active:scale-95",
+            "group/sponsor relative h-24 w-full overflow-hidden shadow-xl transition-all duration-150 active:scale-95",
             template === 'retro' ? "border-2 border-cyan-400 rounded-none bg-black" : "glassmorphism rounded-2xl border border-white/10 hover:border-primary/40"
         )}>
             <div className={cn(
-                "absolute inset-0 flex items-center justify-center p-4 transition-all duration-500",
+                "absolute inset-0 flex items-center justify-center p-4 transition-all duration-300",
                 showPromo ? "opacity-0 scale-90 pointer-events-none" : "opacity-100 scale-100"
             )}>
-                <Image src={sponsor.logoUrl} alt={sponsor.name} fill className="object-contain p-4 filter brightness-125 group-hover/sponsor:brightness-150 transition-all" unoptimized={sponsor.logoUrl.startsWith('data:')} />
+                <Image src={sponsor.logoUrl} alt={sponsor.name} fill className="object-contain p-4 filter brightness-125 group-hover/sponsor:brightness-150 transition-all duration-300" unoptimized={sponsor.logoUrl.startsWith('data:')} />
             </div>
 
             <div className={cn(
-                "absolute inset-0 bg-primary/95 flex flex-col items-center justify-center p-2 text-center transition-all duration-500",
+                "absolute inset-0 bg-primary/95 flex flex-col items-center justify-center p-2 text-center transition-all duration-300",
                 showPromo ? "opacity-100 translate-y-0" : "opacity-0 translate-y-full pointer-events-none"
             )}>
                 <p className="text-[10px] font-black text-black uppercase tracking-widest mb-1">ВАШ ПРОМОКОД</p>
                 <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-lg mb-2">
                     <span className="font-headline text-lg text-black">{sponsor.promoCode}</span>
-                    <button onClick={handleCopy} className="p-1 hover:bg-black/10 rounded transition-colors">
+                    <button onClick={handleCopy} className="p-1 hover:bg-black/10 rounded transition-colors duration-150">
                         {hasCopied ? <Check className="h-4 w-4 text-black" /> : <Copy className="h-4 w-4 text-black" />}
                     </button>
                 </div>
-                <button onClick={() => setShowPromo(false)} className="text-[8px] font-bold text-black/60 uppercase hover:text-black">Скрыть</button>
+                <button onClick={() => setShowPromo(false)} className="text-[8px] font-bold text-black/60 uppercase hover:text-black transition-colors duration-150">Скрыть</button>
             </div>
 
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/sponsor:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 backdrop-blur-sm">
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/sponsor:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 backdrop-blur-sm">
                 {!showPromo && (
                     <>
-                        <Button asChild variant="secondary" size="sm" className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest w-[80%] bg-white text-black hover:bg-white/90">
+                        <Button asChild variant="secondary" size="sm" className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest w-[80%] bg-white text-black hover:bg-white/90 transition-all duration-150">
                             <a href={sponsor.linkUrl} target="_blank" rel="noopener noreferrer">
                                 ПЕРЕЙТИ <ExternalLink className="ml-1 h-3 w-3" />
                             </a>
                         </Button>
                         {sponsor.promoCode && (
-                            <Button onClick={() => setShowPromo(true)} variant="ghost" size="sm" className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest w-[80%] text-white border border-white/20 hover:bg-white/10">
+                            <Button onClick={() => setShowPromo(true)} variant="ghost" size="sm" className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest w-[80%] text-white border border-white/20 hover:bg-white/10 transition-all duration-150">
                                 ПРОМОКОД <Eye className="ml-1 h-3 w-3" />
                             </Button>
                         )}
@@ -303,9 +302,9 @@ export function PlayerCard({
   );
 
   return (
-    <div className="space-y-8 md:space-y-12 animate-in fade-in duration-1000">
+    <div className="space-y-8 md:space-y-12 animate-in fade-in duration-700">
     <Card className={cn(
-        "overflow-hidden transition-all duration-1000 shadow-[0_40px_120px_rgba(0,0,0,0.7)]",
+        "overflow-hidden transition-all duration-500 shadow-[0_40px_120px_rgba(0,0,0,0.7)]",
         containerClasses[template]
     )}>
         <div className={cn(
@@ -334,7 +333,7 @@ export function PlayerCard({
             )}
 
             <div className={cn(
-                "absolute transition-all duration-1000 z-10 w-full px-6",
+                "absolute transition-all duration-500 z-10 w-full px-6",
                 template === 'classic' && "bottom-0 left-0 p-8 md:p-12 flex flex-col md:flex-row items-center md:items-end gap-8 md:gap-12",
                 template === 'modern' && "relative flex flex-col items-center gap-10",
                 template === 'dynamic' && "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2",
@@ -348,7 +347,7 @@ export function PlayerCard({
             )}>
                 <div className="relative shrink-0 flex items-center justify-center">
                     <Avatar className={cn(
-                        "transition-all duration-1000 shadow-[0_0_60px_rgba(0,0,0,0.8)] aspect-square shrink-0",
+                        "transition-all duration-500 shadow-[0_0_60px_rgba(0,0,0,0.8)] aspect-square shrink-0",
                         template === 'classic' && "h-40 w-40 md:h-64 md:w-64 border-4 border-primary ring-[10px] ring-primary/10",
                         template === 'modern' && "h-48 w-48 md:h-64 md:w-64 border-4 border-primary ring-[10px] ring-primary/5",
                         template === 'dynamic' && "h-44 w-44 md:h-60 md:w-60 border-4 border-accent ring-[10px] ring-accent/15",
@@ -401,7 +400,7 @@ export function PlayerCard({
                 template === 'cyber' ? 'top-0 right-0' : 'top-6 right-6 md:top-10 md:right-10'
             )}>
                 <div className={cn(
-                    "flex flex-col items-center justify-center min-w-[100px] md:min-w-[130px] p-5 md:p-7 backdrop-blur-3xl border-2 shadow-[0_15px_50px_rgba(0,0,0,0.6)] transition-all hover:scale-110 duration-500 overflow-hidden",
+                    "flex flex-col items-center justify-center min-w-[100px] md:min-w-[130px] p-5 md:p-7 backdrop-blur-3xl border-2 shadow-[0_15px_50px_rgba(0,0,0,0.6)] transition-all hover:scale-110 duration-150 overflow-hidden",
                     template === 'dynamic' ? 'bg-accent/50 border-accent/60 text-accent' : 'bg-primary/50 border-primary/60 text-primary-foreground',
                     template === 'elite' ? 'bg-black/80 border-gold rounded-full h-32 w-32 md:h-48 md:w-48' : 'rounded-[2rem] md:rounded-[3rem]',
                     template === 'cyber' ? 'bg-[#0a0a0f] border-cyan-500 rounded-none' : '',
@@ -416,7 +415,7 @@ export function PlayerCard({
         </div>
 
         <CardContent className={cn(
-            "p-6 md:p-12 transition-all duration-1000",
+            "p-6 md:p-12 transition-all duration-500",
             template === 'modern' && 'md:w-2/3',
             template === 'dynamic' && "pt-32",
             template === 'elite' && "pt-24",
@@ -428,14 +427,14 @@ export function PlayerCard({
                         <h4 className="font-headline text-xl md:text-3xl text-primary tracking-tighter uppercase">АДМИН-СТУДИЯ</h4>
                         <p className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-black opacity-60 mt-1">НАСТРОЙКА ПРОФИЛЯ</p>
                     </div>
-                    <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "destructive" : "default"} size="lg" className="w-full sm:w-auto rounded-[1.25rem] h-14 px-8 shadow-xl font-black text-base uppercase tracking-widest transition-all">
+                    <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "destructive" : "default"} size="lg" className="w-full sm:w-auto rounded-[1.25rem] h-14 px-8 shadow-xl font-black text-base uppercase tracking-widest transition-all duration-150">
                         {isEditing ? <><X className="mr-2 h-6 w-6" /> ОТМЕНА</> : <><Edit className="mr-2 h-6 w-6" /> ИЗМЕНИТЬ</>}
                     </Button>
                 </div>
              )}
 
              {isEditing && (
-                <div className="mb-16 space-y-8 md:space-y-12 p-8 md:p-12 border-2 border-primary/50 rounded-[3rem] glassmorphism shadow-4xl animate-in zoom-in-95 duration-700">
+                <div className="mb-16 space-y-8 md:space-y-12 p-8 md:p-12 border-2 border-primary/50 rounded-[3rem] glassmorphism shadow-4xl animate-in zoom-in-95 duration-300">
                     <div className="grid md:grid-cols-2 gap-8 md:gap-12">
                         <div className="space-y-4">
                             <Label className="text-[11px] md:text-[13px] uppercase font-black tracking-[0.2em] text-primary ml-2">ПРО-НИКНЕЙМ</Label>
@@ -471,8 +470,8 @@ export function PlayerCard({
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-6 pt-6">
-                        <Button onClick={handleSave} className='flex-1 h-16 rounded-2xl shadow-xl font-black text-lg text-primary-foreground uppercase tracking-[0.1em]' disabled={!isFormDirty}><Save className="mr-2 h-6 w-6" />СОХРАНИТЬ</Button>
-                        <Button onClick={() => { setIsEditing(false); setEditablePlayer(player); }} className='flex-1 h-16 rounded-2xl text-lg font-black uppercase tracking-[0.1em]' variant="ghost"><X className="mr-2 h-6 w-6" />СБРОСИТЬ</Button>
+                        <Button onClick={handleSave} className='flex-1 h-16 rounded-2xl shadow-xl font-black text-lg text-primary-foreground uppercase tracking-[0.1em] transition-all duration-150' disabled={!isFormDirty}><Save className="mr-2 h-6 w-6" />СОХРАНИТЬ</Button>
+                        <Button onClick={() => { setIsEditing(false); setEditablePlayer(player); }} className='flex-1 h-16 rounded-2xl text-lg font-black uppercase tracking-[0.1em] transition-all duration-150' variant="ghost"><X className="mr-2 h-6 w-6" />СБРОСИТЬ</Button>
                     </div>
                 </div>
              )}
@@ -494,11 +493,11 @@ export function PlayerCard({
 
                 {showCTA && (
                     <div className={cn(
-                        "p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-inner group/sponsorship transition-all",
+                        "p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-inner group/sponsorship transition-all duration-300",
                         template === 'retro' ? "border-4 border-dashed border-cyan-400 bg-black rounded-none" : "rounded-[2.5rem] bg-primary/5 border-2 border-dashed border-primary/30 hover:bg-primary/10"
                     )}>
                         <div className="flex items-center gap-5">
-                            <div className="p-3 rounded-xl bg-primary/20 text-primary shadow-lg group-hover/sponsorship:rotate-12 transition-transform">
+                            <div className="p-3 rounded-xl bg-primary/20 text-primary shadow-lg group-hover/sponsorship:rotate-12 transition-transform duration-300">
                                 <Handshake className="h-8 w-8" />
                             </div>
                             <div className="text-center md:text-left">
@@ -524,7 +523,7 @@ export function PlayerCard({
                             <h3 className="text-[11px] md:text-base font-headline uppercase tracking-[0.3em] text-white/60">БИОГРАФИЯ</h3>
                         </div>
                         <ScoringHelpDialog settings={scoringSettings} leagueName={leagueNames} sponsorshipSettings={{ groupVkLink: 'https://vk.com/dartbrig' } as any}>
-                            <Button variant="ghost" size="sm" className="flex gap-3 rounded-xl h-10 px-5 text-[10px] md:text-xs uppercase font-black tracking-widest hover:bg-primary/20 text-primary border-2 border-primary/20">
+                            <Button variant="ghost" size="sm" className="flex gap-3 rounded-xl h-10 px-5 text-[10px] md:text-xs uppercase font-black tracking-widest hover:bg-primary/20 text-primary border-2 border-primary/20 transition-all duration-150">
                                 <Trophy className="h-5 w-5 animate-pulse" />
                                 РЕГЛАМЕНТ
                             </Button>
@@ -532,11 +531,11 @@ export function PlayerCard({
                     </div>
                     <div className="relative group/bio">
                         <div className={cn(
-                            "absolute -left-3 top-0 bottom-0 w-1.5 rounded-full transition-transform duration-700 group-hover/bio:scale-y-110",
+                            "absolute -left-3 top-0 bottom-0 w-1.5 rounded-full transition-transform duration-500 group-hover/bio:scale-y-110",
                             template === 'elite' ? 'bg-gold shadow-[0_0_15px_rgba(255,215,0,0.5)]' : 'bg-gradient-to-b from-primary via-primary/50 to-transparent shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]'
                         )} />
                         <p className={cn(
-                            "text-base md:text-xl lg:text-2xl font-body leading-relaxed italic pl-6 md:pl-10 lg:pl-14 py-4 font-medium",
+                            "text-base md:text-xl lg:text-2xl font-body leading-relaxed italic pl-6 md:pl-10 lg:pl-14 py-4 font-medium transition-colors duration-300",
                             template === 'retro' ? "text-cyan-400 bg-black border-2 border-cyan-400" : "text-white/95 bg-white/[0.02] rounded-r-[2.5rem] shadow-inner border-l border-white/5"
                         )}>
                             {currentPlayerData.bio || "История этой легенды все еще пишется на рубеже. Каждый матч добавляет новую главу в их профессиональную карьеру."}
@@ -546,7 +545,7 @@ export function PlayerCard({
 
                 {hasOmskStats && (
                     <div className={cn(
-                        "p-8 md:p-14 border-2 relative overflow-hidden group/omsk shadow-4xl transition-all",
+                        "p-8 md:p-14 border-2 relative overflow-hidden group/omsk shadow-4xl transition-all duration-300",
                         template === 'elite' ? 'bg-gold/5 border-gold/40 rounded-full' : 'rounded-[2.5rem] md:rounded-[4rem] bg-orange-600/15 border-orange-500/40 hover:bg-orange-600/20'
                     )}>
                         <div className="absolute -top-16 -right-16 p-4 opacity-10 group-hover/omsk:scale-110 transition-all duration-[3000ms]">
@@ -625,10 +624,10 @@ export function PlayerCard({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 lg:gap-12">
                         <div className={cn(
-                            "p-6 md:p-10 border-white/10 relative shadow-4xl flex flex-col group/box h-full transition-all duration-500 overflow-hidden",
+                            "p-6 md:p-10 border-white/10 relative shadow-4xl flex flex-col group/box h-full transition-all duration-300 overflow-hidden",
                             template === 'retro' ? "border-4 border-yellow-400 bg-black rounded-none" : "glassmorphism rounded-[3rem] hover:border-primary/30"
                         )}>
-                            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000 rounded-[3rem]" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-500 rounded-[3rem]" />
                             <h3 className="text-[10px] md:text-[13px] font-headline uppercase tracking-[0.3em] text-white/40 mb-8 flex items-center gap-3 relative z-10">
                                 <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
                                 АНАЛИЗ РЕЗУЛЬТАТОВ
@@ -654,10 +653,10 @@ export function PlayerCard({
                         </div>
 
                         <div className={cn(
-                            "p-6 md:p-10 border-white/10 relative shadow-4xl flex flex-col group/box h-full transition-all duration-500 overflow-hidden",
+                            "p-6 md:p-10 border-white/10 relative shadow-4xl flex flex-col group/box h-full transition-all duration-300 overflow-hidden",
                             template === 'retro' ? "border-4 border-cyan-400 bg-black rounded-none" : "glassmorphism rounded-[3rem] hover:border-accent/30"
                         )}>
-                            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-1000 rounded-[3rem]" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover/box:opacity-100 transition-opacity duration-500 rounded-[3rem]" />
                             <h3 className="text-[10px] md:text-[13px] font-headline uppercase tracking-[0.3em] text-white/40 mb-8 flex items-center gap-3 relative z-10">
                                 <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
                                 ЛИЧНЫЕ РЕКОРДЫ

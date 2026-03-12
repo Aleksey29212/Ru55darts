@@ -93,16 +93,16 @@ function LeagueSection({
     const LeagueIcon = leagueIcons[leagueId] || Trophy;
 
     return (
-        <div className="space-y-12 md:space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-12 md:space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* UNIFIED LEAGUE HERO SECTION */}
-            <div className="relative group overflow-hidden rounded-[3rem] border-2 border-white/10 shadow-2xl transition-all hover:border-primary/20">
+            <div className="relative group overflow-hidden rounded-[3rem] border-2 border-white/10 shadow-2xl transition-all duration-300 hover:border-primary/20">
                 <div className="absolute inset-0 z-0">
                     <Image src={banner} alt="" fill className="object-cover opacity-30 transition-transform duration-[10s] group-hover:scale-110" unoptimized={banner.startsWith('data:')} />
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
                 </div>
                 
                 <div className="relative z-10 p-8 md:p-16 flex flex-col lg:flex-row items-center gap-8 md:gap-12">
-                    <div className="bg-primary/20 p-8 rounded-[2.5rem] border-2 border-primary/30 shadow-[0_0_50px_rgba(var(--primary-rgb),0.2)] group-hover:rotate-3 transition-transform duration-500">
+                    <div className="bg-primary/20 p-8 rounded-[2.5rem] border-2 border-primary/30 shadow-[0_0_50px_rgba(var(--primary-rgb),0.2)] group-hover:rotate-3 transition-transform duration-300">
                         <LeagueIcon className="h-12 w-12 md:h-20 md:w-20 text-primary" />
                     </div>
                     
@@ -126,7 +126,7 @@ function LeagueSection({
                             </ScoringHelpDialog>
                             
                             {leagueId === 'evening_omsk' && (
-                                <div className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-400 shadow-xl">
+                                <div className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-400 shadow-xl transition-all duration-150">
                                     <Wallet className="h-5 w-5" />
                                     <span className="font-headline text-lg">{scoringSettings?.exchangeRate || 7} ₽ <span className="text-[8px] opacity-50 uppercase tracking-widest ml-1">За балл</span></span>
                                 </div>
@@ -145,7 +145,7 @@ function LeagueSection({
                 <div className="flex flex-col items-center justify-center py-32 md:py-48 glassmorphism rounded-[4rem] border-2 border-dashed border-primary/25 text-center px-12 relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
                     <div className="relative z-10 space-y-8">
-                        <div className="p-12 rounded-[3rem] bg-primary/10 mb-4 ring-[12px] ring-primary/5 inline-block group-hover:scale-110 transition-all duration-700 shadow-3xl">
+                        <div className="p-12 rounded-[3rem] bg-primary/10 mb-4 ring-[12px] ring-primary/5 inline-block group-hover:scale-110 transition-all duration-500 shadow-3xl">
                             <Target className="h-20 w-20 text-primary/30" />
                         </div>
                         <div className="space-y-4">
@@ -205,13 +205,13 @@ export function LeaguePanels({
     return (
         <div className="w-full space-y-10">
             {/* Sticky Header Section */}
-            <div className="sticky top-16 md:top-20 z-40 bg-background/95 backdrop-blur-3xl border-b border-white/10 -mx-4 px-4 py-4 space-y-4 shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-all">
+            <div className="sticky top-16 md:top-20 z-40 bg-background/95 backdrop-blur-3xl border-b border-white/10 -mx-4 px-4 py-4 space-y-4 shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-all duration-300">
                 <div className="w-full">
                     <PartnersDisplay partners={partners} variant="compact" hideLabel />
                 </div>
 
                 {/* ДЕСКТОП: Сетка карточек */}
-                <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 animate-in fade-in duration-500">
+                <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 animate-in fade-in duration-300">
                     {orderedLeagues.map((leagueId) => {
                         const leagueInfo = leagueSettings[leagueId];
                         const isSelected = currentLeagueId === leagueId;
@@ -226,22 +226,22 @@ export function LeaguePanels({
                                 tabIndex={0}
                                 onClick={() => handleLeagueSelect(leagueId)}
                                 className={cn(
-                                    'relative h-16 rounded-2xl overflow-hidden transition-all duration-500 transform cursor-pointer outline-none border shadow-xl group',
+                                    'relative h-16 rounded-2xl overflow-hidden transition-all duration-300 transform cursor-pointer outline-none border shadow-xl group',
                                     isSelected 
                                         ? 'border-primary border-2 ring-4 ring-primary/20 scale-[1.03] z-10 shadow-[0_0_40px_rgba(var(--primary-rgb),0.4)] animate-shimmer' 
                                         : 'border-white/15 opacity-80 hover:opacity-100 hover:border-primary/50'
                                 )}
                             >
-                                <Image src={banner} alt="" fill className="object-cover transition-all duration-1000 group-hover:scale-110" unoptimized={banner.startsWith('data:')} />
+                                <Image src={banner} alt="" fill className="object-cover transition-all duration-700 group-hover:scale-110" unoptimized={banner.startsWith('data:')} />
                                 <div className={cn(
-                                    "absolute inset-0 bg-gradient-to-r transition-opacity duration-700",
+                                    "absolute inset-0 bg-gradient-to-r transition-opacity duration-300",
                                     isSelected ? "from-black/95 via-black/80 to-transparent" : "from-black/90 via-black/70 to-transparent"
                                 )} />
                                 <div className="absolute inset-0 px-4 flex items-center gap-3">
                                     <div className="relative">
                                         <div 
                                             className={cn(
-                                                "p-2 rounded-xl backdrop-blur-xl border-2 border-white/30 text-white shadow-2xl transition-all duration-700",
+                                                "p-2 rounded-xl backdrop-blur-xl border-2 border-white/30 text-white shadow-2xl transition-all duration-500",
                                                 isSelected && "scale-110 rotate-[360deg] border-white/50"
                                             )}
                                             style={{ backgroundColor: baseColor }}
@@ -285,7 +285,7 @@ export function LeaguePanels({
                                 role="button"
                                 onClick={() => handleLeagueSelect(leagueId)}
                                 className={cn(
-                                    "relative flex-shrink-0 w-24 h-24 rounded-t-[2rem] transition-all duration-500 ease-out border-x-2 border-t-2 shadow-2xl",
+                                    "relative flex-shrink-0 w-24 h-24 rounded-t-[2rem] transition-all duration-300 ease-out border-x-2 border-t-2 shadow-2xl",
                                     "-ml-12 first:ml-0 cursor-pointer overflow-hidden",
                                     isSelected 
                                         ? "z-50 -translate-y-4 scale-110 mx-2 border-primary ring-4 ring-primary/20 shadow-[0_15px_40px_rgba(var(--primary-rgb),0.5)]" 
@@ -304,7 +304,7 @@ export function LeaguePanels({
                                 
                                 <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center">
                                     <div className={cn(
-                                        "p-2.5 rounded-xl backdrop-blur-xl border-2 transition-all duration-700 shadow-2xl mb-1",
+                                        "p-2.5 rounded-xl backdrop-blur-xl border-2 transition-all duration-500 shadow-2xl mb-1",
                                         isSelected ? "bg-primary text-primary-foreground border-white/50 scale-110" : "bg-black/40 text-white border-white/20"
                                     )}>
                                         {isPending && isSelected ? (
@@ -328,9 +328,9 @@ export function LeaguePanels({
             
             <div className="w-full relative pt-2">
                 {isPending && (
-                    <div className="absolute inset-0 z-10 bg-background/30 backdrop-blur-[2px] transition-all duration-500 pointer-events-none" />
+                    <div className="absolute inset-0 z-10 bg-background/30 backdrop-blur-[2px] transition-all duration-300 pointer-events-none" />
                 )}
-                <section key={currentLeagueId} className="animate-in fade-in slide-in-from-top-4 duration-1000">
+                <section key={currentLeagueId} className="animate-in fade-in slide-in-from-top-4 duration-500">
                     <LeagueSection 
                         leagueId={currentLeagueId}
                         players={currentLeagueRankings}

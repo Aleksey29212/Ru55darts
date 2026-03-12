@@ -68,7 +68,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-none transition-all duration-200;
+    @apply border-border outline-none;
   }
   body {
     @apply bg-background text-foreground selection:bg-primary/30 antialiased;
@@ -94,7 +94,7 @@
   }
 
   .interactive-scale {
-    @apply transition-transform active:scale-95 duration-100 hover:brightness-110;
+    @apply transition-all active:scale-95 duration-75 hover:brightness-110 cursor-pointer;
   }
 
   .animate-shimmer {
