@@ -1,6 +1,6 @@
 'use client';
 
-import type { Tournament, League } from '@/lib/types';
+import type { Tournament, League, LeagueId } from '@/lib/types';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,9 +13,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2, Loader2, Calendar, Trophy, Edit3, Settings2 } from "lucide-react";
+import { Trash2, Loader2, Calendar, Trophy, Edit3, Settings2, Filter, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useTransition, useMemo } from "react";
+import { useTransition, useMemo, useState } from "react";
 import { deleteTournamentAction } from '@/app/actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -32,6 +32,7 @@ import {
 import { useIsClient } from '@/hooks/use-is-client';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 function DeleteTournamentButton({ tournamentId, tournamentName }: { tournamentId: string, tournamentName: string }) {
     const { toast } = useToast();
@@ -77,9 +78,14 @@ function DeleteTournamentButton({ tournamentId, tournamentName }: { tournamentId
 export function TournamentManagement({ tournaments, leagues }: { tournaments: Tournament[], leagues: League[] }) {
     const isMobile = useIsMobile();
     const isClient = useIsClient();
+    const [selectedLeague, setSelectedLeague] = useState<LeagueId | 'all'>('all');
 
-    const sortedTournaments = useMemo(() => {
-        return [...tournaments].sort((a, b) => {
+    const filteredTournaments = useMemo(() => {
+        let result = [...tournaments];
+        if (selectedLeague !== 'all') {
+            result = result.filter(t => t.league === selectedLeague);
+        }
+        return result.sort((a, b) => {
             const getTime = (dateSource: any) => {
                 if (!dateSource) return 0;
                 if (dateSource && typeof dateSource === 'object' && 'seconds' in dateSource) return dateSource.seconds * 1000;
@@ -90,7 +96,7 @@ export function TournamentManagement({ tournaments, leagues }: { tournaments: To
             };
             return getTime(b.date) - getTime(a.date);
         });
-    }, [tournaments]);
+    }, [tournaments, selectedLeague]);
     
     if (!isClient) {
         return (
@@ -101,29 +107,10 @@ export function TournamentManagement({ tournaments, leagues }: { tournaments: To
         );
     }
 
-    if (tournaments.length === 0) {
-        return (
-             <Card className="glassmorphism">
-                <CardHeader>
-                    <CardTitle className="text-xl flex items-center gap-2">
-                        <Trophy className="text-primary h-6 w-6" />
-                        Список турниров
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-center py-12 border-2 border-dashed rounded-xl">
-                        <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-                        <p className="text-muted-foreground">Турниры еще не импортированы. Используйте раздел "Импорт", чтобы добавить данные.</p>
-                    </div>
-                </CardContent>
-            </Card>
-        );
-    }
-
     return (
-        <Card className="glassmorphism">
-            <CardHeader>
-                <div className="flex items-center justify-between">
+        <Card className="glassmorphism overflow-hidden">
+            <CardHeader className="bg-muted/10 border-b">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                         <CardTitle className="text-xl flex items-center gap-2">
                             <Trophy className="text-primary h-6 w-6" />
@@ -131,12 +118,36 @@ export function TournamentManagement({ tournaments, leagues }: { tournaments: To
                         </CardTitle>
                         <CardDescription>Управление всеми загруженными данными и результатами.</CardDescription>
                     </div>
+                    
+                    <div className="flex items-center gap-3 bg-black/40 p-2 rounded-2xl border border-white/5">
+                        <Filter className="h-4 w-4 text-muted-foreground ml-2" />
+                        <select 
+                            value={selectedLeague} 
+                            onChange={(e) => setSelectedLeague(e.target.value as any)}
+                            className="bg-transparent text-xs font-bold uppercase tracking-widest outline-none cursor-pointer pr-4"
+                        >
+                            <option value="all">ВСЕ ЛИГИ</option>
+                            {leagues.filter(l => l.enabled || l.id === 'general').map(l => (
+                                <option key={l.id} value={l.id}>{l.name.toUpperCase()}</option>
+                            ))}
+                        </select>
+                        {selectedLeague !== 'all' && (
+                            <button onClick={() => setSelectedLeague('all')} className="p-1 hover:text-primary transition-colors">
+                                <X className="h-3 w-3" />
+                            </button>
+                        )}
+                    </div>
                 </div>
             </CardHeader>
             <CardContent className="p-0">
-                { isMobile ? (
+                {filteredTournaments.length === 0 ? (
+                    <div className="text-center py-24">
+                        <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-10" />
+                        <p className="text-muted-foreground font-medium italic">Турниры в данной категории отсутствуют.</p>
+                    </div>
+                ) : isMobile ? (
                     <Accordion type="multiple" className="w-full">
-                        {sortedTournaments.map((tournament) => (
+                        {filteredTournaments.map((tournament) => (
                             <AccordionItem value={tournament.id} key={tournament.id} className="border-b border-border/50">
                                 <AccordionTrigger className="p-4 hover:bg-muted/50 hover:no-underline">
                                     <div className="flex flex-col items-start text-left gap-1">
@@ -180,17 +191,17 @@ export function TournamentManagement({ tournaments, leagues }: { tournaments: To
                  <Table>
                     <TableHeader>
                         <TableRow className="bg-muted/30">
-                            <TableHead>Название турнира</TableHead>
-                            <TableHead>Лига</TableHead>
+                            <TableHead className="pl-6">Название турнира</TableHead>
+                            <TableHead>Лига начисления</TableHead>
                             <TableHead>Дата проведения</TableHead>
                             <TableHead className="text-center">Игроки</TableHead>
-                            <TableHead className="text-right">Действия</TableHead>
+                            <TableHead className="text-right pr-6">Действия</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {sortedTournaments.map((tournament) => (
+                        {filteredTournaments.map((tournament) => (
                             <TableRow key={tournament.id} className="hover:bg-muted/20 transition-colors">
-                                <TableCell className="font-medium max-w-[300px] truncate">
+                                <TableCell className="font-medium max-w-[300px] truncate pl-6">
                                     <div className="flex items-center gap-3">
                                         {tournament.name}
                                         {tournament.isManuallyEdited && (
@@ -198,10 +209,14 @@ export function TournamentManagement({ tournaments, leagues }: { tournaments: To
                                         )}
                                     </div>
                                 </TableCell>
-                                <TableCell><Badge variant="outline" className="bg-background">{leagues.find(l => l.id === tournament.league)?.name || tournament.league}</Badge></TableCell>
+                                <TableCell>
+                                    <Badge variant="outline" className="bg-black/40 border-white/5 uppercase text-[9px] font-black tracking-widest py-1">
+                                        {leagues.find(l => l.id === tournament.league)?.name || tournament.league}
+                                    </Badge>
+                                </TableCell>
                                 <TableCell className="whitespace-nowrap text-muted-foreground">{formatDate(tournament.date)}</TableCell>
                                 <TableCell className="text-center font-mono">{tournament.players?.length || 0}</TableCell>
-                                <TableCell className="text-right">
+                                <TableCell className="text-right pr-6">
                                     <div className="flex items-center justify-end gap-2">
                                         <Button asChild variant="outline" size="sm" className="h-9 rounded-xl px-4" title="Редактировать результаты вручную">
                                             <Link href={`/admin/tournaments/${tournament.id}/edit-results`}>
