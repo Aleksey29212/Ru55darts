@@ -6,9 +6,9 @@ import { cache } from 'react';
 import { calculatePlayerPoints } from './scoring';
 
 /**
- * ЭТАЛОННЫЙ ДВИГАТЕЛЬ АГРЕГАЦИИ (v4.5 Robust)
+ * ЭТАЛОННЫЙ ДВИГАТЕЛЬ АГРЕГАЦИИ (v4.6 Tie-Breakers Update)
  * Оптимизирован для Next.js 15 и больших объемов данных.
- * ГАРАНТИЯ: Точный расчет рейтингов даже при пустой БД.
+ * ГАРАНТИЯ: Точный расчет рейтингов согласно спортивному регламенту.
  */
 async function calculateAllRankings(): Promise<Record<string, Player[]>> {
     try {
@@ -136,18 +136,34 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                 };
             });
 
-            // Сортировка (Очки -> AVG)
+            // Сортировка согласно запросу: Баллы -> AVG -> Hi-Out -> 180s -> Турниры
             const sorted = processedPlayers.sort((a, b) => {
+                // 1. Баллы (Points)
                 if (b.points !== a.points) return b.points - a.points;
-                return b.avg - a.avg;
+                
+                // 2. Средний набор (AVG)
+                if (b.avg !== a.avg) return b.avg - a.avg;
+                
+                // 3. Максимальный чекаут (Hi-Out)
+                if (b.hiOut !== a.hiOut) return b.hiOut - a.hiOut;
+                
+                // 4. Количество 180-к (n180s)
+                if (b.n180s !== a.n180s) return b.n180s - a.n180s;
+                
+                // 5. Количество сыгранных турниров (matchesPlayed)
+                return b.matchesPlayed - a.matchesPlayed;
             });
 
-            // Присвоение мест с учетом одинаковых результатов
+            // Присвоение мест с учетом всех критериев tie-breaker
             let currentRank = 0;
             finalRankings[leagueId] = sorted.map((p, i) => {
-                const isSameResult = i > 0 && 
-                    sorted[i].points === sorted[i-1].points && 
-                    Math.abs(sorted[i].avg - sorted[i-1].avg) < 0.01;
+                const prev = i > 0 ? sorted[i-1] : null;
+                const isSameResult = prev && 
+                    p.points === prev.points && 
+                    Math.abs(p.avg - prev.avg) < 0.01 &&
+                    p.hiOut === prev.hiOut &&
+                    p.n180s === prev.n180s &&
+                    p.matchesPlayed === prev.matchesPlayed;
                 
                 if (!isSameResult) {
                     currentRank = i + 1;
