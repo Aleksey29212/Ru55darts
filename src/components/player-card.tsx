@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Player, PlayerProfile, ScoringSettings, SponsorTemplateId, PlayerSponsor } from '@/lib/types';
@@ -43,18 +44,19 @@ const StatItem = ({
     const valueString = String(value);
     const len = valueString.length;
     
-    // ГАРАНТИЯ: Интеллектуальный масштаб для предотвращения выхода за рамки
+    // ГАРАНТИЯ: Интеллектуальный масштаб. Чем больше знаков, тем меньше шрифт.
+    // whitespace-nowrap предотвращает "стекание" цифр вниз.
     let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
-    if (len >= 8) {
+    if (len >= 7) {
         fontSizeClass = "text-lg sm:text-xl lg:text-2xl"; 
-    } else if (len >= 6) {
+    } else if (len >= 5) {
         fontSizeClass = "text-xl sm:text-2xl lg:text-3xl"; 
     } else if (len >= 4) {
         fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl"; 
     }
     
-    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-4 rounded-[2rem] transition-all border shadow-2xl relative w-full h-full min-h-[160px] sm:min-h-[190px] cursor-pointer active:scale-95 select-none overflow-hidden bg-black/40";
+    const baseClasses = "flex flex-col items-center justify-between p-3 sm:p-4 rounded-[2rem] transition-all border shadow-2xl relative w-full h-full min-h-[150px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none overflow-hidden bg-black/40";
     
     const templateClasses = {
         classic: "glassmorphism border-white/10 hover:border-primary/40",
@@ -70,7 +72,7 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-500 tabular-nums break-all px-1",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-500 tabular-nums whitespace-nowrap overflow-hidden text-ellipsis px-1",
         fontSizeClass,
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : '',
@@ -89,8 +91,8 @@ const StatItem = ({
             onClick={() => setIsRevealed(!isRevealed)}
         >
             {/* Заголовок статы */}
-            <div className="w-full flex items-center justify-center gap-1.5 mb-2 relative z-10">
-                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-muted-foreground/90 leading-none truncate max-w-[80%]">
+            <div className="w-full flex items-center justify-center gap-1 mb-2 relative z-10">
+                <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-wider text-muted-foreground/90 leading-none truncate max-w-[75%]">
                     {label}
                 </span>
                 
@@ -100,7 +102,7 @@ const StatItem = ({
                             className="p-1 hover:text-primary transition-all active:scale-90 shrink-0 outline-none"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <AlertCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary/50 hover:text-primary" />
+                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary/50 hover:text-primary" />
                         </button>
                     </PopoverTrigger>
                     <PopoverContent 
@@ -120,16 +122,16 @@ const StatItem = ({
                 </Popover>
             </div>
             
-            {/* Центральная цифра */}
-            <div className="flex-1 flex items-center justify-center w-full my-2 overflow-hidden relative z-10">
+            {/* Центральная цифра - ГАРАНТИЯ ЧИТАЕМОСТИ */}
+            <div className="flex-1 flex items-center justify-center w-full my-1 overflow-hidden relative z-10 min-h-[60px]">
                 {isRevealed ? (
                     <span className={valueClasses}>{value}</span>
                 ) : (
-                    <div className="flex flex-col items-center gap-3 animate-in fade-in duration-500">
-                        <div className="p-3 sm:p-4 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform">
-                            <Lock className="h-6 w-6 sm:h-8 sm:w-8 text-primary opacity-60 group-hover:opacity-100" />
+                    <div className="flex flex-col items-center gap-2 animate-in fade-in duration-500">
+                        <div className="p-2.5 sm:p-3 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform">
+                            <Lock className="h-5 w-5 sm:h-7 sm:w-7 text-primary opacity-60 group-hover:opacity-100" />
                         </div>
-                        <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary/60">ОТКРЫТЬ</span>
+                        <span className="text-[7px] font-black uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary/60">OPEN</span>
                     </div>
                 )}
             </div>
@@ -137,8 +139,8 @@ const StatItem = ({
             {/* Подвал статы */}
             <div className="w-full mt-auto relative z-10">
                 <div className="h-px w-full bg-white/10 mb-2" />
-                <p className="text-[8px] sm:text-[9px] font-black uppercase text-primary/70 tracking-widest text-center leading-none truncate">
-                    {caption || "STATISTICS"}
+                <p className="text-[8px] sm:text-[9px] font-black uppercase text-primary/70 tracking-widest text-center leading-none truncate px-1">
+                    {caption || "METRIC"}
                 </p>
             </div>
         </div>
