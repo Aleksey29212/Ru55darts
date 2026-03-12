@@ -42,16 +42,15 @@ const StatItem = ({
     const [isRevealed, setIsRevealed] = useState(false);
     const valueString = String(value);
     const len = valueString.length;
-    const hasDecimal = valueString.includes('.') || valueString.includes(',');
     
-    let fontSizeClass = "text-4xl sm:text-5xl lg:text-6xl"; 
+    // ЕДИНЫЙ РАЗМЕР: все цифры теперь одного масштаба, как в окне AVG.
+    // Используем адаптивные классы, которые плавно уменьшают шрифт только если значение слишком длинное.
+    let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
-    if (hasDecimal || len >= 5) {
+    if (len >= 6) {
         fontSizeClass = "text-xl sm:text-2xl lg:text-3xl"; 
     } else if (len >= 4) {
         fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl"; 
-    } else if (len >= 3) {
-        fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     }
     
     const baseClasses = "flex flex-col items-center justify-between p-2 sm:p-4 rounded-[2rem] transition-all border border-transparent shadow-2xl relative w-full h-full min-h-[150px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none";
