@@ -39,18 +39,20 @@ echo -e "${GREEN}✅ Репозиторий подключен: ${WHITE}$TARGET_
 
 # 3. Подготовка коммита
 echo -e "${GREEN}📦 Индексация файлов DartBrig Pro v2.8 Stable...${NC}"
+echo -e "${WHITE}• Добавлен Dockerfile для Timeweb${NC}"
 echo -e "${WHITE}• Исправление множителей Омска (1.0 Победитель)${NC}"
 echo -e "${WHITE}• Оптимизация читаемости чисел 100+${NC}"
 echo -e "${WHITE}• Мобильный регламент (4 колонки)${NC}"
-echo -e "${WHITE}• Аудит математической точности пройден${NC}"
 
 git add .
 
 # 4. Сохранение
-git commit -m "Stable Build v2.8: Final Audit and Math Polish for Timeweb" --quiet || echo "Изменений для фиксации нет."
+git commit -m "Stable Build v2.8: Docker Support and Math Audit" --quiet || echo "Изменений для фиксации нет."
 
 # 5. Принудительная отправка
 echo -e "${YELLOW}📤 Отправка в GitHub (Master Push)...${NC}"
+echo -e "${WHITE}Примечание: Если запросит пароль, используйте Personal Access Token.${NC}"
+
 if git push -u origin main --force; then
   echo -e "\n${BLUE}=======================================${NC}"
   echo -e "${GREEN}✅ ПРОЕКТ УСПЕШНО ЗАГРУЖЕН В GITHUB!${NC}"
@@ -59,4 +61,5 @@ if git push -u origin main --force; then
   echo -e "Зайдите в Timeweb Cloud и создайте проект из этого репозитория."
 else
   echo -e "\n${RED}❌ Ошибка отправки. Проверьте ваш доступ к GitHub.${NC}"
+  echo -e "${YELLOW}Совет: Используйте Personal Access Token вместо обычного пароля.${NC}"
 fi

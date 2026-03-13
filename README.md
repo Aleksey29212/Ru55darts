@@ -24,7 +24,7 @@
    - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` — (ваш authDomain)
    - `NEXT_PUBLIC_FIREBASE_PROJECT_ID` — (ваш projectId)
    - `NEXT_PUBLIC_FIREBASE_APP_ID` — (ваш appId)
-   - `NEXT_PUBLIC_ADMIN_PASSWORD` — (любой ваш пароль для входа в админку)
+   - `NEXT_PUBLIC_ADMIN_PASSWORD` — (ваш пароль для входа в админку)
 
 ### Шаг 3: Запуск
 После сохранения переменных и запуска сборки, Timeweb Cloud автоматически развернет контейнер.
