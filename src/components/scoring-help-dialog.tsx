@@ -33,13 +33,11 @@ import {
     Diamond,
     CircleUser,
     ListOrdered,
-    History,
-    AlertCircle,
     Activity,
     Crown,
     PlusCircle
 } from 'lucide-react';
-import type { ScoringSettings, LeagueId, SponsorshipSettings } from '@/lib/types';
+import type { ScoringSettings, SponsorshipSettings } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -94,73 +92,65 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
   if (!mounted) return children || null;
 
   const renderHelpPill = (label: string, val: string | number, Icon: any, colorClass: string, description?: string, key?: string | number) => (
-    <div key={key} className="flex items-center justify-between py-2 px-3 md:py-3 md:px-4 rounded-xl md:rounded-2xl bg-white/[0.04] border border-white/5 hover:border-primary/40 transition-all group shadow-sm active:scale-[0.98]">
-        <div className="flex items-center gap-2 md:gap-3 min-w-0">
-            <div className={cn("p-1.5 md:p-2 rounded-lg md:rounded-xl bg-black/40 border border-white/5 shrink-0 shadow-inner", colorClass)}>
-                <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
+    <div key={key} className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/[0.03] border border-white/5 hover:border-primary/30 transition-all group shadow-sm active:scale-[0.98]">
+        <div className="flex items-center gap-2 min-w-0">
+            <div className={cn("p-1 rounded-md bg-black/40 border border-white/5 shrink-0", colorClass)}>
+                <Icon className="h-3 w-3" />
             </div>
             <div className="flex flex-col min-w-0">
-                <span className="text-[9px] md:text-[11px] font-black text-white uppercase tracking-tight truncate leading-none">{label}</span>
+                <span className="text-[10px] font-black text-white uppercase tracking-tight truncate leading-none">{label}</span>
                 {description && (
-                    <span className="text-[7px] md:text-[8px] text-muted-foreground font-bold uppercase tracking-tight truncate mt-0.5 md:mt-1 opacity-50">{description}</span>
+                    <span className="text-[7px] text-muted-foreground font-bold uppercase tracking-tight truncate mt-0.5 opacity-50">{description}</span>
                 )}
             </div>
         </div>
-        <span className="text-base md:text-xl font-headline text-primary ml-2 drop-shadow-[0_0_12px_rgba(var(--primary-rgb),0.6)] shrink-0 text-right">{val}</span>
+        <span className="text-sm font-headline text-primary ml-2 drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)] shrink-0 text-right">{val}</span>
     </div>
   );
 
   const renderLeagueContent = (s: ScoringSettings) => {
     if (s.isEveningOmsk) {
         return (
-            <div className="flex flex-col gap-3 md:gap-4 pt-2 pb-12">
-                <div className="p-4 md:p-5 rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-orange-500/15 to-orange-950/30 border border-orange-500/20 space-y-3 md:space-y-4 relative overflow-hidden group shadow-2xl">
-                    <div className="absolute -top-10 -right-10 opacity-5 group-hover:scale-110 transition-transform duration-[5s]">
-                        <Moon className="h-32 w-32 md:h-48 md:w-48 text-orange-500" />
+            <div className="flex flex-col gap-3 pt-1 pb-10">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-orange-500/10 to-black border border-orange-500/20 space-y-3 relative overflow-hidden group">
+                    <div className="absolute -top-6 -right-6 opacity-5 group-hover:scale-110 transition-transform">
+                        <Moon className="h-24 w-24 text-orange-500" />
                     </div>
-                    <div className="flex items-center gap-3 md:gap-4 relative z-10">
-                        <div className="p-1.5 md:p-2 bg-orange-500/20 rounded-lg md:rounded-xl shadow-xl border border-orange-500/30">
-                            <Sparkles className="text-orange-400 h-4 w-4 md:h-5 md:w-5" />
+                    <div className="flex items-center gap-3 relative z-10">
+                        <div className="p-1.5 bg-orange-500/20 rounded-lg border border-orange-500/30">
+                            <Sparkles className="text-orange-400 h-4 w-4" />
                         </div>
-                        <div className="flex flex-col">
-                            <h4 className="font-headline text-xs md:text-sm uppercase tracking-tight text-orange-400">Система множителей</h4>
-                            <p className="text-[7px] md:text-[8px] uppercase font-black text-orange-300/40 tracking-widest">Вечерний Омск • Динамический расчет</p>
-                        </div>
+                        <h4 className="font-headline text-xs uppercase tracking-tight text-orange-400">Множители этапов</h4>
                     </div>
-                    <div className="bg-black/60 p-2 md:p-3 rounded-lg md:rounded-xl border border-white/5 relative z-10 shadow-inner">
-                        <p className="text-[10px] md:text-xs text-white/80 leading-relaxed font-medium">
-                            Итоговые баллы вычисляются по формуле: <span className="text-orange-400 font-black text-xs md:text-sm text-glow">AVG × Множитель этапа</span>
-                        </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 relative z-10">
+                        {renderHelpPill('1-е', `× 1.00`, Medal, 'text-gold', 'Победа', 'omsk-1')}
+                        {renderHelpPill('2-е', `× 0.70`, Medal, 'text-silver', 'Финал', 'omsk-2')}
+                        {renderHelpPill('1/2', `× 0.50`, Medal, 'text-bronze', 'Полуфинал', 'omsk-3-4')}
+                        {renderHelpPill('1/4', `× 0.25`, Target, 'text-primary', 'Четвертьфинал', 'omsk-5-8')}
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 relative z-10">
-                        {renderHelpPill('Победитель', `× 1.00`, Medal, 'text-gold', '1-е место', 'omsk-1')}
-                        {renderHelpPill('Финалист', `× 0.70`, Medal, 'text-silver', '2-е место', 'omsk-2')}
-                        {renderHelpPill('1/2 финала', `× 0.50`, Medal, 'text-bronze', 'Полуфинал', 'omsk-3-4')}
-                        {renderHelpPill('1/4 финала', `× 0.25`, Target, 'text-primary', 'Четвертьфинал', 'omsk-5-8')}
-                    </div>
+                    <p className="text-[9px] text-white/60 text-center italic mt-1 relative z-10">Формула: AVG × Множитель. Округление до целого.</p>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-2 md:gap-3">
-                    <div className="p-3 md:p-4 rounded-xl md:rounded-[1.5rem] bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3 md:gap-4 shadow-xl">
-                        <div className="bg-emerald-500/20 p-1.5 md:p-2 rounded-lg md:rounded-xl border border-emerald-500/20 shadow-inner"><Wallet className="text-emerald-400 h-4 w-4 md:h-5 md:w-5" /></div>
-                        <div className="text-left">
-                            <h4 className="font-headline text-[8px] md:text-[10px] uppercase tracking-widest text-emerald-400">Курс балла</h4>
-                            <p className="text-base md:text-xl text-white font-black">{s.exchangeRate || 7} ₽</p>
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Wallet className="text-emerald-400 h-3.5 w-3.5" />
+                            <span className="text-[9px] font-black uppercase text-emerald-400/70 tracking-widest">Курс балла</span>
                         </div>
+                        <p className="text-sm text-white font-black">{s.exchangeRate || 7} ₽</p>
                     </div>
-                    <div className="p-3 md:p-4 rounded-xl md:rounded-[1.5rem] bg-blue-500/10 border border-blue-500/20 flex items-center gap-3 md:gap-4 shadow-xl">
-                        <div className="bg-blue-500/20 p-1.5 md:p-2 rounded-lg md:rounded-xl border border-blue-500/20 shadow-inner"><Award className="text-blue-400 h-4 w-4 md:h-5 md:w-5" /></div>
-                        <div className="text-left">
-                            <h4 className="font-headline text-[8px] md:text-[10px] uppercase tracking-widest text-blue-400">Суперфинал</h4>
-                            <p className="text-base md:text-xl text-white font-black">ТОП-16</p>
+                    <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Award className="text-blue-400 h-3.5 w-3.5" />
+                            <span className="text-[9px] font-black uppercase text-blue-400/70 tracking-widest">Финал</span>
                         </div>
+                        <p className="text-sm text-white font-black">ТОП-16</p>
                     </div>
                 </div>
             </div>
         );
     }
 
-    // Для стандартных лиг строим упорядоченный список
     const getPlacePoints = (p: number) => {
         if (s.customPointsByPlace && s.customPointsByPlace[p.toString()] !== undefined) {
             return Number(s.customPointsByPlace[p.toString()]);
@@ -181,7 +171,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         { label: '9-16 МЕСТА', points: getPlacePoints(9), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' },
     ];
 
-    // Любые кастомные места за пределами 16-го или специфичные дополнения (добавляются ниже)
     const extraEntries = s.customPointsByPlace 
         ? Object.entries(s.customPointsByPlace)
             .filter(([place]) => Number(place) > 16)
@@ -189,58 +178,58 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         : [];
 
     return (
-        <div className="flex flex-col gap-6 md:gap-8 pt-2 pb-20">
+        <div className="flex flex-col gap-4 pt-1 pb-16">
             {/* 1. БАЗОВОЕ УЧАСТИЕ */}
             {s.participationPoints > 0 && (
-                <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-2xl animate-pulse">
-                    <div className="flex items-center gap-3">
-                        <Sparkles className="h-5 w-5 text-primary" />
-                        <span className="text-xs md:text-sm font-bold uppercase tracking-tight">Бонус за участие (всем)</span>
+                <div className="py-2 px-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-lg">
+                    <div className="flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        <span className="text-[10px] font-black uppercase tracking-tight">Бонус за участие</span>
                     </div>
-                    <span className="font-headline text-lg md:text-2xl text-primary">+{s.participationPoints}</span>
+                    <span className="font-headline text-lg text-primary">+{s.participationPoints}</span>
                 </div>
             )}
 
-            {/* 2. ТАБЛИЦА РЕЙТИНГА (БАЗА) */}
-            <div className="space-y-2 md:space-y-3">
-                <div className="flex items-center gap-3 px-3 md:px-4 border-l-4 border-orange-500 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
-                    <Trophy className="h-3.5 w-3.5 md:h-4 md:w-4 text-orange-500" />
-                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Таблица рейтинга (База)</h4>
+            {/* 2. ТАБЛИЦА РЕЙТИНГА */}
+            <div className="space-y-2">
+                <div className="flex items-center gap-2 px-2 border-l-2 border-orange-500">
+                    <Trophy className="h-3 w-3 text-orange-500" />
+                    <h4 className="font-headline text-[9px] uppercase tracking-widest text-white/60">Базовые баллы</h4>
                 </div>
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                     {basePlaces.map((p, idx) => (
                         renderHelpPill(p.label, p.points, p.icon, p.color, p.desc, `base-place-${idx}`)
                     ))}
                 </div>
             </div>
 
-            {/* 3. НОВЫЕ ВВЕДЕНИЯ (ДОПОЛНИТЕЛЬНЫЕ МЕСТА) - ДОБАВЛЯЮТСЯ НИЖЕ */}
+            {/* 3. ДОПОЛНИТЕЛЬНЫЕ МЕСТА */}
             {extraEntries.length > 0 && (
-                <div className="space-y-2 md:space-y-3">
-                    <div className="flex items-center gap-3 px-3 md:px-4 border-l-4 border-purple-500 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
-                        <PlusCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-purple-500" />
-                        <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Дополнительные позиции</h4>
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2 px-2 border-l-2 border-purple-500">
+                        <PlusCircle className="h-3 w-3 text-purple-500" />
+                        <h4 className="font-headline text-[9px] uppercase tracking-widest text-white/60">Доп. позиции</h4>
                     </div>
-                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                         {extraEntries.map(([place, points]) => (
-                            renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Расширение сетки', `extra-place-${place}`)
+                            renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Расширение', `extra-place-${place}`)
                         ))}
                     </div>
                 </div>
             )}
 
-            {/* 4. УНИВЕРСАЛЬНЫЕ БОНУСЫ (ДОБАВЛЯЮТСЯ В КОНЦЕ) */}
-            <div className="space-y-2 md:space-y-3">
-                <div className="flex items-center gap-3 px-3 md:px-4 border-l-4 border-cyan-400 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
-                    <Star className="h-3.5 w-3.5 md:h-4 md:w-4 text-cyan-400" />
-                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Универсальные бонусы</h4>
+            {/* 4. УНИВЕРСАЛЬНЫЕ БОНУСЫ */}
+            <div className="space-y-2">
+                <div className="flex items-center gap-2 px-2 border-l-2 border-cyan-400">
+                    <Star className="h-3 w-3 text-cyan-400" />
+                    <h4 className="font-headline text-[9px] uppercase tracking-widest text-white/60">Бонусы за стат.</h4>
                 </div>
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                    {s.enable180Bonus && renderHelpPill('MAX 180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'За каждый 180', 'bonus-180')}
-                    {s.enableHiOutBonus && renderHelpPill(`HI-OUT ≥ ${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'Высокое закрытие', 'bonus-hiout')}
-                    {s.enableAvgBonus && renderHelpPill(`AVG ≥ ${s.avgThreshold}`, `+${s.avgBonus}`, Activity, 'text-yellow-400', 'Высокий средний', 'bonus-avg')}
-                    {s.enableShortLegBonus && renderHelpPill(`SHORT LEG ≤ ${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Flame, 'text-cyan-400', 'Короткий лег', 'bonus-shortleg')}
-                    {s.enable9DarterBonus && renderHelpPill(`9-DARTER`, `+${s.bonusFor9Darter}`, Crown, 'text-primary', 'Идеальный лег', 'bonus-9darter')}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                    {s.enable180Bonus && renderHelpPill('180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'Максимум', 'bonus-180')}
+                    {s.enableHiOutBonus && renderHelpPill(`OUT ≥${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'Закрытие', 'bonus-hiout')}
+                    {s.enableAvgBonus && renderHelpPill(`AVG ≥${s.avgThreshold}`, `+${s.avgBonus}`, Activity, 'text-yellow-400', 'Средний', 'bonus-avg')}
+                    {s.enableShortLegBonus && renderHelpPill(`SL ≤${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Flame, 'text-cyan-400', 'Короткий лег', 'bonus-shortleg')}
+                    {s.enable9DarterBonus && renderHelpPill(`9-DARTER`, `+${s.bonusFor9Darter}`, Crown, 'text-primary', 'Идеальный', 'bonus-9darter')}
                 </div>
             </div>
         </div>
@@ -256,32 +245,32 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="glassmorphism max-w-4xl p-0 overflow-hidden border-white/10 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_0_120px_rgba(0,0,0,1)] bg-[#050505] w-[96vw] md:w-full h-[92dvh] max-h-[92dvh] flex flex-col transition-all duration-500">
+      <DialogContent className="glassmorphism max-w-2xl p-0 overflow-hidden border-white/10 rounded-[2rem] shadow-[0_0_100px_rgba(0,0,0,1)] bg-[#050505] w-[96vw] h-[85dvh] flex flex-col">
         
-        <DialogHeader className="bg-gradient-to-b from-white/5 to-transparent pt-3 pb-3 px-4 md:pt-4 md:pb-4 md:px-6 relative items-center text-center shrink-0 border-b border-white/10">
-            <Button onClick={() => setOpen(false)} asChild variant="ghost" size="icon" className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl hover:bg-white/5 z-20 transition-all shadow-xl border border-white/5">
+        <DialogHeader className="bg-gradient-to-b from-white/5 to-transparent pt-4 pb-3 px-6 relative items-center text-center shrink-0 border-b border-white/10">
+            <Button onClick={() => setOpen(false)} asChild variant="ghost" size="icon" className="absolute left-4 top-1/2 -translate-y-1/2 h-9 w-9 rounded-xl hover:bg-white/5 z-20 shadow-xl border border-white/5">
                 <Link href="/">
-                    <Home className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+                    <Home className="h-4 w-4 text-primary" />
                 </Link>
             </Button>
 
-            <DialogClose className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-all z-20 flex items-center justify-center border border-white/5 group">
-                <X className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground group-hover:scale-110 transition-transform" />
+            <DialogClose className="absolute right-4 top-1/2 -translate-y-1/2 h-9 w-9 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-all z-20 flex items-center justify-center border border-white/5">
+                <X className="h-4 w-4 text-muted-foreground" />
             </DialogClose>
             
             <DialogTitle className="flex flex-col items-center">
-                <span className="text-base md:text-2xl uppercase font-headline tracking-tighter text-white text-glow leading-none">Регламент</span>
-                <span className="text-[7px] md:text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 mt-1 md:mt-1.5">Официальные правила лиг</span>
+                <span className="text-lg uppercase font-headline tracking-tighter text-white leading-none">Регламент</span>
+                <span className="text-[8px] font-black uppercase tracking-[0.4em] text-primary/60 mt-1">Официальные правила лиг</span>
             </DialogTitle>
         </DialogHeader>
 
-        <div className="p-0 flex flex-col flex-1 overflow-hidden relative">
+        <div className="flex-1 overflow-hidden relative">
             <Tabs 
                 defaultValue={settingsArray[0]?.id || "general"} 
                 className="w-full flex flex-col h-full"
             >
-                <div className="relative z-20 shrink-0 px-4 md:px-12 mt-4 mb-2 flex justify-center w-full">
-                    <TabsList className="bg-black/80 backdrop-blur-3xl p-2 md:p-3 border border-white/10 h-auto flex flex-wrap justify-center gap-2 md:gap-3 mx-auto max-w-[850px] rounded-xl md:rounded-[1.5rem] shadow-2xl">
+                <div className="relative z-20 shrink-0 px-4 mt-4 mb-2">
+                    <TabsList className="bg-black/60 backdrop-blur-3xl p-1.5 border border-white/5 h-auto flex flex-wrap justify-center gap-1.5 rounded-xl mx-auto max-w-full overflow-x-auto no-scrollbar">
                         {settingsArray.map((s, idx) => {
                             const id = s.id || 'general';
                             const Icon = leagueIcons[id] || Trophy;
@@ -291,15 +280,15 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                     key={`tab-trigger-${id}`} 
                                     value={id} 
                                     className={cn(
-                                        "relative flex flex-col items-center justify-center w-[calc(25%-8px)] sm:w-24 h-12 md:w-28 md:h-16 rounded-lg md:rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg",
+                                        "relative flex flex-col items-center justify-center w-16 h-12 md:w-20 md:h-14 rounded-lg border transition-all duration-300",
                                         "bg-gradient-to-br overflow-hidden",
-                                        "data-[state=active]:-translate-y-1 data-[state=active]:scale-105 data-[state=active]:border-white/60 data-[state=active]:z-10 data-[state=active]:shadow-2xl",
-                                        "data-[state=inactive]:opacity-30 data-[state=inactive]:grayscale-[0.6] data-[state=inactive]:hover:opacity-100",
+                                        "data-[state=active]:border-white/40 data-[state=active]:z-10 data-[state=active]:scale-105",
+                                        "data-[state=inactive]:opacity-40 data-[state=inactive]:grayscale-[0.4]",
                                         style
                                     )}
                                 >
-                                    <Icon className="h-4 w-4 md:h-6 md:w-6 mb-0.5 md:mb-1 text-white drop-shadow-md" />
-                                    <span className="text-[6px] md:text-[8px] font-black uppercase tracking-tight text-white text-center leading-none px-0.5 line-clamp-1">
+                                    <Icon className="h-4 w-4 mb-0.5 text-white" />
+                                    <span className="text-[6px] font-black uppercase tracking-tight text-white text-center leading-none px-0.5 line-clamp-1">
                                         {namesArray[idx] || 'Лига'}
                                     </span>
                                 </TabsTrigger>
@@ -308,75 +297,64 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                         
                         <TabsTrigger 
                             value="ranking-logic"
-                            className="relative flex flex-col items-center justify-center w-[calc(25%-8px)] sm:w-24 h-12 md:w-28 md:h-16 rounded-lg md:rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-900 border-indigo-400/50 data-[state=active]:-translate-y-1 data-[state=active]:scale-105 data-[state=active]:border-white/60"
+                            className="relative flex flex-col items-center justify-center w-16 h-12 md:w-20 md:h-14 rounded-lg border transition-all duration-300 bg-gradient-to-br from-indigo-600 to-purple-900 border-indigo-400/50 data-[state=active]:scale-105 data-[state=active]:border-white/40"
                         >
-                            <ListOrdered className="h-4 w-4 md:h-6 md:w-6 mb-0.5 md:mb-1 text-white" />
-                            <span className="text-[6px] md:text-[8px] font-black uppercase tracking-tight text-white">ТАЙ-БРЕЙК</span>
+                            <ListOrdered className="h-4 w-4 mb-0.5 text-white" />
+                            <span className="text-[6px] font-black uppercase tracking-tight text-white">ЛОГИКА</span>
                         </TabsTrigger>
                     </TabsList>
                 </div>
 
-                <ScrollArea className="flex-1 px-4 md:px-12 lg:px-20 scroll-smooth">
-                    <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-[#050505] to-transparent z-10 pointer-events-none" />
-                    
+                <ScrollArea className="flex-1 px-6 scroll-smooth">
                     {settingsArray.map((s, idx) => (
-                        <TabsContent key={`tab-content-${s.id || idx}`} value={s.id || 'general'} className="outline-none animate-in fade-in slide-in-from-bottom-2 duration-700 mt-0">
-                            <div className="flex items-center gap-3 mb-3 mt-4 md:mb-4 md:mt-6">
+                        <TabsContent key={`tab-content-${s.id || idx}`} value={s.id || 'general'} className="outline-none animate-in fade-in duration-500 mt-0">
+                            <div className="flex items-center gap-3 mb-3 mt-4">
                                 <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                                <h3 className="text-xs md:text-lg font-headline uppercase tracking-tight text-white/95 text-glow-white">
+                                <h3 className="text-sm font-headline uppercase tracking-tight text-white/90">
                                     {namesArray[idx]}
                                 </h3>
-                                <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent" />
+                                <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
                             </div>
                             
                             {renderLeagueContent(s)}
                         </TabsContent>
                     ))}
 
-                    <TabsContent value="ranking-logic" className="outline-none animate-in fade-in slide-in-from-bottom-2 duration-700 mt-0">
-                        <div className="flex items-center gap-3 mb-3 mt-4 md:mb-4 md:mt-6">
+                    <TabsContent value="ranking-logic" className="outline-none animate-in fade-in duration-500 mt-0">
+                        <div className="flex items-center gap-3 mb-3 mt-4">
                             <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
-                            <h3 className="text-xs md:text-lg font-headline uppercase tracking-tight text-white/95 text-glow-white">
-                                Правила распределения мест
+                            <h3 className="text-sm font-headline uppercase tracking-tight text-white/90">
+                                Правила ранжирования
                             </h3>
-                            <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent" />
+                            <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
                         </div>
 
-                        <div className="space-y-2 md:space-y-3 pb-20">
-                            {renderHelpPill('1. Сумма баллов', 'Основа', Trophy, 'text-gold', 'Суммируются очки за места и бонусы за статистику.', 'logic-1')}
-                            {renderHelpPill('2. Дублирование мест', 'Задвоение', Users, 'text-primary', 'При равных показателях игроки делят одну позицию в рейтинге.', 'logic-2')}
-                            {renderHelpPill('3. Средний набор (AVG)', 'Набор', Zap, 'text-yellow-400', 'Первый тай-брейк: при равных баллах выше стоит игрок с большим AVG.', 'logic-3')}
-                            {renderHelpPill('4. Max Out (Hi-Out)', 'Финиш', Target, 'text-pink-500', 'Второй тай-брейк: преимущество у игрока с более высоким чекаутом.', 'logic-4')}
+                        <div className="grid gap-2 pb-16">
+                            {renderHelpPill('1. Сумма баллов', 'Основа', Trophy, 'text-gold', 'Места + Бонусы', 'logic-1')}
+                            {renderHelpPill('2. Дублирование', 'Задвоение', Users, 'text-primary', 'Места могут делиться', 'logic-2')}
+                            {renderHelpPill('3. Набор (AVG)', 'Тай-брейк 1', Zap, 'text-yellow-400', 'Приоритет у высшего AVG', 'logic-3')}
+                            {renderHelpPill('4. Финиш (MAX)', 'Тай-брейк 2', Target, 'text-pink-500', 'Приоритет у высшего чекаута', 'logic-4')}
                             
-                            <div className="p-4 md:p-6 rounded-xl md:rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 mt-4 md:mt-6 shadow-2xl">
-                                <p className="text-[10px] md:text-xs text-indigo-200/80 leading-relaxed italic font-medium">
-                                    Система DartBrig Pro автоматически проводит аудит каждого турнира, применяя правила тай-брейка для обеспечения максимально честного рейтинга.
+                            <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/20 mt-2">
+                                <p className="text-[10px] text-indigo-200/60 leading-relaxed italic text-center">
+                                    Система автоматически применяет эти правила для формирования максимально честного рейтинга.
                                 </p>
                             </div>
                         </div>
                     </TabsContent>
-                    
-                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#050505] to-transparent z-10 pointer-events-none" />
                 </ScrollArea>
             </Tabs>
         </div>
 
-        <div className="bg-black/98 backdrop-blur-3xl p-2 px-4 md:p-3 md:px-8 border-t border-white/10 shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
-          <div className="flex flex-row justify-between items-center gap-4 max-w-5xl mx-auto">
-            <div className="flex items-center gap-2 md:gap-3">
-                <div className="h-6 w-6 md:h-8 md:w-8 rounded-lg md:rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center font-headline text-primary text-[8px] md:text-xs shadow-inner">D</div>
-                <div className="flex flex-col">
-                    <p className="text-[8px] md:text-[10px] text-white font-black uppercase tracking-widest leading-none">DartBrig Pro</p>
-                    <p className="text-[6px] md:text-[7px] text-primary/50 font-bold uppercase tracking-[0.3em] mt-0.5 md:mt-1">v2.8 Stable • Rules Engine v4.0</p>
-                </div>
+        <div className="bg-black/95 p-3 px-6 border-t border-white/5 shrink-0">
+          <div className="flex justify-between items-center max-w-2xl mx-auto">
+            <div className="flex flex-col">
+                <p className="text-[9px] text-white font-black uppercase tracking-widest leading-none">DartBrig Pro</p>
+                <p className="text-[7px] text-primary/50 font-bold uppercase tracking-[0.2em] mt-1">v2.8 Stable</p>
             </div>
             
-            <Button onClick={() => setOpen(false)} asChild variant="outline" className="rounded-lg md:rounded-xl font-black uppercase tracking-widest text-[8px] md:text-[9px] h-8 md:h-10 px-4 md:px-8 gap-2 border-white/10 bg-white/5 hover:bg-primary hover:text-primary-foreground transition-all shadow-xl active:scale-95">
-                <Link href="/">
-                    <Home className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary group-hover:text-white" />
-                    <span>ЗАКРЫТЬ</span>
-                    <ChevronRight className="h-3.5 w-3.5 md:h-4 md:w-4 opacity-50" />
-                </Link>
+            <Button onClick={() => setOpen(false)} variant="outline" className="rounded-xl font-black uppercase tracking-widest text-[9px] h-9 px-6 border-white/10 bg-white/5 hover:bg-primary hover:text-primary-foreground transition-all">
+                ЗАКРЫТЬ
             </Button>
           </div>
         </div>
