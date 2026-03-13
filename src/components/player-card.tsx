@@ -44,10 +44,11 @@ const StatItem = ({
     const len = valueString.length;
     
     // ИДЕАЛЬНОЕ МАСШТАБИРОВАНИЕ ДЛЯ ЧИТАЕМОСТИ ЦИФР
+    // Если цифр 3 и более (например 100 или 59.1), уменьшаем шрифт для мобильных
     let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
     if (len >= 6) {
-        fontSizeClass = "text-base sm:text-lg lg:text-xl"; 
+        fontSizeClass = "text-lg sm:text-xl lg:text-2xl"; 
     } else if (len >= 4) {
         fontSizeClass = "text-xl sm:text-2xl lg:text-3xl"; 
     } else if (len >= 3) {
@@ -88,7 +89,7 @@ const StatItem = ({
             )}
             onClick={() => setIsRevealed(!isRevealed)}
         >
-            <div className="w-full flex items-center justify-center gap-0.5 mb-1 relative z-10 px-1">
+            <div className="w-full flex items-center justify-center gap-0.5 mb-1 relative z-10 px-1 pt-2">
                 <span className="text-[9px] font-black uppercase tracking-tight text-muted-foreground/90 leading-none shrink-0">
                     {label}
                 </span>
@@ -132,8 +133,8 @@ const StatItem = ({
                 )}
             </div>
 
-            <div className="w-full mt-auto relative z-10">
-                <div className="h-px w-full bg-white/10 mb-1.5" />
+            <div className="w-full mt-auto relative z-10 pb-2">
+                <div className="h-px w-[80%] mx-auto bg-white/10 mb-1.5" />
                 <p className="text-[8px] sm:text-[9px] font-black uppercase text-primary/60 tracking-[0.15em] text-center leading-none truncate px-0.5">
                     {caption || "METRIC"}
                 </p>
