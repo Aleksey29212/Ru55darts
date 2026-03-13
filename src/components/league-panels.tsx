@@ -119,7 +119,7 @@ function LeagueSection({
 
                         <div className="flex flex-wrap justify-center lg:justify-start gap-4">
                             <ScoringHelpDialog settings={scoringSettings} leagueName={leagueInfo.name} sponsorshipSettings={sponsorshipSettings}>
-                                <Button className="h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-3 shadow-xl interactive-scale bg-white/5 hover:bg-white/10 border border-white/10 text-white">
+                                <Button className="h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-3 shadow-xl interactive-scale bg-white/5 hover:bg-white/10 border border-white/10 text-white active:scale-95">
                                     <Info className="h-4 w-4" />
                                     Посмотреть регламент
                                 </Button>
@@ -184,7 +184,7 @@ export function LeaguePanels({
     }, [enabledLeagues, currentLeagueId]);
 
     const handleLeagueSelect = (leagueId: LeagueId) => {
-        if (leagueId === currentLeagueId) return;
+        if (leagueId === currentLeagueId || isPending) return;
         startTransition(() => {
             router.push(`/?league=${leagueId}`, { scroll: false });
         });
@@ -226,7 +226,7 @@ export function LeaguePanels({
                                 tabIndex={0}
                                 onClick={() => handleLeagueSelect(leagueId)}
                                 className={cn(
-                                    'relative h-16 rounded-2xl overflow-hidden transition-all duration-300 transform cursor-pointer outline-none border shadow-xl group',
+                                    'relative h-16 rounded-2xl overflow-hidden transition-all duration-300 transform cursor-pointer outline-none border shadow-xl group active:scale-95',
                                     isSelected 
                                         ? 'border-primary border-2 ring-4 ring-primary/20 scale-[1.03] z-10 shadow-[0_0_40px_rgba(var(--primary-rgb),0.4)] animate-shimmer' 
                                         : 'border-white/15 opacity-80 hover:opacity-100 hover:border-primary/50'
@@ -285,7 +285,7 @@ export function LeaguePanels({
                                 role="button"
                                 onClick={() => handleLeagueSelect(leagueId)}
                                 className={cn(
-                                    "relative flex-shrink-0 w-24 h-24 rounded-t-[2rem] transition-all duration-300 ease-out border-x-2 border-t-2 shadow-2xl",
+                                    "relative flex-shrink-0 w-24 h-24 rounded-t-[2rem] transition-all duration-300 ease-out border-x-2 border-t-2 shadow-2xl active:scale-90",
                                     "-ml-12 first:ml-0 cursor-pointer overflow-hidden",
                                     isSelected 
                                         ? "z-50 -translate-y-4 scale-110 mx-2 border-primary ring-4 ring-primary/20 shadow-[0_15px_40px_rgba(var(--primary-rgb),0.5)]" 

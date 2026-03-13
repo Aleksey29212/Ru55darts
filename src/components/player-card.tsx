@@ -95,10 +95,10 @@ const StatItem = ({
                 <Popover>
                     <PopoverTrigger asChild>
                         <button 
-                            className="p-0.5 hover:text-primary transition-colors duration-150 active:scale-90 shrink-0 outline-none"
+                            className="p-1 hover:text-primary transition-all duration-150 active:scale-75 shrink-0 outline-none -mr-1"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <AlertCircle className="h-3 w-3 text-primary/40 hover:text-primary" />
+                            <AlertCircle className="h-3.5 w-3.5 text-primary/40 hover:text-primary" />
                         </button>
                     </PopoverTrigger>
                     <PopoverContent 
@@ -397,7 +397,7 @@ export function PlayerCard({
                 template === 'cyber' ? 'top-0 right-0' : 'top-6 right-6 md:top-10 md:right-10'
             )}>
                 <div className={cn(
-                    "flex flex-col items-center justify-center min-w-[100px] md:min-w-[130px] p-5 md:p-7 backdrop-blur-3xl border-2 shadow-[0_15px_50px_rgba(0,0,0,0.6)] transition-all hover:scale-110 duration-150 overflow-hidden",
+                    "flex flex-col items-center justify-center min-w-[100px] md:min-w-[130px] p-5 md:p-7 backdrop-blur-3xl border-2 shadow-[0_15px_50px_rgba(0,0,0,0.6)] transition-all hover:scale-110 duration-150 overflow-hidden active:scale-95",
                     template === 'dynamic' ? 'bg-accent/50 border-accent/60 text-accent' : 'bg-primary/50 border-primary/60 text-primary-foreground',
                     template === 'elite' ? 'bg-black/80 border-gold rounded-full h-32 w-32 md:h-48 md:w-48' : 'rounded-[2rem] md:rounded-[3rem]',
                     template === 'cyber' ? 'bg-[#0a0a0f] border-cyan-500 rounded-none' : '',
@@ -424,7 +424,7 @@ export function PlayerCard({
                         <h4 className="font-headline text-xl md:text-3xl text-primary tracking-tighter uppercase">АДМИН-СТУДИЯ</h4>
                         <p className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-black opacity-60 mt-1">НАСТРОЙКА ПРОФИЛЯ</p>
                     </div>
-                    <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "destructive" : "default"} size="lg" className="w-full sm:w-auto rounded-[1.25rem] h-14 px-8 shadow-xl font-black text-base uppercase tracking-widest transition-all duration-150">
+                    <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "destructive" : "default"} size="lg" className="w-full sm:w-auto rounded-[1.25rem] h-14 px-8 shadow-xl font-black text-base uppercase tracking-widest transition-all duration-150 active:scale-95">
                         {isEditing ? <><X className="mr-2 h-6 w-6" /> ОТМЕНА</> : <><Edit className="mr-2 h-6 w-6" /> ИЗМЕНИТЬ</>}
                     </Button>
                 </div>
@@ -467,8 +467,8 @@ export function PlayerCard({
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-6 pt-6">
-                        <Button onClick={handleSave} className='flex-1 h-16 rounded-2xl shadow-xl font-black text-lg text-primary-foreground uppercase tracking-[0.1em] transition-all duration-150' disabled={!isFormDirty}><Save className="mr-2 h-6 w-6" />СОХРАНИТЬ</Button>
-                        <Button onClick={() => { setIsEditing(false); setEditablePlayer(player); }} className='flex-1 h-16 rounded-2xl text-lg font-black uppercase tracking-[0.1em] transition-all duration-150' variant="ghost"><X className="mr-2 h-6 w-6" />СБРОСИТЬ</Button>
+                        <Button onClick={handleSave} className='flex-1 h-16 rounded-2xl shadow-xl font-black text-lg text-primary-foreground uppercase tracking-[0.1em] transition-all duration-150 active:scale-95' disabled={!isFormDirty}><Save className="mr-2 h-6 w-6" />СОХРАНИТЬ</Button>
+                        <Button onClick={() => { setIsEditing(false); setEditablePlayer(player); }} className='flex-1 h-16 rounded-2xl text-lg font-black uppercase tracking-[0.1em] transition-all duration-150 active:scale-95' variant="ghost"><X className="mr-2 h-6 w-6" />СБРОСИТЬ</Button>
                     </div>
                 </div>
              )}
@@ -490,7 +490,7 @@ export function PlayerCard({
 
                 {showCTA && (
                     <div className={cn(
-                        "p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-inner group/sponsorship transition-all duration-300",
+                        "p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-inner group/sponsorship transition-all duration-300 active:scale-[0.98]",
                         template === 'retro' ? "border-4 border-dashed border-cyan-400 bg-black rounded-none" : "rounded-[2.5rem] bg-primary/5 border-2 border-dashed border-primary/30 hover:bg-primary/10"
                     )}>
                         <div className="flex items-center gap-5">
@@ -502,7 +502,7 @@ export function PlayerCard({
                                 <p className="text-[9px] md:text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-0.5">ПОДДЕРЖИТЕ ИГРОКА И ПОЛУЧИТЕ ОХВАТ</p>
                             </div>
                         </div>
-                        <Button asChild className="h-14 px-8 rounded-xl font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 interactive-scale shrink-0 bg-primary text-primary-foreground">
+                        <Button asChild className="h-14 px-8 rounded-xl font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 interactive-scale shrink-0 bg-primary text-primary-foreground active:scale-90">
                             <a href="/partners" className="flex items-center gap-2">
                                 УЗНАТЬ УСЛОВИЯ
                                 <ExternalLink className="h-4 w-4" />
@@ -520,7 +520,7 @@ export function PlayerCard({
                             <h3 className="text-[11px] md:text-base font-headline uppercase tracking-[0.3em] text-white/60">БИОГРАФИЯ</h3>
                         </div>
                         <ScoringHelpDialog settings={scoringSettings} leagueName={leagueNames} sponsorshipSettings={{ groupVkLink: 'https://vk.com/dartbrig' } as any}>
-                            <Button variant="ghost" size="sm" className="flex gap-3 rounded-xl h-10 px-5 text-[10px] md:text-xs uppercase font-black tracking-widest hover:bg-primary/20 text-primary border-2 border-primary/20 transition-all duration-150">
+                            <Button variant="ghost" size="sm" className="flex gap-3 rounded-xl h-10 px-5 text-[10px] md:text-xs uppercase font-black tracking-widest hover:bg-primary/20 text-primary border-2 border-primary/20 transition-all duration-150 active:scale-95">
                                 <Trophy className="h-5 w-5 animate-pulse" />
                                 РЕГЛАМЕНТ
                             </Button>
@@ -542,7 +542,7 @@ export function PlayerCard({
 
                 {hasOmskStats && (
                     <div className={cn(
-                        "p-8 md:p-14 border-2 relative overflow-hidden group/omsk shadow-4xl transition-all duration-300",
+                        "p-8 md:p-14 border-2 relative overflow-hidden group/omsk shadow-4xl transition-all duration-300 active:scale-[0.99]",
                         template === 'elite' ? 'bg-gold/5 border-gold/40 rounded-full' : 'rounded-[2.5rem] md:rounded-[4rem] bg-orange-600/15 border-orange-500/40 hover:bg-orange-600/20'
                     )}>
                         <div className="absolute -top-16 -right-16 p-4 opacity-10 group-hover/omsk:scale-110 transition-all duration-[3000ms]">

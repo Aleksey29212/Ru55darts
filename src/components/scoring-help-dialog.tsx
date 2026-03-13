@@ -87,7 +87,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     setMounted(true);
   }, []);
 
-  // Фильтруем settings, чтобы избежать TypeError при итерировании
   const settingsArray = (Array.isArray(settings) ? settings : [settings]).filter(Boolean);
   const namesArray = Array.isArray(leagueName) ? leagueName : [leagueName];
 
@@ -157,17 +156,15 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         );
     }
 
-    // Логика расчета отображения мест
     const getPlacePoints = (p: number) => {
         if (s.customPointsByPlace && s.customPointsByPlace[p.toString()] !== undefined) {
             return Number(s.customPointsByPlace[p.toString()]);
         }
         if (p === 1) return s.pointsFor1st;
         if (p === 2) return s.pointsFor2nd;
-        if (p === 3) return s.pointsFor3rd || s.pointsFor3rd_4th;
-        if (p === 4) return s.pointsFor3rd_4th;
+        if (p === 3 && (s.pointsFor3rd ?? 0) > 0) return s.pointsFor3rd!;
+        if (p === 3 || p === 4) return s.pointsFor3rd_4th;
         
-        // Индивидуальные места 5-10
         if (p === 5 && (s.pointsFor5th ?? 0) > 0) return s.pointsFor5th!;
         if (p === 6 && (s.pointsFor6th ?? 0) > 0) return s.pointsFor6th!;
         if (p === 7 && (s.pointsFor7th ?? 0) > 0) return s.pointsFor7th!;
@@ -180,45 +177,30 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         return 0;
     };
 
-    const basePlaces: { label: string, points: number, icon: any, color: string, desc: string }[] = [
-        { label: '1 МЕСТО', points: getPlacePoints(1), icon: Medal, color: 'text-gold', desc: 'Победа' },
-        { label: '2 МЕСТО', points: getPlacePoints(2), icon: Medal, color: 'text-silver', desc: 'Финал' },
-    ];
+    // Алгоритм группировки мест 1-16
+    const groupedRanks: { label: string, points: number, icon: any, color: string, desc: string }[] = [];
+    let start = 1;
+    while (start <= 16) {
+        let end = start;
+        const pts = getPlacePoints(start);
+        
+        while (end + 1 <= 16 && getPlacePoints(end + 1) === pts) {
+            end++;
+        }
 
-    // Обработка 3-4 мест
-    if (Number(s.pointsFor3rd) > 0 && s.pointsFor3rd !== s.pointsFor3rd_4th) {
-        basePlaces.push({ label: '3 МЕСТО', points: getPlacePoints(3), icon: Medal, color: 'text-bronze', desc: 'Бронза' });
-        basePlaces.push({ label: '4 МЕСТО', points: getPlacePoints(4), icon: Award, color: 'text-primary', desc: '1/2 финала' });
-    } else {
-        basePlaces.push({ label: '3-4 МЕСТА', points: getPlacePoints(3), icon: Medal, color: 'text-bronze', desc: 'Полуфинал' });
-    }
+        if (pts > 0) {
+            const label = start === end ? `${start} МЕСТО` : `${start}-${end} МЕСТА`;
+            let Icon = Award;
+            let color = 'text-primary';
+            let desc = start <= 2 ? 'Финалист' : (start <= 4 ? '1/2 финала' : (start <= 8 ? '1/4 финала' : '1/8 финала'));
+            
+            if (start === 1) { Icon = Medal; color = 'text-gold'; desc = 'Победа'; }
+            else if (start === 2) { Icon = Medal; color = 'text-silver'; desc = 'Финал'; }
+            else if (start === 3 && end === 3) { Icon = Medal; color = 'text-bronze'; desc = 'Бронза'; }
 
-    // Обработка 5-8 мест
-    const hasSpecific5_8 = [5, 6, 7, 8].some(p => {
-        const val = s[`pointsFor${p}th` as keyof ScoringSettings];
-        return typeof val === 'number' && val > 0 && val !== s.pointsFor5th_8th;
-    });
-
-    if (hasSpecific5_8) {
-        [5, 6, 7, 8].forEach(p => {
-            basePlaces.push({ label: `${p} МЕСТО`, points: getPlacePoints(p), icon: Target, color: 'text-primary', desc: '1/4 финала' });
-        });
-    } else {
-        basePlaces.push({ label: '5-8 МЕСТА', points: getPlacePoints(5), icon: Target, color: 'text-primary', desc: '1/4 финала' });
-    }
-
-    // Обработка 9-16 мест
-    const hasSpecific9_10 = [9, 10].some(p => {
-        const val = s[`pointsFor${p}th` as keyof ScoringSettings];
-        return typeof val === 'number' && val > 0 && val !== s.pointsFor9th_16th;
-    });
-
-    if (hasSpecific9_10) {
-        basePlaces.push({ label: `9 МЕСТО`, points: getPlacePoints(9), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' });
-        basePlaces.push({ label: `10 МЕСТО`, points: getPlacePoints(10), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' });
-        basePlaces.push({ label: `11-16 МЕСТА`, points: getPlacePoints(11), icon: TrendingUp, color: 'text-primary/40', desc: '1/8 финала' });
-    } else {
-        basePlaces.push({ label: '9-16 МЕСТА', points: getPlacePoints(9), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' });
+            groupedRanks.push({ label, points: pts, icon: Icon, color, desc });
+        }
+        start = end + 1;
     }
 
     const extraEntries = s.customPointsByPlace 
@@ -230,7 +212,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     return (
         <div className="flex flex-col gap-4 pt-1 pb-16">
             {s.participationPoints > 0 && (
-                <div className="py-2 px-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-lg">
+                <div className="py-2 px-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-lg active:scale-95 transition-transform">
                     <div className="flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-primary" />
                         <span className="text-[10px] font-black uppercase tracking-tight">Бонус за участие</span>
@@ -248,8 +230,8 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                     <h4 className="font-headline text-[9px] uppercase tracking-widest text-white/60">Базовые баллы (ТОП-16)</h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
-                    {basePlaces.map((p, idx) => (
-                        renderHelpPill(p.label, p.points, p.icon, p.color, p.desc, `base-place-${idx}`)
+                    {groupedRanks.map((p, idx) => (
+                        renderHelpPill(p.label, p.points, p.icon, p.color, p.desc, `base-rank-${idx}`)
                     ))}
                 </div>
             </div>
@@ -289,7 +271,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children || (
-          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-primary/10 transition-all border border-white/5 shadow-xl">
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-primary/10 transition-all border border-white/5 shadow-xl active:scale-90">
             <Trophy className="text-primary h-5 w-5" />
           </Button>
         )}
@@ -297,13 +279,13 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
       <DialogContent className="glassmorphism max-w-2xl p-0 overflow-hidden border-white/10 rounded-[2rem] shadow-[0_0_100px_rgba(0,0,0,1)] bg-[#050505] w-[96vw] h-[85dvh] flex flex-col">
         
         <DialogHeader className="bg-gradient-to-b from-white/5 to-transparent pt-4 pb-3 px-6 relative items-center text-center shrink-0 border-b border-white/10">
-            <Button onClick={() => setOpen(false)} asChild variant="ghost" size="icon" className="absolute left-4 top-1/2 -translate-y-1/2 h-9 w-9 rounded-xl hover:bg-white/5 z-20 shadow-xl border border-white/5">
+            <Button onClick={() => setOpen(false)} asChild variant="ghost" size="icon" className="absolute left-4 top-1/2 -translate-y-1/2 h-9 w-9 rounded-xl hover:bg-white/5 z-20 shadow-xl border border-white/5 active:scale-90">
                 <Link href="/">
                     <Home className="h-4 w-4 text-primary" />
                 </Link>
             </Button>
 
-            <DialogClose className="absolute right-4 top-1/2 -translate-y-1/2 h-9 w-9 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-all z-20 flex items-center justify-center border border-white/5">
+            <DialogClose className="absolute right-4 top-1/2 -translate-y-1/2 h-9 w-9 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-all z-20 flex items-center justify-center border border-white/5 active:scale-90">
                 <X className="h-4 w-4 text-muted-foreground" />
             </DialogClose>
             
@@ -329,9 +311,9 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                     key={`tab-trigger-${id}`} 
                                     value={id} 
                                     className={cn(
-                                        "relative flex flex-col items-center justify-center w-16 h-12 md:w-20 md:h-14 rounded-lg border transition-all duration-300",
+                                        "relative flex flex-col items-center justify-center w-16 h-12 md:w-20 md:h-14 rounded-lg border transition-all duration-300 active:scale-95",
                                         "bg-gradient-to-br overflow-hidden",
-                                        "data-[state=active]:border-white/40 data-[state=active]:z-10 data-[state=active]:scale-105",
+                                        "data-[state=active]:border-white/40 data-[state=active]:z-10 data-[state=active]:scale-105 shadow-2xl",
                                         "data-[state=inactive]:opacity-40 data-[state=inactive]:grayscale-[0.4]",
                                         style
                                     )}
@@ -346,7 +328,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                         
                         <TabsTrigger 
                             value="ranking-logic"
-                            className="relative flex flex-col items-center justify-center w-16 h-12 md:w-20 md:h-14 rounded-lg border transition-all duration-300 bg-gradient-to-br from-indigo-600 to-purple-900 border-indigo-400/50 data-[state=active]:scale-105 data-[state=active]:border-white/40"
+                            className="relative flex flex-col items-center justify-center w-16 h-12 md:w-20 md:h-14 rounded-lg border transition-all duration-300 bg-gradient-to-br from-indigo-600 to-purple-900 border-indigo-400/50 data-[state=active]:scale-105 data-[state=active]:border-white/40 active:scale-95"
                         >
                             <ListOrdered className="h-4 w-4 mb-0.5 text-white" />
                             <span className="text-[6px] font-black uppercase tracking-tight text-white">ЛОГИКА</span>
@@ -431,7 +413,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 <p className="text-[7px] text-primary/50 font-bold uppercase tracking-[0.2em] mt-1">v2.8 Stable Audit</p>
             </div>
             
-            <Button onClick={() => setOpen(false)} variant="outline" className="rounded-xl font-black uppercase tracking-widest text-[9px] h-9 px-6 border-white/10 bg-white/5 hover:bg-primary hover:text-primary-foreground transition-all">
+            <Button onClick={() => setOpen(false)} variant="outline" className="rounded-xl font-black uppercase tracking-widest text-[9px] h-9 px-6 border-white/10 bg-white/5 hover:bg-primary hover:text-primary-foreground transition-all active:scale-95">
                 ПОНЯТНО
             </Button>
           </div>
