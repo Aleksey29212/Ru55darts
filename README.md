@@ -8,30 +8,40 @@
 - **Auth**: Firebase Auth (Anonymous)
 - **Deployment**: Docker / Firebase App Hosting
 
-## 🚀 Варианты деплоя
+## 🚀 Как отправить код в GitHub (Деплой)
 
-### Вариант А: Firebase App Hosting (Без сторонних серверов)
-Самый простой способ развернуть сайт в той же среде, где находится ваша база данных.
+Если при запуске `npm run deploy:github` вы получаете ошибку авторизации:
+
+1. **Получите токен (PAT)**:
+   - Перейдите в [GitHub Token Settings](https://github.com/settings/tokens).
+   - Нажмите **Generate new token (classic)**.
+   - Выберите срок действия и отметьте галочку **repo**.
+   - Скопируйте полученный код (например: `ghp_xxxxxxx`).
+
+2. **Привяжите токен к проекту**:
+   Выполните в терминале команду (замените `ВАШ_ТОКЕН` на скопированный код):
+   ```bash
+   git remote set-url origin https://ВАШ_ТОКЕН@github.com/Aleksey29212/Ru55darts.git
+   ```
+
+3. **Запустите деплой снова**:
+   ```bash
+   npm run deploy:github
+   ```
+
+## 🚀 Варианты хостинга
+
+### Вариант А: Firebase App Hosting (Рекомендуется)
 1. Зайдите в [Консоль Firebase](https://console.firebase.google.com/).
 2. Раздел **Build** -> **App Hosting**.
-3. Нажмите **Get Started** и подключите ваш репозиторий GitHub: `Aleksey29212/Ru55darts`.
-4. Firebase автоматически обнаружит настройки в `apphosting.yaml` и развернет сайт.
+3. Подключите ваш репозиторий GitHub.
 
 ### Вариант Б: Timeweb Cloud (Docker-compose)
-Если вам нужен хостинг в РФ с оплатой в рублях.
-1. Создайте проект **«Приложение из Docker-compose»** в Timeweb.
-2. Подключите ваш GitHub репозиторий.
-3. Добавьте переменные окружения в панели Timeweb:
+1. Создайте проект **«Приложение из Docker-compose»**.
+2. Добавьте переменные окружения:
    - `NEXT_PUBLIC_FIREBASE_API_KEY`
-   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
    - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
-   - `NEXT_PUBLIC_FIREBASE_APP_ID`
-   - `NEXT_PUBLIC_ADMIN_PASSWORD`
-
-## 🔑 Где взять ключи Firebase?
-1. В консоли Firebase перейдите в **Project Settings** (шестеренка вверху).
-2. Вкладка **General**, внизу раздел **Your apps** -> **Web App**.
-3. Нажмите **Config** и скопируйте значения.
+   - `NEXT_PUBLIC_ADMIN_PASSWORD` (ваш новый пароль для входа)
 
 ---
-Разработано для профессионального сообщества. Аудит математики и Docker-конфигурации пройден (v2.8 Stable).
+Разработано для профессионального сообщества. Аудит математики и Docker-конфигурации пройден.

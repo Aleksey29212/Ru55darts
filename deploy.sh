@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# DartBrig Pro: Production Deployment Script (v3.0 Stable)
+# DartBrig Pro: Production Deployment Script (v3.1 Stable)
 # Автоматизация подготовки и отправки кода в репозиторий
 
 GREEN='\033[0;32m'
@@ -37,9 +37,7 @@ fi
 
 # 2. Подготовка файлов
 echo -e "${BLUE}📦 Индексация файлов проекта...${NC}"
-# Убираем лишние скрипты из подпапок, если они есть
 rm -f src/app/deploy.sh 2>/dev/null
-
 git add .
 
 # 3. Фиксация изменений
@@ -51,7 +49,8 @@ git commit -m "$COMMIT_MSG" --quiet || echo -e "${YELLOW}ℹ️ Изменени
 echo -e "${YELLOW}📤 Отправка в GitHub (Force Push)...${NC}"
 echo -e "${WHITE}Примечание: Используйте Personal Access Token при запросе пароля.${NC}"
 
-if git push -u origin main --force; then
+# Пытаемся запушить, временно отключая сломанный помощник учетных данных, если он мешает
+if git -c credential.helper= push -u origin main --force; then
   echo -e "\n${BLUE}=======================================${NC}"
   echo -e "${GREEN}✅ ПРОЕКТ УСПЕШНО ДОСТАВЛЕН В ОБЛАКО!${NC}"
   echo -e "${BLUE}=======================================${NC}"
@@ -59,6 +58,10 @@ if git push -u origin main --force; then
   echo -e "${YELLOW}1. Для Firebase:${NC} Развертывание начнется автоматически (App Hosting)."
   echo -e "${YELLOW}2. Для Timeweb:${NC} Зайдите в панель и нажмите 'Пересобрать' в проекте Docker-compose."
 else
-  echo -e "\n${RED}❌ Ошибка отправки. Проверьте права доступа к GitHub.${NC}"
-  echo -e "${YELLOW}Совет: Убедитесь, что ваш токен (PAT) имеет права 'repo'.${NC}"
+  echo -e "\n${RED}❌ Ошибка отправки. GitHub отклонил доступ.${NC}"
+  echo -e "${YELLOW}КАК ИСПРАВИТЬ:${NC}"
+  echo -e "1. Создайте токен на GitHub: Settings -> Developer Settings -> Personal Access Tokens (Classic) -> Generate (нужны права 'repo')."
+  echo -e "2. Выполните команду в терминале, подставив свой токен:"
+  echo -e "${WHITE}git remote set-url origin https://ВАШ_ТОКЕН@github.com/Aleksey29212/Ru55darts.git${NC}"
+  echo -e "3. Снова запустите ${GREEN}npm run deploy:github${NC}"
 fi
