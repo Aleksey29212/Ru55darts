@@ -8,7 +8,7 @@
 - **Auth**: Firebase Auth (Anonymous)
 - **Deployment**: Docker / Node.js Standalone
 
-## 🚀 Инструкция по деплою на Timeweb Cloud
+## 🚀 Инструкция по деплою на Timeweb Cloud (Docker-compose)
 
 ### Шаг 1: Подготовка данных Firebase
 Для работы сайта вам нужны ключи вашего проекта Firebase.
@@ -17,9 +17,9 @@
 3. Вам понадобятся значения: `apiKey`, `authDomain`, `projectId`, `appId`.
 
 ### Шаг 2: Настройка в Timeweb Cloud
-1. Создайте проект «Приложение из Docker-compose».
+1. Создайте проект **«Приложение из Docker-compose»**.
 2. Подключите ваш GitHub репозиторий: `https://github.com/Aleksey29212/Ru55darts.git`.
-3. Перейдите во вкладку **«Переменные окружения»** и добавьте следующие ключи:
+3. Перейдите во вкладку **«Переменные окружения»** (Environment Variables) и добавьте следующие ключи:
    - `NEXT_PUBLIC_FIREBASE_API_KEY` — (ваш apiKey)
    - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` — (ваш authDomain)
    - `NEXT_PUBLIC_FIREBASE_PROJECT_ID` — (ваш projectId)
@@ -28,9 +28,9 @@
 
 ### Шаг 3: Запуск
 После сохранения переменных и запуска сборки, Timeweb Cloud автоматически развернет контейнер.
-- **Команда сборки**: `docker-compose build`
-- **Команда запуска**: `docker-compose up -d`
 - **Внутренний порт**: `3000`
+- **Команда сборки**: определяется автоматически через Dockerfile.
 
 ---
+**Совет:** Если вы не уверены в выборе тарифа, используйте промт из файла `docs/timeweb-prompt.md` для консультации с TimewebGPT.
 Разработано для профессионального сообщества. Аудит математики и Docker-конфигурации пройден (v2.8 Stable).
