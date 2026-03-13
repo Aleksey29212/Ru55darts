@@ -13,12 +13,13 @@ import { TournamentPlayerList } from './tournament-player-list';
 /**
  * @fileOverview Страница подробностей турнира.
  * ГАРАНТИЯ: Адаптировано под Next.js 15 (Async Params).
+ * Учёт ручных правок при отображении баллов.
  */
 
 export default async function TournamentDetailsPage(props: { 
   params: Promise<{ id: string }> 
 }) {
-    const params = await props.params; // NEXT.JS 15: Must await params
+    const params = await props.params; 
     const tournamentData = await getTournamentById(params.id);
 
     if (!tournamentData) {
@@ -28,17 +29,20 @@ export default async function TournamentDetailsPage(props: {
     const leagueSettings = await getLeagueSettings();
     const leagueName = leagueSettings[tournamentData.league]?.name || tournamentData.league;
 
-    // Пересчет очков "на лету" для гарантии актуальности настроек админки
+    // Пересчет очков "на лету" только если турнир НЕ был отредактирован вручную
     const scoringSettings = await getScoringSettings(tournamentData.league);
-    const playersWithCalculatedPoints = tournamentData.players.map(player => {
+    
+    const processedPlayers = tournamentData.players.map(player => {
         const playerCopy = { ...player };
-        calculatePlayerPoints(playerCopy, scoringSettings);
+        if (!tournamentData.isManuallyEdited) {
+            calculatePlayerPoints(playerCopy, scoringSettings);
+        }
         return playerCopy;
     });
 
     const tournament = {
         ...tournamentData,
-        players: playersWithCalculatedPoints,
+        players: processedPlayers,
     };
     
     const sortedPlayers = [...tournament.players].sort((a, b) => a.rank - b.rank);
@@ -56,8 +60,17 @@ export default async function TournamentDetailsPage(props: {
             </div>
             <Card className="glassmorphism">
                 <CardHeader>
-                    <CardTitle className="text-2xl">{tournament.name}</CardTitle>
-                    <CardDescription>Результаты от {formatDate(tournament.date as string)}</CardDescription>
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <CardTitle className="text-2xl">{tournament.name}</CardTitle>
+                            <CardDescription>Результаты от {formatDate(tournament.date as string)}</CardDescription>
+                        </div>
+                        {tournament.isManuallyEdited && (
+                            <div className="bg-orange-500/10 border border-orange-500/20 text-orange-500 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                                Проверено админом
+                            </div>
+                        )}
+                    </div>
                 </CardHeader>
                 <CardContent className="p-0 md:p-6">
                     <TournamentPlayerList players={sortedPlayers} tournamentId={tournament.id} />
