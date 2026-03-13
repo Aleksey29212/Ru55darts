@@ -86,7 +86,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     setMounted(true);
   }, []);
 
-  // Фильтруем пустые значения, чтобы избежать ошибок "reading id of undefined"
+  // Фильтруем пустые значения, чтобы избежать ошибок при рендеринге
   const settingsArray = (Array.isArray(settings) ? settings : [settings]).filter(s => s && typeof s === 'object');
   const namesArray = Array.isArray(leagueName) ? leagueName : [leagueName];
 
@@ -96,20 +96,21 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     <div key={key} className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/[0.03] border border-white/5 hover:border-primary/30 transition-all group shadow-sm active:scale-[0.98]">
         <div className="flex items-center gap-2 min-w-0">
             <div className={cn("p-1 rounded-md bg-black/40 border border-white/5 shrink-0", colorClass)}>
-                <Icon className="h-3 w-3" />
+                <Icon className="h-3 w-3 md:h-3.5 md:w-3.5" />
             </div>
             <div className="flex flex-col min-w-0">
-                <span className="text-[10px] font-black text-white uppercase tracking-tight truncate leading-none">{label}</span>
+                <span className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-tight truncate leading-none">{label}</span>
                 {description && (
-                    <span className="text-[7px] text-muted-foreground font-bold uppercase tracking-tight truncate mt-0.5 opacity-50">{description}</span>
+                    <span className="text-[7px] md:text-[8px] text-muted-foreground font-bold uppercase tracking-tight truncate mt-0.5 opacity-50">{description}</span>
                 )}
             </div>
         </div>
-        <span className="text-sm font-headline text-primary ml-2 drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)] shrink-0 text-right">{val}</span>
+        <span className="text-xs md:text-sm font-headline text-primary ml-2 drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)] shrink-0 text-right">{val}</span>
     </div>
   );
 
   const renderLeagueContent = (s: ScoringSettings) => {
+    // Логика для Evening Omsk
     if (s.isEveningOmsk) {
         return (
             <div className="flex flex-col gap-3 pt-1 pb-10">
@@ -121,7 +122,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                         <div className="p-1.5 bg-orange-500/20 rounded-lg border border-orange-500/30">
                             <Sparkles className="text-orange-400 h-4 w-4" />
                         </div>
-                        <h4 className="font-headline text-xs uppercase tracking-tight text-orange-400">Множители этапов</h4>
+                        <h4 className="font-headline text-xs md:text-sm uppercase tracking-tight text-orange-400">Множители этапов</h4>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 relative z-10">
                         {renderHelpPill('1-е', `× 1.00`, Medal, 'text-gold', 'Победа', 'omsk-1')}
@@ -130,7 +131,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                         {renderHelpPill('1/4', `× 0.25`, Target, 'text-primary', 'Четвертьфинал', 'omsk-5-8')}
                     </div>
                     <div className="p-3 bg-black/40 rounded-xl border border-white/5 mt-2 relative z-10">
-                        <p className="text-[10px] text-white/80 leading-relaxed italic text-center">
+                        <p className="text-[10px] md:text-[11px] text-white/80 leading-relaxed italic text-center">
                             <span className="text-primary font-bold">Формула:</span> AVG × Множитель. Баланс игрока — это сумма 5 лучших туров сезона, умноженная на курс рубля.
                         </p>
                     </div>
@@ -156,14 +157,13 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         );
     }
 
+    // Логика извлечения баллов (идентично scoring.ts)
     const getPlacePoints = (p: number) => {
         if (s.customPointsByPlace && s.customPointsByPlace[p.toString()] !== undefined) {
             return Number(s.customPointsByPlace[p.toString()]);
         }
         if (p === 1) return s.pointsFor1st;
         if (p === 2) return s.pointsFor2nd;
-        
-        // 3 место имеет приоритет
         if (p === 3 && (s.pointsFor3rd ?? 0) > 0) return s.pointsFor3rd!;
         if (p === 3 || p === 4) return s.pointsFor3rd_4th;
         
@@ -215,16 +215,16 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
 
     return (
         <div className="flex flex-col gap-4 pt-1 pb-16">
-            {/* 1. БОНУС ЗА УЧАСТИЕ (Выносим вверх как приветственный) */}
+            {/* 1. БОНУС ЗА УЧАСТИЕ */}
             {s.participationPoints > 0 && (
-                <div className="py-2 px-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-lg active:scale-95 transition-transform">
+                <div className="py-2.5 px-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-lg active:scale-95 transition-transform">
                     <div className="flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-primary" />
-                        <span className="text-[10px] font-black uppercase tracking-tight">Бонус за участие</span>
+                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-tight">Бонус за участие</span>
                     </div>
                     <div className="flex flex-col items-end">
-                        <span className="font-headline text-lg text-primary">+{s.participationPoints}</span>
-                        <span className="text-[6px] font-bold uppercase text-primary/60">ВСЕМ ИГРОКАМ ТУРА</span>
+                        <span className="font-headline text-lg md:text-xl text-primary">+{s.participationPoints}</span>
+                        <span className="text-[6px] md:text-[7px] font-bold uppercase text-primary/60">ВСЕМ УЧАСТНИКАМ ТУРА</span>
                     </div>
                 </div>
             )}
@@ -232,42 +232,42 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
             {/* 2. БАЗОВАЯ СЕТКА (1-16) */}
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-orange-500">
-                    <Trophy className="h-3 w-3 text-orange-500" />
-                    <h4 className="font-headline text-[9px] uppercase tracking-widest text-white/60">Базовые баллы (ТОП-16)</h4>
+                    <Trophy className="h-3 w-3 md:h-4 md:w-4 text-orange-500" />
+                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Базовые баллы (ТОП-16)</h4>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                     {groupedRanks.map((p, idx) => (
                         renderHelpPill(p.label, p.points, p.icon, p.color, p.desc, `base-rank-${idx}`)
                     ))}
                 </div>
             </div>
 
-            {/* 3. ДОПОЛНИТЕЛЬНЫЕ МЕСТА (17+) - Новые введения НИЖЕ базы */}
+            {/* 3. ДОПОЛНИТЕЛЬНЫЕ МЕСТА (17+) */}
             {extraEntries.length > 0 && (
                 <div className="space-y-2">
-                    <div className="flex items-center gap-3 px-3 border-l-4 border-purple-500 bg-white/5 py-1.5 rounded-r-xl shadow-xl">
-                        <PlusCircle className="h-3.5 w-3.5 text-purple-500" />
-                        <h4 className="font-headline text-[9px] uppercase tracking-widest text-white leading-none">Дополнительные позиции</h4>
+                    <div className="flex items-center gap-3 px-3 border-l-2 border-purple-500">
+                        <PlusCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-purple-500" />
+                        <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Расширенная сетка</h4>
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                         {extraEntries.map(([place, points]) => (
-                            renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Расширение сетки', `extra-place-${place}`)
+                            renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Доп. позиция', `extra-place-${place}`)
                         ))}
                     </div>
                 </div>
             )}
 
-            {/* 4. ТЕХНИЧЕСКИЕ БОНУСЫ (AVG, 180 и др) - Новые введения НИЖЕ базы */}
+            {/* 4. ПРО-БОНУСЫ */}
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-cyan-400">
-                    <Star className="h-3 w-3 text-cyan-400" />
-                    <h4 className="font-headline text-[9px] uppercase tracking-widest text-white/60">Про-статистика (Бонусы)</h4>
+                    <Star className="h-3 w-3 md:h-4 md:w-4 text-cyan-400" />
+                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Про-статистика (Бонусы)</h4>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                     {s.enable180Bonus && renderHelpPill('180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'За каждый максимум', 'bonus-180')}
-                    {s.enableHiOutBonus && renderHelpPill(`OUT ≥${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'За высокое закрытие', 'bonus-hiout')}
-                    {s.enableAvgBonus && renderHelpPill(`AVG ≥${s.avgThreshold}`, `+${s.avgBonus}`, Activity, 'text-yellow-400', 'За мощный набор', 'bonus-avg')}
-                    {s.enableShortLegBonus && renderHelpPill(`SL ≤${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Flame, 'text-cyan-400', 'За короткий лег', 'bonus-shortleg')}
+                    {s.enableHiOutBonus && renderHelpPill(`OUT ≥${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'Высокое закрытие', 'bonus-hiout')}
+                    {s.enableAvgBonus && renderHelpPill(`AVG ≥${s.avgThreshold}`, `+${s.avgBonus}`, Activity, 'text-yellow-400', 'Мощный набор', 'bonus-avg')}
+                    {s.enableShortLegBonus && renderHelpPill(`SL ≤${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Flame, 'text-cyan-400', 'Короткий лег', 'bonus-shortleg')}
                     {s.enable9DarterBonus && renderHelpPill(`9-DARTER`, `+${s.bonusFor9Darter}`, Crown, 'text-primary', 'Идеальный лег', 'bonus-9darter')}
                 </div>
             </div>
@@ -404,7 +404,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                 </div>
                                 <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/20">
                                     <p className="text-xs text-indigo-200/80 leading-relaxed italic">
-                                        В спортивной системе DartBrig Pro места могут делиться (Competition Ranking). Если у двух игроков идентичны Баллы, AVG, HF и 180-ки — они оба занимают, например, 3-е место. Следующий по списку игрок получит 5-е.
+                                        В спортивной системе DartBrig Pro места могут делиться (Competition Ranking). Если у двух игроков идентичны Баллы, AVG, HF и 180-ки — они оба занимают одно место.
                                     </p>
                                 </div>
                             </div>
