@@ -247,12 +247,12 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
             </div>
           ))}
         </CardContent>
-        <CardFooter className="fixed bottom-0 left-0 right-0 md:left-[var(--sidebar-width)] bg-background/95 backdrop-blur-xl pt-4 pb-10 px-6 border-t border-white/10 z-[60] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <CardFooter className="fixed bottom-0 left-0 right-0 md:left-[var(--sidebar-width)] bg-background/95 backdrop-blur-xl py-3 px-6 border-t border-white/10 z-[60] shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
           <div className="max-w-2xl mx-auto w-full flex justify-end">
             <Button 
                 type="submit" 
                 disabled={!isDirty || isPending} 
-                className="w-full sm:w-auto h-14 px-10 rounded-2xl shadow-2xl shadow-primary/30 font-bold text-lg transition-all active:scale-95 disabled:opacity-50"
+                className="w-full sm:w-auto h-12 px-10 rounded-xl shadow-2xl shadow-primary/30 font-black text-sm transition-all active:scale-95 disabled:opacity-50"
             >
                 {isPending ? (
                 <>

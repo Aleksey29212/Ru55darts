@@ -111,7 +111,7 @@ export function ScoringForm({ leagueId, defaultValues }: { leagueId: LeagueId, d
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10 pb-20">
         
         {/* SECTION: PLACES */}
         <div className="space-y-6">
@@ -257,10 +257,10 @@ export function ScoringForm({ leagueId, defaultValues }: { leagueId: LeagueId, d
             </div>
         </div>
 
-        <CardFooter className="fixed bottom-0 left-0 right-0 md:left-[var(--sidebar-width)] bg-background/95 backdrop-blur-xl p-6 border-t border-white/10 z-50">
+        <CardFooter className="fixed bottom-0 left-0 right-0 md:left-[var(--sidebar-width)] bg-background/95 backdrop-blur-xl py-3 px-6 border-t border-white/10 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
             <div className="max-w-4xl mx-auto w-full flex justify-end">
-                <Button type="submit" disabled={isPending} className="h-14 px-12 rounded-2xl shadow-2xl shadow-primary/30 font-black text-lg uppercase tracking-widest transition-all active:scale-95">
-                    {isPending ? <><Loader2 className="animate-spin mr-3 h-6 w-6" /> СОХРАНЕНИЕ...</> : <><Save className="mr-3 h-6 w-6" /> ПРИМЕНИТЬ ПРАВИЛА</>}
+                <Button type="submit" disabled={isPending} className="h-12 px-10 rounded-xl shadow-2xl shadow-primary/30 font-black text-sm uppercase tracking-widest transition-all active:scale-95">
+                    {isPending ? <><Loader2 className="animate-spin mr-3 h-5 w-5" /> СОХРАНЕНИЕ...</> : <><Save className="mr-3 h-5 w-5" /> ПРИМЕНИТЬ ПРАВИЛА</>}
                 </Button>
             </div>
         </CardFooter>
