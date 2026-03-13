@@ -36,8 +36,7 @@ import {
     PlusCircle,
     Activity,
     Info,
-    ChevronRight,
-    ArrowRightCircle
+    ChevronRight
 } from 'lucide-react';
 import type { ScoringSettings, SponsorshipSettings } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
@@ -157,6 +156,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         );
     }
 
+    // Обычная лига: Чистая логика начислений
     const getPlacePoints = (p: number) => {
         if (s.customPointsByPlace && s.customPointsByPlace[p.toString()] !== undefined) {
             return Number(s.customPointsByPlace[p.toString()]);
@@ -170,7 +170,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         return 0;
     };
 
-    const hasSpecific3rd = s.pointsFor3rd > 0 && s.pointsFor3rd !== s.pointsFor3rd_4th;
+    const hasSpecific3rd = Number(s.pointsFor3rd) > 0 && s.pointsFor3rd !== s.pointsFor3rd_4th;
 
     const basePlaces = [
         { label: '1 МЕСТО', points: getPlacePoints(1), icon: Medal, color: 'text-gold', desc: 'Победа' },
@@ -380,7 +380,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                 </div>
                                 <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/20">
                                     <p className="text-xs text-indigo-200/80 leading-relaxed italic">
-                                        В спортивной системе DartBrig Pro места могут делиться (Competition Ranking). Если у двух игроков идентичны Баллы, AVG и HF — они оба занимают, например, 3-е место. Следующий по списку игрок получит 5-е.
+                                        В спортивной системе DartBrig Pro места могут делиться (Competition Ranking). Если у двух игроков идентичны Баллы, AVG, HF и 180-ки — они оба занимают, например, 3-е место. Следующий по списку игрок получит 5-е.
                                     </p>
                                 </div>
                             </div>

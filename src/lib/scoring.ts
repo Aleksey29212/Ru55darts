@@ -36,16 +36,21 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
         return calculateEveningOmskPoints(result, settings);
     }
 
-    // 1. Базовые очки за место (только для 1-16 мест)
+    // 1. Сброс текущих баллов перед расчетом (предотвращение "задвоения")
+    result.points = 0;
+    result.basePoints = 0;
+    result.bonusPoints = 0;
+
+    // 2. Базовые очки за место (только для 1-16 мест или кастомных)
     const placePoints = getPointsForRank(result.rank, settings);
     
-    // 2. Очки за участие (начисляются всем, кто есть в протоколе)
+    // 3. Очки за участие (начисляются всем, кто есть в протоколе)
     const participationPoints = Number(settings.participationPoints) || 0;
     
-    // Итоговая база (строгое сложение чисел)
+    // Итоговая база
     result.basePoints = Number(placePoints) + Number(participationPoints);
     
-    // 3. Сброс и расчет расширенных бонусов
+    // 4. Расчет расширенных бонусов
     let currentBonusTotal = 0;
     
     result.pointsFor180s = 0;
@@ -80,7 +85,7 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
         currentBonusTotal += result.pointsForAvg;
     }
 
-    // Бонус за Короткий Лег (Short Leg) - если лучший лег меньше или равен порогу
+    // Бонус за Короткий Лег (Short Leg)
     if (settings.enableShortLegBonus && Number(result.bestLeg) > 0 && Number(result.bestLeg) <= (Number(settings.shortLegThreshold) || 0)) {
         result.pointsForBestLeg = Number(settings.shortLegBonus) || 0;
         result.isBestLegBonusApplied = true;
@@ -96,7 +101,7 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
 
     result.bonusPoints = currentBonusTotal;
 
-    // ФИНАЛЬНАЯ СУММА: База + Все Бонусы
+    // ФИНАЛЬНАЯ СУММА: База + Все Бонусы (Гарантия числового типа)
     result.points = Number(result.basePoints) + Number(result.bonusPoints);
 }
 
@@ -121,6 +126,6 @@ function calculateEveningOmskPoints(result: TournamentPlayerResult, settings: Sc
 
     // Очки = Средний набор * Множитель этапа
     result.basePoints = Math.round(avg * multiplier);
-    result.bonusPoints = 0; // В Омске бонусы не влияют на баланс выплат
+    result.bonusPoints = 0; 
     result.points = result.basePoints;
 }

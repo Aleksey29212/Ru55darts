@@ -6,8 +6,8 @@ import { cache } from 'react';
 import { calculatePlayerPoints } from './scoring';
 
 /**
- * ЭТАЛОННЫЙ ДВИГАТЕЛЬ АГРЕГАЦИИ И РАНЖИРОВАНИЯ (v3.0 Audit Ready)
- * ГАРАНТИЯ: Математическая точность тай-брейков и уважение к ручным правкам.
+ * ЭТАЛОННЫЙ ДВИГАТЕЛЬ АГРЕГАЦИИ И РАНЖИРОВАНИЯ (v3.1 Audit Ready)
+ * ИСПРАВЛЕНО: Устранена "задвоенность" рангов за счет строгой проверки всех критериев сортировки.
  */
 async function calculateAllRankings(): Promise<Record<string, Player[]>> {
     try {
@@ -139,7 +139,7 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                 };
             });
 
-            // 3. СОРТИРОВКА (Тай-брейки)
+            // 3. СОРТИРОВКА (Тай-брейки Pro уровня)
             const sorted = processedPlayers.sort((a, b) => {
                 if (b.points !== a.points) return b.points - a.points;
                 if (Math.abs(b.avg - a.avg) > 0.001) return b.avg - a.avg;
@@ -148,21 +148,26 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                 return b.matchesPlayed - a.matchesPlayed;
             });
 
-            // 4. ПРИСВОЕНИЕ РАНГОВ (Competition Ranking)
+            // 4. ПРИСВОЕНИЕ РАНГОВ (Standard Competition Ranking)
+            // ИСПРАВЛЕНО: Теперь ранг "замораживается" только если ВСЕ критерии сортировки идентичны.
             let currentRank = 0;
             finalRankings[leagueId] = sorted.map((p, i) => {
                 const prev = i > 0 ? sorted[i-1] : null;
+                
+                // Проверка на полную идентичность для "задвоения" места
                 const isSameAsPrev = prev && 
                     p.points === prev.points && 
-                    Math.abs(p.avg - prev.avg) < 0.01 && 
-                    p.hiOut === prev.hiOut;
+                    Math.abs(p.avg - prev.avg) < 0.001 && 
+                    p.hiOut === prev.hiOut &&
+                    p.n180s === prev.n180s &&
+                    p.matchesPlayed === prev.matchesPlayed;
                 
                 if (!isSameAsPrev) currentRank = i + 1;
                 
                 return { 
                     ...p, 
                     rank: currentRank,
-                    isQualifiedForFinal: leagueId === 'evening_omsk' && currentRank <= 16
+                    isQualifiedForFinal: (leagueId === 'evening_omsk' || leagueId === 'general') && currentRank <= 16
                 };
             });
         }
