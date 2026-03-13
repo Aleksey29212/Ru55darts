@@ -122,14 +122,14 @@ export default function AdminLayout({
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon" className="border-r-2 border-primary/10">
+      <Sidebar collapsible="icon" className="border-r border-white/10 bg-black/40 backdrop-blur-xl">
         <AdminSidebarContent />
       </Sidebar>
-      <SidebarInset className="bg-background/50">
-        <main className="flex-1 p-4 md:p-10">
+      <SidebarInset className="bg-background/80 backdrop-blur-sm min-h-screen">
+        <main className="flex-1 p-4 md:p-8 lg:p-12">
            <div className="flex items-center justify-between mb-8 border-b border-primary/10 pb-6">
             <div className="flex items-center gap-4">
-                <SidebarTrigger className="md:hidden"/>
+                <SidebarTrigger className="md:hidden p-2 rounded-xl bg-primary/10 text-primary" />
                 <Link 
                     href="/admin" 
                     className={cn(
@@ -141,13 +141,13 @@ export default function AdminLayout({
                         "p-3 rounded-xl shadow-inner transition-colors duration-150",
                         isMainAdmin ? "bg-primary/10 text-primary" : "bg-primary text-primary-foreground group-hover:bg-primary/90"
                     )}>
-                        {isMainAdmin ? <Shield className="h-8 w-8" /> : <ChevronLeft className="h-8 w-8" />}
+                        {isMainAdmin ? <Shield className="h-6 w-6 md:h-8 md:w-8" /> : <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />}
                     </div>
                     <div>
-                        <h1 className="text-xl md:text-3xl font-headline tracking-tighter uppercase leading-none">
+                        <h1 className="text-lg md:text-3xl font-headline tracking-tighter uppercase leading-none">
                             {isMainAdmin ? "Панель управления" : "Вернуться в меню"}
                         </h1>
-                        <p className="text-[9px] md:text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1 opacity-70">
+                        <p className="text-[8px] md:text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1 opacity-70">
                             DartBrig Pro Management
                         </p>
                     </div>
@@ -161,7 +161,7 @@ export default function AdminLayout({
                 </div>
             )}
           </div>
-          <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="animate-in fade-in slide-in-from-top-2 duration-300">
             {children}
           </div>
         </main>

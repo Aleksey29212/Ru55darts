@@ -18,11 +18,12 @@ export function MainLayout({
   children: React.ReactNode;
   backgroundUrl: string;
   sponsorshipSettings: SponsorshipSettings;
-  scoringSettings: ScoringSettings;
-  leagueName: string;
+  scoringSettings: ScoringSettings[];
+  leagueName: string[];
 }) {
   const pathname = usePathname();
   const isGatePage = pathname === '/gate';
+  const isAdminSection = pathname.startsWith('/admin');
 
   if (isGatePage) {
     return <>{children}</>;
@@ -30,7 +31,7 @@ export function MainLayout({
 
   return (
     <>
-      {backgroundUrl && (
+      {backgroundUrl && !isAdminSection && (
         <div
           className="fixed inset-0 z-[-2] bg-cover bg-center"
           style={{ backgroundImage: `url(${backgroundUrl})` }}
@@ -39,27 +40,31 @@ export function MainLayout({
       <div className="fixed inset-0 z-[-1] bg-background/90" />
 
       <div className={cn('flex min-h-screen flex-col')}>
-        <Header
-          sponsorshipSettings={sponsorshipSettings}
-          scoringSettings={scoringSettings}
-          leagueName={leagueName}
-        />
-        <div className="flex-1">{children}</div>
-        <footer className="container flex-shrink-0 py-8">
-          <div className="text-center text-sm text-muted-foreground space-y-1">
-            <p>По вопросам сотрудничества и размещения информации:</p>
-            <Button variant="link" asChild className="text-base text-primary">
-              <a
-                href={sponsorshipSettings.groupVkLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Send />
-                Написать в VK-группу
-              </a>
-            </Button>
-          </div>
-        </footer>
+        {!isAdminSection && (
+          <Header
+            sponsorshipSettings={sponsorshipSettings}
+            scoringSettings={scoringSettings}
+            leagueName={leagueName}
+          />
+        )}
+        <div className="flex-1 flex flex-col">{children}</div>
+        {!isAdminSection && (
+          <footer className="container flex-shrink-0 py-8">
+            <div className="text-center text-sm text-muted-foreground space-y-1">
+              <p>По вопросам сотрудничества и размещения информации:</p>
+              <Button variant="link" asChild className="text-base text-primary">
+                <a
+                  href={sponsorshipSettings.groupVkLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Send className="mr-2 h-4 w-4" />
+                  Написать в VK-группу
+                </a>
+              </Button>
+            </div>
+          </footer>
+        )}
       </div>
     </>
   );
