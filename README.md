@@ -8,29 +8,29 @@
 - **Auth**: Firebase Auth (Anonymous)
 - **Deployment**: Docker / Node.js Standalone
 
-## 🚀 Инструкция по деплою (Timeweb Cloud / любая Docker-платформа)
+## 🚀 Инструкция по деплою на Timeweb Cloud
 
-### Шаг 1: Отправка в GitHub
-1. Выполните команду: `npm run deploy:github`
-2. Весь код со всеми исправлениями (математика, Docker-файлы, UI) будет отправлен в ваш репозиторий `Aleksey29212/Ru55darts.git`.
+### Шаг 1: Подготовка данных Firebase
+Для работы сайта вам нужны ключи вашего проекта Firebase.
+1. В [Консоли Firebase](https://console.firebase.google.com/) перейдите в **Project Settings**.
+2. Внизу страницы найдите раздел **Your apps** -> **Web App** -> **SDK setup** -> **Config**.
+3. Вам понадобятся значения: `apiKey`, `authDomain`, `projectId`, `appId`.
 
 ### Шаг 2: Настройка в Timeweb Cloud
-1. Создайте проект «Приложение из Docker-compose» или «Node.js приложение».
-2. Подключите ваш GitHub репозиторий.
-3. В разделе **«Переменные окружения»** добавьте:
-   ```env
-   NEXT_PUBLIC_FIREBASE_API_KEY=ваш_ключ
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=ваш_домен
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=ваш_id_проекта
-   NEXT_PUBLIC_FIREBASE_APP_ID=ваш_id_приложения
-   NEXT_PUBLIC_ADMIN_PASSWORD=1234
-   ```
+1. Создайте проект «Приложение из Docker-compose».
+2. Подключите ваш GitHub репозиторий: `https://github.com/Aleksey29212/Ru55darts.git`.
+3. Перейдите во вкладку **«Переменные окружения»** и добавьте следующие ключи:
+   - `NEXT_PUBLIC_FIREBASE_API_KEY` — (ваш apiKey)
+   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` — (ваш authDomain)
+   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID` — (ваш projectId)
+   - `NEXT_PUBLIC_FIREBASE_APP_ID` — (ваш appId)
+   - `NEXT_PUBLIC_ADMIN_PASSWORD` — (любой ваш пароль для входа в админку)
 
-### Шаг 3: Команды запуска (для техподдержки)
-Если система запрашивает команды вручную:
-- **Сборка**: `docker-compose build`
-- **Запуск**: `docker-compose up -d`
-- **Порт**: `3000`
+### Шаг 3: Запуск
+После сохранения переменных и запуска сборки, Timeweb Cloud автоматически развернет контейнер.
+- **Команда сборки**: `docker-compose build`
+- **Команда запуска**: `docker-compose up -d`
+- **Внутренний порт**: `3000`
 
 ---
 Разработано для профессионального сообщества. Аудит математики и Docker-конфигурации пройден (v2.8 Stable).
