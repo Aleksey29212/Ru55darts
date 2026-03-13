@@ -1,3 +1,4 @@
+
 import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 import { getDb } from '@/firebase/server';
 import type { ScoringSettings, AllLeagueSettings, LeagueId, SponsorshipSettings, AppearanceSettings, TemplateId } from './types';
@@ -59,17 +60,30 @@ export const getScoringSettings = cache(
 );
 
 export async function updateScoringSettings(leagueId: LeagueId, settings: ScoringSettings): Promise<void> {
-  // Сохраняем в глобальную память (для демо-режима)
+  // Сохраняем в глобальную память (для демо-режима и мгновенного обновления)
+  if (!(global as any).memoScoringSettings) (global as any).memoScoringSettings = {};
   (global as any).memoScoringSettings[leagueId] = settings;
   
   const db = getDb();
   if (!db) return;
+  
   try {
       const docRef = doc(db, 'scoring_configurations', leagueId);
       const dataToSet = { ...settings };
       delete (dataToSet as any).id;
-      await setDoc(docRef, dataToSet);
-  } catch (e) {}
+      
+      // Принудительно гарантируем числовой формат для всех полей баллов
+      for (const key in dataToSet) {
+          if (typeof (dataToSet as any)[key] === 'string' && !isNaN(Number((dataToSet as any)[key]))) {
+              (dataToSet as any)[key] = Number((dataToSet as any)[key]);
+          }
+      }
+      
+      await setDoc(docRef, dataToSet, { merge: true });
+  } catch (e) {
+      console.error('Settings persist failed:', e);
+      throw e;
+  }
 }
 
 export const getLeagueSettings = cache(

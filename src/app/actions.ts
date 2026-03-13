@@ -1,3 +1,4 @@
+
 'use server';
 
 import { getPlayerProfiles, updatePlayerProfiles, getPlayerProfileById, clearAllPlayerProfiles } from '@/lib/players';
@@ -173,11 +174,16 @@ export async function clearAllPlayerData() {
 export async function saveScoringSettings(leagueId: LeagueId, data: ScoringSettings) {
   try {
     await updateScoringSettings(leagueId, data);
+    
+    // Принудительная ревалидация всех связанных путей
     revalidateTag('scoring');
+    revalidatePath('/admin/scoring', 'page');
     revalidatePath('/', 'layout');
-    return { success: true, message: `Настройки сохранены.` };
+    
+    return { success: true, message: `Настройки для лиги "${leagueId}" успешно применены.` };
   } catch (e) {
-    return { success: false, message: 'Ошибка сохранения.' };
+    console.error('Save scoring error:', e);
+    return { success: false, message: 'Ошибка сохранения настроек в базу данных.' };
   }
 }
 

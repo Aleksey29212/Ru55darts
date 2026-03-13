@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -17,39 +18,39 @@ import { saveScoringSettings } from '@/app/actions';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const scoringSchema = z.object({
-  pointsFor1st: z.coerce.number().min(0),
-  pointsFor2nd: z.coerce.number().min(0),
-  pointsFor3rd: z.coerce.number().min(0),
-  pointsFor3rd_4th: z.coerce.number().min(0),
+  pointsFor1st: z.coerce.number().min(0).default(0),
+  pointsFor2nd: z.coerce.number().min(0).default(0),
+  pointsFor3rd: z.coerce.number().min(0).default(0),
+  pointsFor3rd_4th: z.coerce.number().min(0).default(0),
   
-  pointsFor5th: z.coerce.number().min(0),
-  pointsFor6th: z.coerce.number().min(0),
-  pointsFor7th: z.coerce.number().min(0),
-  pointsFor8th: z.coerce.number().min(0),
-  pointsFor9th: z.coerce.number().min(0),
-  pointsFor10th: z.coerce.number().min(0),
+  pointsFor5th: z.coerce.number().min(0).default(0),
+  pointsFor6th: z.coerce.number().min(0).default(0),
+  pointsFor7th: z.coerce.number().min(0).default(0),
+  pointsFor8th: z.coerce.number().min(0).default(0),
+  pointsFor9th: z.coerce.number().min(0).default(0),
+  pointsFor10th: z.coerce.number().min(0).default(0),
 
-  pointsFor5th_8th: z.coerce.number().min(0),
-  pointsFor9th_16th: z.coerce.number().min(0),
-  participationPoints: z.coerce.number().min(0),
+  pointsFor5th_8th: z.coerce.number().min(0).default(0),
+  pointsFor9th_16th: z.coerce.number().min(0).default(0),
+  participationPoints: z.coerce.number().min(0).default(0),
 
   enable180Bonus: z.boolean().default(false),
-  bonusPer180: z.coerce.number().min(0),
+  bonusPer180: z.coerce.number().min(0).default(0),
 
   enableHiOutBonus: z.boolean().default(false),
-  hiOutThreshold: z.coerce.number().min(0),
-  hiOutBonus: z.coerce.number().min(0),
+  hiOutThreshold: z.coerce.number().min(0).default(0),
+  hiOutBonus: z.coerce.number().min(0).default(0),
   
   enableAvgBonus: z.boolean().default(false),
-  avgThreshold: z.coerce.number().min(0).max(180),
-  avgBonus: z.coerce.number().min(0),
+  avgThreshold: z.coerce.number().min(0).max(180).default(0),
+  avgBonus: z.coerce.number().min(0).default(0),
 
   enableShortLegBonus: z.boolean().default(false),
-  shortLegThreshold: z.coerce.number().min(9).max(30),
-  shortLegBonus: z.coerce.number().min(0),
+  shortLegThreshold: z.coerce.number().min(9).max(30).default(15),
+  shortLegBonus: z.coerce.number().min(0).default(0),
 
   enable9DarterBonus: z.boolean().default(false),
-  bonusFor9Darter: z.coerce.number().min(0),
+  bonusFor9Darter: z.coerce.number().min(0).default(0),
   
   customPointsByPlace: z.record(z.string(), z.coerce.number()).optional(),
 });
@@ -140,13 +141,26 @@ export function ScoringForm({ leagueId, defaultValues }: { leagueId: LeagueId, d
         });
 
         const result = await saveScoringSettings(leagueId, { ...data, customPointsByPlace: customRecord } as any);
-        toast({ title: result.success ? 'Успешно' : 'Ошибка', description: result.message });
+        if (result.success) {
+            toast({ title: 'Успешно', description: result.message });
+            form.reset(data); // Сбрасываем состояние "грязной" формы
+        } else {
+            toast({ title: 'Ошибка', description: result.message, variant: 'destructive' });
+        }
     });
   }
 
+  const onInvalid = () => {
+    toast({
+        title: 'Ошибка заполнения',
+        description: 'Проверьте все поля. Все значения баллов должны быть числами больше или равными 0.',
+        variant: 'destructive',
+    });
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10 pb-20">
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-10 pb-20">
         
         <div className="space-y-6">
             <div className="flex items-center gap-3 border-b border-white/10 pb-4">
