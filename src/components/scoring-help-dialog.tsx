@@ -36,7 +36,8 @@ import {
     History,
     AlertCircle,
     Activity,
-    Crown
+    Crown,
+    PlusCircle
 } from 'lucide-react';
 import type { ScoringSettings, LeagueId, SponsorshipSettings } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
