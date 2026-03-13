@@ -165,6 +165,9 @@ export type ScoringSettings = {
   // Evening Omsk specific
   exchangeRate?: number; // RUB per 1 point
   isEveningOmsk?: boolean;
+
+  // New: Custom points per specific place
+  customPointsByPlace?: Record<string, number>;
 };
 
 

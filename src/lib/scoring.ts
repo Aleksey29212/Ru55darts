@@ -1,11 +1,18 @@
 import type { TournamentPlayerResult, ScoringSettings } from './types';
 
 export function getPointsForRank(rank: number, settings: ScoringSettings): number {
+    // 1. Проверяем индивидуальную настройку места (если есть)
+    if (settings.customPointsByPlace && settings.customPointsByPlace[rank.toString()] !== undefined) {
+        return Number(settings.customPointsByPlace[rank.toString()]);
+    }
+
+    // 2. Стандартная логика по группам
     if (rank === 1) return settings.pointsFor1st;
     if (rank === 2) return settings.pointsFor2nd;
     if (rank >= 3 && rank <= 4) return settings.pointsFor3rd_4th;
     if (rank >= 5 && rank <= 8) return settings.pointsFor5th_8th;
     if (rank >= 9 && rank <= 16) return settings.pointsFor9th_16th;
+    
     return settings.participationPoints;
 }
 

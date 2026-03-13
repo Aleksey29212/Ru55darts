@@ -156,6 +156,10 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         );
     }
 
+    // Собираем все индивидуальные места для отображения
+    const customEntries = s.customPointsByPlace ? Object.entries(s.customPointsByPlace)
+        .sort((a, b) => Number(a[0]) - Number(b[0])) : [];
+
     return (
         <div className="flex flex-col gap-6 md:gap-8 pt-2 pb-20">
             <div className="space-y-2 md:space-y-3">
@@ -164,6 +168,12 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                     <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Баллы за итоговые места</h4>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                    {/* Показываем кастомные места в начале */}
+                    {customEntries.map(([place, points]) => (
+                        renderHelpPill(`${place} МЕСТО`, points, Medal, Number(place) <= 3 ? (Number(place) === 1 ? 'text-gold' : Number(place) === 2 ? 'text-silver' : 'text-bronze') : 'text-primary', 'Точная настройка')
+                    ))}
+                    
+                    {/* Стандартные группы показываем только если нет пересекающихся кастомных или для полноты картины */}
                     {renderHelpPill('1 МЕСТО', s.pointsFor1st, Medal, 'text-gold', 'Победа')}
                     {renderHelpPill('2 МЕСТО', s.pointsFor2nd, Medal, 'text-silver', 'Финал')}
                     {renderHelpPill('3-4 МЕСТА', s.pointsFor3rd_4th, Medal, 'text-bronze', 'Полуфинал')}
