@@ -141,6 +141,15 @@ export type ScoringSettings = {
   pointsFor2nd: number;
   pointsFor3rd: number;
   pointsFor3rd_4th: number;
+  
+  // New specific place fields
+  pointsFor5th?: number;
+  pointsFor6th?: number;
+  pointsFor7th?: number;
+  pointsFor8th?: number;
+  pointsFor9th?: number;
+  pointsFor10th?: number;
+
   pointsFor5th_8th: number;
   pointsFor9th_16th: number;
   participationPoints: number;

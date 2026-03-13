@@ -165,6 +165,15 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         if (p === 2) return s.pointsFor2nd;
         if (p === 3) return s.pointsFor3rd || s.pointsFor3rd_4th;
         if (p === 4) return s.pointsFor3rd_4th;
+        
+        // Specific place logic for 5-10
+        if (p === 5 && s.pointsFor5th && s.pointsFor5th > 0) return s.pointsFor5th;
+        if (p === 6 && s.pointsFor6th && s.pointsFor6th > 0) return s.pointsFor6th;
+        if (p === 7 && s.pointsFor7th && s.pointsFor7th > 0) return s.pointsFor7th;
+        if (p === 8 && s.pointsFor8th && s.pointsFor8th > 0) return s.pointsFor8th;
+        if (p === 9 && s.pointsFor9th && s.pointsFor9th > 0) return s.pointsFor9th;
+        if (p === 10 && s.pointsFor10th && s.pointsFor10th > 0) return s.pointsFor10th;
+
         if (p >= 5 && p <= 8) return s.pointsFor5th_8th;
         if (p >= 9 && p <= 16) return s.pointsFor9th_16th;
         return 0;
@@ -184,8 +193,33 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         basePlaces.push({ label: '3-4 МЕСТА', points: getPlacePoints(3), icon: Medal, color: 'text-bronze', desc: 'Полуфинал' });
     }
 
-    basePlaces.push({ label: '5-8 МЕСТА', points: getPlacePoints(5), icon: Target, color: 'text-primary', desc: '1/4 финала' });
-    basePlaces.push({ label: '9-16 МЕСТА', points: getPlacePoints(9), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' });
+    // Determine if we should show 5-8 as a group or individually
+    const specific5_8 = [5, 6, 7, 8].some(p => {
+        const val = s[`pointsFor${p}th` as keyof ScoringSettings];
+        return val !== undefined && val > 0 && val !== s.pointsFor5th_8th;
+    });
+
+    if (specific5_8) {
+        [5, 6, 7, 8].forEach(p => {
+            basePlaces.push({ label: `${p} МЕСТО`, points: getPlacePoints(p), icon: Target, color: 'text-primary', desc: '1/4 финала' });
+        });
+    } else {
+        basePlaces.push({ label: '5-8 МЕСТА', points: getPlacePoints(5), icon: Target, color: 'text-primary', desc: '1/4 финала' });
+    }
+
+    // Determine if we should show 9-10 as individual
+    const specific9_10 = [9, 10].some(p => {
+        const val = s[`pointsFor${p}th` as keyof ScoringSettings];
+        return val !== undefined && val > 0 && val !== s.pointsFor9th_16th;
+    });
+
+    if (specific9_10) {
+        basePlaces.push({ label: `9 МЕСТО`, points: getPlacePoints(9), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' });
+        basePlaces.push({ label: `10 МЕСТО`, points: getPlacePoints(10), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' });
+        basePlaces.push({ label: `11-16 МЕСТА`, points: getPlacePoints(11), icon: TrendingUp, color: 'text-primary/40', desc: '1/8 финала' });
+    } else {
+        basePlaces.push({ label: '9-16 МЕСТА', points: getPlacePoints(9), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' });
+    }
 
     const extraEntries = s.customPointsByPlace 
         ? Object.entries(s.customPointsByPlace)
