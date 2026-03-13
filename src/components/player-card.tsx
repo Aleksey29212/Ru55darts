@@ -43,7 +43,7 @@ const StatItem = ({
     const valueString = String(value);
     const len = valueString.length;
     
-    // УЛЬТРА-АДАПТИВНЫЙ МАСШТАБ ЦИФР
+    // УЛЬТРА-АДАПТИВНЫЙ МАСШТАБ ЦИФР (Защита от переполнения)
     let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
     if (len >= 7) {
@@ -72,7 +72,7 @@ const StatItem = ({
     };
 
     const valueClasses = cn(
-        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-150 tabular-nums whitespace-nowrap px-0.5",
+        "font-headline tracking-tighter leading-none w-full text-center drop-shadow-2xl transition-all duration-75 tabular-nums whitespace-nowrap px-0.5",
         fontSizeClass,
         (name === 'avg' || name === 'n180s' || name === 'hiOut' || name === 'winRate' || name === 'points') ? 'text-primary text-glow' : 'text-white',
         template === 'dynamic' ? 'text-accent text-glow-accent' : '',
@@ -91,7 +91,7 @@ const StatItem = ({
             onClick={() => setIsRevealed(!isRevealed)}
         >
             <div className="w-full flex items-center justify-center gap-0.5 mb-1 relative z-10 px-1">
-                <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-tighter text-muted-foreground/90 leading-none">
+                <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-tighter text-muted-foreground/90 leading-none shrink-0">
                     {label}
                 </span>
                 
@@ -126,7 +126,7 @@ const StatItem = ({
                     <span className={valueClasses}>{value}</span>
                 ) : (
                     <div className="flex flex-col items-center gap-1.5 animate-in fade-in duration-150">
-                        <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform duration-150">
+                        <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform duration-75">
                             <Lock className="h-3.5 w-3.5 sm:h-7 sm:w-7 text-primary opacity-60 group-hover:opacity-100" />
                         </div>
                         <span className="text-[5px] sm:text-[6px] font-black uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary/60">OPEN</span>

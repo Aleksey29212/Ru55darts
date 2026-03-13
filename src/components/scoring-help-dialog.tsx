@@ -230,7 +230,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 defaultValue={settingsArray[0]?.id || "general"} 
                 className="w-full flex flex-col h-full"
             >
-                {/* Интеллектуальная панель навигации: лиги стремятся к центру, до 6 в ряд */}
                 <div className="relative z-20 shrink-0 px-6 md:px-12 mt-6 mb-4 flex justify-center w-full">
                     <TabsList className="bg-black/80 backdrop-blur-3xl p-3 border border-white/10 h-auto flex flex-wrap justify-center gap-3 mx-auto max-w-[850px] rounded-[1.5rem] shadow-2xl">
                         {settingsArray.map((s, idx) => {
@@ -257,7 +256,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                             )
                         })}
                         
-                        {/* Вкладка ранжирования */}
                         <TabsTrigger 
                             value="ranking-logic"
                             className="relative flex flex-col items-center justify-center w-[calc(33.33%-12px)] sm:w-24 h-16 md:w-28 md:h-16 rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-900 border-indigo-400/50 data-[state=active]:-translate-y-1.5 data-[state=active]:scale-105 data-[state=active]:border-white/60"
@@ -268,7 +266,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                     </TabsList>
                 </div>
 
-                {/* Основная область прокрутки (Лента) */}
                 <ScrollArea className="flex-1 px-6 md:px-12 lg:px-20 scroll-smooth">
                     <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-[#050505] to-transparent z-10 pointer-events-none" />
                     
@@ -282,12 +279,10 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                 <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent" />
                             </div>
                             
-                            {/* Рендеринг содержимого ленты */}
                             {renderLeagueContent(s)}
                         </TabsContent>
                     ))}
 
-                    {/* Контент вкладки Ранжирования */}
                     <TabsContent value="ranking-logic" className="outline-none animate-in fade-in slide-in-from-bottom-4 duration-700 mt-0">
                         <div className="flex items-center gap-4 mb-4 mt-6">
                             <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
@@ -317,7 +312,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
             </Tabs>
         </div>
 
-        {/* Компактный подвал */}
         <div className="bg-black/98 backdrop-blur-3xl p-3 px-8 border-t border-white/10 shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
           <div className="flex flex-row justify-between items-center gap-6 max-w-5xl mx-auto">
             <div className="flex items-center gap-3">
