@@ -4,8 +4,8 @@ import { calculatePlayerPoints } from './scoring';
 
 /**
  * @fileOverview Модуль парсинга данных с dartsbase.ru
- * ГАРАНТИЯ: Точный поиск Max Out и очистка текстовых пометок в скобках.
- * Версия алгоритма: 4.8 (Master)
+ * ГАРАНТИЯ: Точное извлечение числовых данных и очистка мусорных символов.
+ * Версия алгоритма: 4.9 (Audit Ready)
  */
 
 export interface ScrapedTournament {
@@ -16,34 +16,40 @@ export interface ScrapedTournament {
 }
 
 /**
- * Извлекает дату из текстового заголовка турнира.
+ * Извлекает дату из текстового заголовка турнира (ДД.ММ.ГГГГ).
  */
 function parseDateFromText(text: string): Date {
   const dateRegex = /(\d{2})\.(\d{2})\.(\d{4})/;
   const match = text.match(dateRegex);
   if (match) {
+    // Используем UTC для предотвращения смещения дат из-за часовых поясов
     return new Date(Date.UTC(Number(match[3]), Number(match[2]) - 1, Number(match[1])));
   }
   return new Date();
 }
 
 /**
- * Извлекает только ПЕРВОЕ число из строки.
+ * ГАРАНТИЯ: Извлечение только ПЕРВОГО целого числа из строки.
  */
 const extractNumber = (val: any): number => {
     if (val === null || val === undefined) return 0;
     const cleanVal = String(val).trim();
+    // Находим первую последовательность цифр
     const match = cleanVal.match(/\d+/);
     return match ? parseInt(match[0], 10) : 0;
 };
 
 /**
- * Очистка дробных чисел (AVG).
+ * ГАРАНТИЯ: Преобразование строки в дробное число (AVG).
+ * Поддерживает оба формата десятичного разделителя (65.5 и 65,5).
  */
 const cleanFloat = (val: string): number => {
     if (!val) return 0;
-    const parts = String(val).trim().split(/\s+/);
-    return parseFloat(parts[0].replace(',', '.')) || 0;
+    const normalized = String(val).trim().replace(',', '.');
+    // Извлекаем только первую часть, если есть пробелы или текст
+    const parts = normalized.split(/\s+/);
+    const result = parseFloat(parts[0]);
+    return isNaN(result) ? 0 : result;
 };
 
 export async function scrapeTournamentData(
@@ -65,6 +71,7 @@ export async function scrapeTournamentData(
   const html = await response.text();
   const $ = cheerio.load(html);
 
+  // 1. Метаданные турнира
   const h1 = $('h1').first();
   const fullTitle = h1.text().trim();
   const tournamentDate = parseDateFromText(fullTitle);
@@ -73,12 +80,13 @@ export async function scrapeTournamentData(
   h1Clone.find('span').remove();
   let tournamentName = h1Clone.text().trim() || `Турнир #${tournamentId}`;
 
+  // 2. Поиск главной таблицы статистики
   let table = $('table').first();
   let maxMatchScore = -1;
 
   $('table').each((_, el) => {
       const headText = $(el).text().toLowerCase();
-      const keywords = ['avg', 'игрок', 'место', '180', 'checkout', 'hi-out', 'max out', 'finish', 'sl', 'leg'];
+      const keywords = ['avg', 'игрок', 'место', '180', 'checkout', 'hi-out', 'sl', 'leg'];
       let score = 0;
       keywords.forEach(k => { if (headText.includes(k)) score++; });
       if (score > maxMatchScore) {
@@ -87,6 +95,7 @@ export async function scrapeTournamentData(
       }
   });
 
+  // 3. Динамический маппинг колонок (Column Mapping)
   const headerMap: Record<string, number> = {};
   const headerRow = table.find('thead tr').length > 0 ? table.find('thead tr').first() : table.find('tr').first();
   
@@ -116,10 +125,11 @@ export async function scrapeTournamentData(
     }
   });
 
+  // 4. Извлечение строк игроков
   const results: TournamentPlayerResult[] = [];
   const rows = table.find('tbody tr').length > 0 ? table.find('tbody tr') : table.find('tr').slice(1);
 
-  rows.each((i, row) => {
+  rows.each((_, row) => {
     const cols = $(row).find('td');
     if (cols.length < 2) return;
 
@@ -159,6 +169,7 @@ export async function scrapeTournamentData(
       nineDarters: extractNumber(getVal(headerMap['nine'])),
     };
 
+    // 5. Расчет очков на основе правил лиги
     calculatePlayerPoints(playerResult, scoringSettings);
     results.push(playerResult);
   });

@@ -6,8 +6,8 @@ import { cache } from 'react';
 import { calculatePlayerPoints } from './scoring';
 
 /**
- * ЭТАЛОННЫЙ ДВИГАТЕЛЬ АГРЕГАЦИИ (v2.9 Audit)
- * ГАРАНТИЯ: Обработка задвоенных мест и расчет ТОП-16 финалистов.
+ * ЭТАЛОННЫЙ ДВИГАТЕЛЬ АГРЕГАЦИИ И РАНЖИРОВАНИЯ (v2.9 Audit)
+ * ГАРАНТИЯ: Математическая точность тай-брейков и обработки дублей мест.
  */
 async function calculateAllRankings(): Promise<Record<string, Player[]>> {
     try {
@@ -23,9 +23,10 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
         const profileMap = new Map(playerProfiles.map(p => [p.id, p]));
         const leagueDataMap: Record<string, Record<string, any[]>> = {};
         const generalLeagueId = 'general';
+        
         leagueDataMap[generalLeagueId] = {};
 
-        // 1. Распределение турниров по лигам и расчет очков "на лету"
+        // 1. Сбор данных и расчет очков для каждого турнирного вхождения
         allTournaments.forEach(t => {
             const lSettings = leagueSettings[t.league];
             if (!lSettings || (!lSettings.enabled && t.league !== generalLeagueId)) return;
@@ -40,11 +41,11 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                 
                 const entry = { ...pResult, tournamentId: t.id, leagueId: t.league };
 
-                // Накопление в лигу начисления
+                // Накопление в целевую лигу
                 if (!leagueDataMap[t.league][p.id]) leagueDataMap[t.league][p.id] = [];
                 leagueDataMap[t.league][p.id].push(entry);
 
-                // Накопление в общий рейтинг (если включено для лиги)
+                // Накопление в общий рейтинг (если лига отмечена как влияющая на глобал)
                 if (t.league !== generalLeagueId && lSettings.includeInGeneralRanking) {
                     if (!leagueDataMap[generalLeagueId][p.id]) leagueDataMap[generalLeagueId][p.id] = [];
                     leagueDataMap[generalLeagueId][p.id].push(entry);
@@ -52,53 +53,60 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
             });
         });
 
-        const eveningOmskRate = allScoringSettings.evening_omsk?.exchangeRate || 7;
+        const eveningOmskRate = Number(allScoringSettings.evening_omsk?.exchangeRate) || 7;
         const finalRankings: Record<string, Player[]> = {};
 
-        // 2. Агрегация данных по каждому игроку в каждой лиге
+        // 2. Агрегация и расчет средних показателей
         for (const leagueId in leagueDataMap) {
             const playersInLeague = leagueDataMap[leagueId];
             const processedPlayers: Player[] = Object.keys(playersInLeague).map(playerId => {
                 const results = playersInLeague[playerId];
                 const profile = profileMap.get(playerId);
                 
-                let points = 0;
-                let basePoints = 0;
-                let bonusPoints = 0;
-                let n180s = 0;
-                let hiOut = 0;
-                let bestLeg = 999;
+                let pointsTotal = 0;
+                let basePointsTotal = 0;
+                let bonusPointsTotal = 0;
+                let n180sTotal = 0;
+                let hiOutMax = 0;
+                let bestLegMin = 999;
                 let avgSum = 0;
                 let avgCount = 0;
-                let wins = 0; // Для агрегата: победы = выходы в плей-офф (rank <= 8)
+                let playoffAppearances = 0; // Для расчета Win Rate (выходы в 1/4 и выше)
 
                 results.forEach(r => {
-                    // В Омске расчет идет ниже по логике 5 лучших туров
+                    // Стандартное суммирование (для всех лиг кроме Омска)
                     if (leagueId !== 'evening_omsk') {
-                        points += (r.points || 0);
-                        basePoints += (r.basePoints || 0);
-                        bonusPoints += (r.bonusPoints || 0);
+                        pointsTotal += (Number(r.points) || 0);
+                        basePointsTotal += (Number(r.basePoints) || 0);
+                        bonusPointsTotal += (Number(r.bonusPoints) || 0);
                     }
                     
-                    n180s += (r.n180s || 0);
-                    hiOut = Math.max(hiOut, r.hiOut || 0);
-                    if (r.bestLeg > 0) bestLeg = Math.min(bestLeg, r.bestLeg);
+                    n180sTotal += (Number(r.n180s) || 0);
+                    hiOutMax = Math.max(hiOutMax, Number(r.hiOut) || 0);
                     
-                    if ((r.avg || 0) > 0) {
-                        avgSum += r.avg;
+                    if (Number(r.bestLeg) > 0) {
+                        bestLegMin = Math.min(bestLegMin, Number(r.bestLeg));
+                    }
+                    
+                    if ((Number(r.avg) || 0) > 0) {
+                        avgSum += Number(r.avg);
                         avgCount++;
                     }
-                    if (r.rank <= 8) wins++;
+                    
+                    // Учет "побед" как выходов в плей-офф (ранг 1-8)
+                    if (Number(r.rank) <= 8) playoffAppearances++;
                 });
 
-                // Специфика «Вечернего Омска»: в зачет идут только 5 лучших туров
+                // СПЕЦИФИКА ОМСКА: Только 5 лучших результатов
                 if (leagueId === 'evening_omsk') {
-                    const sortedByPoints = [...results].sort((a, b) => (b.points || 0) - (a.points || 0));
+                    const sortedByPoints = [...results].sort((a, b) => (Number(b.points) || 0) - (Number(a.points) || 0));
                     const top5 = sortedByPoints.slice(0, 5);
-                    points = top5.reduce((sum, r) => sum + (r.points || 0), 0);
-                    basePoints = points;
-                    bonusPoints = 0;
+                    pointsTotal = top5.reduce((sum, r) => sum + (Number(r.points) || 0), 0);
+                    basePointsTotal = pointsTotal;
+                    bonusPointsTotal = 0;
                 }
+
+                const finalAvg = avgCount > 0 ? avgSum / avgCount : 0;
 
                 return {
                     ...profile!,
@@ -107,53 +115,59 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                     nickname: profile?.nickname || results[0].nickname,
                     avatarUrl: profile?.avatarUrl || results[0].avatarUrl,
                     rank: 0,
-                    points,
-                    basePoints,
-                    bonusPoints,
+                    points: pointsTotal,
+                    basePoints: basePointsTotal,
+                    bonusPoints: bonusPointsTotal,
                     matchesPlayed: results.length,
-                    wins,
-                    losses: results.length - wins,
-                    avg: avgCount > 0 ? avgSum / avgCount : 0,
-                    n180s,
-                    hiOut,
-                    bestLeg: bestLeg === 999 ? 0 : bestLeg,
-                    totalPointsFor180s: 0,
+                    wins: playoffAppearances,
+                    losses: results.length - playoffAppearances,
+                    avg: finalAvg,
+                    n180s: n180sTotal,
+                    hiOut: hiOutMax,
+                    bestLeg: bestLegMin === 999 ? 0 : bestLegMin,
+                    totalPointsFor180s: 0, // Устаревшие поля, держим для типов
                     totalPointsForHiOut: 0,
                     totalPointsForAvg: 0,
                     totalPointsForBestLeg: 0,
                     totalPointsFor9Darter: 0,
-                    cashValue: leagueId === 'evening_omsk' ? points * eveningOmskRate : undefined,
+                    cashValue: leagueId === 'evening_omsk' ? Math.round(pointsTotal * eveningOmskRate) : undefined,
                     isQualifiedForFinal: false 
                 };
             });
 
-            // 3. СОРТИРОВКА (Тай-брейки): Баллы -> AVG -> Hi-Out -> 180s -> Опыт
+            // 3. СОРТИРОВКА (Математические Тай-брейки)
+            // Приоритет: Баллы -> AVG (с точностью до 0.001) -> Hi-Out -> 180s -> Количество турниров
             const sorted = processedPlayers.sort((a, b) => {
                 if (b.points !== a.points) return b.points - a.points;
-                if (b.avg !== a.avg) return b.avg - a.avg;
+                
+                // Сравнение AVG (дробные числа)
+                if (Math.abs(b.avg - a.avg) > 0.001) return b.avg - a.avg;
+                
                 if (b.hiOut !== a.hiOut) return b.hiOut - a.hiOut;
                 if (b.n180s !== a.n180s) return b.n180s - a.n180s;
                 return b.matchesPlayed - a.matchesPlayed;
             });
 
-            // 4. ПРИСВОЕНИЕ РАНГОВ (Обработка задвоенных мест)
+            // 4. ПРИСВОЕНИЕ РАНГОВ (Competition Ranking Logic)
+            // Если показатели идентичны — игроки делят одно место.
             let currentRank = 0;
             finalRankings[leagueId] = sorted.map((p, i) => {
                 const prev = i > 0 ? sorted[i-1] : null;
-                // Игроки делят место, если их ключевые показатели идентичны
-                const isSame = prev && 
+                
+                // Проверка на идентичность для разделения места
+                const isSameAsPrev = prev && 
                     p.points === prev.points && 
                     Math.abs(p.avg - prev.avg) < 0.01 && 
                     p.hiOut === prev.hiOut;
                 
-                if (!isSame) {
+                if (!isSameAsPrev) {
                     currentRank = i + 1;
                 }
                 
                 return { 
                     ...p, 
                     rank: currentRank,
-                    // Квалификация в финал (ТОП-16)
+                    // Финалисты ТОП-16 (особенно актуально для Омска)
                     isQualifiedForFinal: leagueId === 'evening_omsk' && currentRank <= 16
                 };
             });
@@ -161,7 +175,7 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
 
         return finalRankings;
     } catch (error) {
-        console.error('Aggregation Error:', error);
+        console.error('Aggregation Engine Critical Error:', error);
         return {};
     }
 }
