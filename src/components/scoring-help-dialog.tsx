@@ -73,7 +73,7 @@ const leagueBookStyles: Record<string, string> = {
     cricket: 'from-emerald-600 to-emerald-900 border-emerald-400/50',
     second: 'from-sky-600 to-sky-900 border-sky-400/50',
     third: 'from-indigo-600 to-indigo-900 border-indigo-400/50',
-    fourth: 'from-purple-600 to-purple-900 border-purple-400/50',
+    fourth: 'from-purple-600 to-purple-900 border-pink-400/50',
     senior: 'from-blue-700 to-slate-900 border-blue-400/50',
     youth: 'from-lime-600 to-lime-900 border-lime-400/50',
     women: 'from-indigo-500 to-purple-900 border-pink-400/50',
@@ -159,11 +159,37 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         );
     }
 
-    const customEntries = s.customPointsByPlace ? Object.entries(s.customPointsByPlace)
-        .sort((a, b) => Number(a[0]) - Number(b[0])) : [];
+    // Для стандартных лиг строим упорядоченный список
+    const getPlacePoints = (p: number) => {
+        if (s.customPointsByPlace && s.customPointsByPlace[p.toString()] !== undefined) {
+            return Number(s.customPointsByPlace[p.toString()]);
+        }
+        if (p === 1) return s.pointsFor1st;
+        if (p === 2) return s.pointsFor2nd;
+        if (p >= 3 && p <= 4) return s.pointsFor3rd_4th;
+        if (p >= 5 && p <= 8) return s.pointsFor5th_8th;
+        if (p >= 9 && p <= 16) return s.pointsFor9th_16th;
+        return 0;
+    };
+
+    const basePlaces = [
+        { label: '1 МЕСТО', points: getPlacePoints(1), icon: Medal, color: 'text-gold', desc: 'Победа' },
+        { label: '2 МЕСТО', points: getPlacePoints(2), icon: Medal, color: 'text-silver', desc: 'Финал' },
+        { label: '3-4 МЕСТА', points: getPlacePoints(3), icon: Medal, color: 'text-bronze', desc: 'Полуфинал' },
+        { label: '5-8 МЕСТА', points: getPlacePoints(5), icon: Target, color: 'text-primary', desc: '1/4 финала' },
+        { label: '9-16 МЕСТА', points: getPlacePoints(9), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' },
+    ];
+
+    // Любые кастомные места за пределами 16-го или специфичные дополнения (добавляются ниже)
+    const extraEntries = s.customPointsByPlace 
+        ? Object.entries(s.customPointsByPlace)
+            .filter(([place]) => Number(place) > 16)
+            .sort((a, b) => Number(a[0]) - Number(b[0]))
+        : [];
 
     return (
         <div className="flex flex-col gap-6 md:gap-8 pt-2 pb-20">
+            {/* 1. БАЗОВОЕ УЧАСТИЕ */}
             {s.participationPoints > 0 && (
                 <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-2xl animate-pulse">
                     <div className="flex items-center gap-3">
@@ -174,31 +200,35 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 </div>
             )}
 
+            {/* 2. ТАБЛИЦА РЕЙТИНГА (БАЗА) */}
             <div className="space-y-2 md:space-y-3">
                 <div className="flex items-center gap-3 px-3 md:px-4 border-l-4 border-orange-500 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
                     <Trophy className="h-3.5 w-3.5 md:h-4 md:w-4 text-orange-500" />
-                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Таблица рейтинга</h4>
+                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Таблица рейтинга (База)</h4>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                    {customEntries.map(([place, points]) => (
-                        renderHelpPill(
-                            `${place} МЕСТО`, 
-                            points, 
-                            Medal, 
-                            Number(place) <= 3 ? (Number(place) === 1 ? 'text-gold' : Number(place) === 2 ? 'text-silver' : 'text-bronze') : 'text-primary', 
-                            'Точная настройка',
-                            `custom-place-${place}`
-                        )
+                    {basePlaces.map((p, idx) => (
+                        renderHelpPill(p.label, p.points, p.icon, p.color, p.desc, `base-place-${idx}`)
                     ))}
-                    
-                    {renderHelpPill('1 МЕСТО', s.pointsFor1st, Medal, 'text-gold', 'Победа', 'place-1')}
-                    {renderHelpPill('2 МЕСТО', s.pointsFor2nd, Medal, 'text-silver', 'Финал', 'place-2')}
-                    {renderHelpPill('3-4 МЕСТА', s.pointsFor3rd_4th, Medal, 'text-bronze', 'Полуфинал', 'place-3-4')}
-                    {renderHelpPill('5-8 МЕСТА', s.pointsFor5th_8th, Target, 'text-primary', '1/4 финала', 'place-5-8')}
-                    {renderHelpPill('9-16 МЕСТА', s.pointsFor9th_16th, TrendingUp, 'text-primary/60', '1/8 финала', 'place-9-16')}
                 </div>
             </div>
 
+            {/* 3. НОВЫЕ ВВЕДЕНИЯ (ДОПОЛНИТЕЛЬНЫЕ МЕСТА) - ДОБАВЛЯЮТСЯ НИЖЕ */}
+            {extraEntries.length > 0 && (
+                <div className="space-y-2 md:space-y-3">
+                    <div className="flex items-center gap-3 px-3 md:px-4 border-l-4 border-purple-500 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
+                        <PlusCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-purple-500" />
+                        <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Дополнительные позиции</h4>
+                    </div>
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                        {extraEntries.map(([place, points]) => (
+                            renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Расширение сетки', `extra-place-${place}`)
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* 4. УНИВЕРСАЛЬНЫЕ БОНУСЫ (ДОБАВЛЯЮТСЯ В КОНЦЕ) */}
             <div className="space-y-2 md:space-y-3">
                 <div className="flex items-center gap-3 px-3 md:px-4 border-l-4 border-cyan-400 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
                     <Star className="h-3.5 w-3.5 md:h-4 md:w-4 text-cyan-400" />
