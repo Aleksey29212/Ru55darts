@@ -24,9 +24,10 @@ type EveningOmskFormValues = z.infer<typeof eveningOmskSchema>;
 
 interface EveningOmskFormProps {
   defaultValues: ScoringSettings;
+  leagueName: string;
 }
 
-export function EveningOmskForm({ defaultValues }: EveningOmskFormProps) {
+export function EveningOmskForm({ defaultValues, leagueName }: EveningOmskFormProps) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
 
@@ -75,7 +76,7 @@ export function EveningOmskForm({ defaultValues }: EveningOmskFormProps) {
                     <Info className="h-6 w-6" />
                 </div>
                 <div className="space-y-2">
-                    <h3 className="text-xl font-headline uppercase tracking-tight text-orange-500">Автоматическая система</h3>
+                    <h3 className="text-xl font-headline uppercase tracking-tight text-orange-500">Автоматическая система ({leagueName})</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                         Для лиги «Вечерний Омск» правила начисления очков фиксированы согласно регламенту:
                     </p>

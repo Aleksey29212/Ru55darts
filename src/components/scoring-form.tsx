@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -72,7 +71,13 @@ const LabelWithTooltip = ({ label, tooltipText, icon: Icon = Info }: { label: st
     </div>
 );
 
-export function ScoringForm({ leagueId, defaultValues }: { leagueId: LeagueId, defaultValues: ScoringSettings }) {
+interface ScoringFormProps {
+  leagueId: LeagueId;
+  leagueName: string;
+  defaultValues: ScoringSettings;
+}
+
+export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringFormProps) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const [customPlaces, setCustomPlaces] = useState<{place: string, points: number}[]>([]);
@@ -166,7 +171,7 @@ export function ScoringForm({ leagueId, defaultValues }: { leagueId: LeagueId, d
             <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                 <div className="p-2 rounded-lg bg-primary/10 text-primary shadow-inner"><ListOrdered className="h-5 w-5" /></div>
                 <div>
-                    <h3 className="text-xl font-headline uppercase tracking-tight">Основные позиции</h3>
+                    <h3 className="text-xl font-headline uppercase tracking-tight">Основные позиции <span className="text-primary/60 font-medium lowercase">({leagueName})</span></h3>
                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest opacity-60">Базовое распределение (1-16)</p>
                 </div>
             </div>
@@ -237,7 +242,7 @@ export function ScoringForm({ leagueId, defaultValues }: { leagueId: LeagueId, d
             <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                 <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500 shadow-inner"><Zap className="h-5 w-5" /></div>
                 <div>
-                    <h3 className="text-xl font-headline uppercase tracking-tight">Про-Бонусы</h3>
+                    <h3 className="text-xl font-headline uppercase tracking-tight">Про-Бонусы <span className="text-orange-400/60 font-medium lowercase">({leagueName})</span></h3>
                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest opacity-60">Технические достижения</p>
                 </div>
             </div>

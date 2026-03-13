@@ -138,10 +138,14 @@ export function ScoringClientPage({ initialScoringSettings, initialLeagueSetting
               selectedLeague === leagueId && (
                 <div key={leagueId} className="animate-in fade-in-50 duration-300">
                     {leagueId === 'evening_omsk' ? (
-                        <EveningOmskForm defaultValues={allScoringSettings[leagueId]} />
+                        <EveningOmskForm 
+                            defaultValues={allScoringSettings[leagueId]} 
+                            leagueName={leagueSettings[leagueId].name}
+                        />
                     ) : (
                         <ScoringForm 
                             leagueId={leagueId}
+                            leagueName={leagueSettings[leagueId].name}
                             defaultValues={allScoringSettings[leagueId]} 
                         />
                     )}
