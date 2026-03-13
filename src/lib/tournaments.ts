@@ -5,8 +5,9 @@ import { cache } from 'react';
 import { sanitizeFirestore } from './utils';
 
 /**
- * ГАРАНТИЯ: Глобальный контейнер турниров.
+ * ГАРАНТИЯ: Глобальный контейнер турниров (Persistent Archive).
  * Исключает необходимость повторного парсинга уже загруженных данных.
+ * Данные хранятся до момента ручной очистки в админ-панели.
  */
 if (!(global as any).demoTournaments) {
     (global as any).demoTournaments = [];
@@ -61,7 +62,7 @@ export async function addTournaments(newTournaments: any[]): Promise<string[]> {
             date: newT.date instanceof Timestamp ? newT.date : Timestamp.fromDate(new Date(newT.date as string)) 
         };
 
-        // Сохраняем в контейнер сайта (мгновенная доступность)
+        // Сохраняем в контейнер сайта (мгновенная доступность без повторного парсинга)
         const existsIdx = memoryStore.findIndex(existing => existing.id === dataToSave.id);
         if (existsIdx !== -1) {
             memoryStore[existsIdx] = dataToSave as Tournament;
