@@ -2,9 +2,11 @@ import type { TournamentPlayerResult, ScoringSettings } from './types';
 
 /**
  * Возвращает базовые баллы за место согласно настройкам лиги.
+ * ГАРАНТИЯ: Иерархия приоритетов (Custom -> Specific TOP-10 -> Group 16).
  */
 export function getPointsForRank(rank: number, settings: ScoringSettings): number {
     const r = Number(rank);
+    
     // 1. Приоритет индивидуальной настройки конкретного места (через customPoints)
     if (settings.customPointsByPlace && settings.customPointsByPlace[r.toString()] !== undefined) {
         return Number(settings.customPointsByPlace[r.toString()]);
@@ -13,14 +15,18 @@ export function getPointsForRank(rank: number, settings: ScoringSettings): numbe
     // 2. Индивидуальные настройки ТОП-10 (высокий приоритет)
     if (r === 1) return Number(settings.pointsFor1st) || 0;
     if (r === 2) return Number(settings.pointsFor2nd) || 0;
-    if (r === 3) return Number(settings.pointsFor3rd || settings.pointsFor3rd_4th) || 0;
-    if (r === 4) return Number(settings.pointsFor3rd_4th) || 0;
-    if (r === 5 && settings.pointsFor5th !== undefined && settings.pointsFor5th > 0) return Number(settings.pointsFor5th);
-    if (r === 6 && settings.pointsFor6th !== undefined && settings.pointsFor6th > 0) return Number(settings.pointsFor6th);
-    if (r === 7 && settings.pointsFor7th !== undefined && settings.pointsFor7th > 0) return Number(settings.pointsFor7th);
-    if (r === 8 && settings.pointsFor8th !== undefined && settings.pointsFor8th > 0) return Number(settings.pointsFor8th);
-    if (r === 9 && settings.pointsFor9th !== undefined && settings.pointsFor9th > 0) return Number(settings.pointsFor9th);
-    if (r === 10 && settings.pointsFor10th !== undefined && settings.pointsFor10th > 0) return Number(settings.pointsFor10th);
+    
+    // 3 место имеет приоритет над группой 3-4
+    if (r === 3 && (settings.pointsFor3rd ?? 0) > 0) return Number(settings.pointsFor3rd);
+    if (r === 3 || r === 4) return Number(settings.pointsFor3rd_4th) || 0;
+
+    // Места 5-10 индивидуально
+    if (r === 5 && (settings.pointsFor5th ?? 0) > 0) return Number(settings.pointsFor5th);
+    if (r === 6 && (settings.pointsFor6th ?? 0) > 0) return Number(settings.pointsFor6th);
+    if (r === 7 && (settings.pointsFor7th ?? 0) > 0) return Number(settings.pointsFor7th);
+    if (r === 8 && (settings.pointsFor8th ?? 0) > 0) return Number(settings.pointsFor8th);
+    if (r === 9 && (settings.pointsFor9th ?? 0) > 0) return Number(settings.pointsFor9th);
+    if (r === 10 && (settings.pointsFor10th ?? 0) > 0) return Number(settings.pointsFor10th);
 
     // 3. Групповые настройки для ТОП-16 (финальный fallback)
     if (r >= 5 && r <= 8) return Number(settings.pointsFor5th_8th) || 0;

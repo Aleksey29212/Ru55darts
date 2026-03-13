@@ -87,7 +87,8 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     setMounted(true);
   }, []);
 
-  const settingsArray = Array.isArray(settings) ? settings : [settings];
+  // Фильтруем settings, чтобы избежать TypeError при итерировании
+  const settingsArray = (Array.isArray(settings) ? settings : [settings]).filter(Boolean);
   const namesArray = Array.isArray(leagueName) ? leagueName : [leagueName];
 
   if (!mounted) return children || null;
@@ -156,7 +157,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         );
     }
 
-    // Обычная лига: Чистая логика начислений
+    // Логика расчета отображения мест
     const getPlacePoints = (p: number) => {
         if (s.customPointsByPlace && s.customPointsByPlace[p.toString()] !== undefined) {
             return Number(s.customPointsByPlace[p.toString()]);
@@ -166,40 +167,39 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         if (p === 3) return s.pointsFor3rd || s.pointsFor3rd_4th;
         if (p === 4) return s.pointsFor3rd_4th;
         
-        // Specific place logic for 5-10
-        if (p === 5 && s.pointsFor5th && s.pointsFor5th > 0) return s.pointsFor5th;
-        if (p === 6 && s.pointsFor6th && s.pointsFor6th > 0) return s.pointsFor6th;
-        if (p === 7 && s.pointsFor7th && s.pointsFor7th > 0) return s.pointsFor7th;
-        if (p === 8 && s.pointsFor8th && s.pointsFor8th > 0) return s.pointsFor8th;
-        if (p === 9 && s.pointsFor9th && s.pointsFor9th > 0) return s.pointsFor9th;
-        if (p === 10 && s.pointsFor10th && s.pointsFor10th > 0) return s.pointsFor10th;
+        // Индивидуальные места 5-10
+        if (p === 5 && (s.pointsFor5th ?? 0) > 0) return s.pointsFor5th!;
+        if (p === 6 && (s.pointsFor6th ?? 0) > 0) return s.pointsFor6th!;
+        if (p === 7 && (s.pointsFor7th ?? 0) > 0) return s.pointsFor7th!;
+        if (p === 8 && (s.pointsFor8th ?? 0) > 0) return s.pointsFor8th!;
+        if (p === 9 && (s.pointsFor9th ?? 0) > 0) return s.pointsFor9th!;
+        if (p === 10 && (s.pointsFor10th ?? 0) > 0) return s.pointsFor10th!;
 
         if (p >= 5 && p <= 8) return s.pointsFor5th_8th;
         if (p >= 9 && p <= 16) return s.pointsFor9th_16th;
         return 0;
     };
 
-    const hasSpecific3rd = Number(s.pointsFor3rd) > 0 && s.pointsFor3rd !== s.pointsFor3rd_4th;
-
-    const basePlaces = [
+    const basePlaces: { label: string, points: number, icon: any, color: string, desc: string }[] = [
         { label: '1 МЕСТО', points: getPlacePoints(1), icon: Medal, color: 'text-gold', desc: 'Победа' },
         { label: '2 МЕСТО', points: getPlacePoints(2), icon: Medal, color: 'text-silver', desc: 'Финал' },
     ];
 
-    if (hasSpecific3rd) {
+    // Обработка 3-4 мест
+    if (Number(s.pointsFor3rd) > 0 && s.pointsFor3rd !== s.pointsFor3rd_4th) {
         basePlaces.push({ label: '3 МЕСТО', points: getPlacePoints(3), icon: Medal, color: 'text-bronze', desc: 'Бронза' });
         basePlaces.push({ label: '4 МЕСТО', points: getPlacePoints(4), icon: Award, color: 'text-primary', desc: '1/2 финала' });
     } else {
         basePlaces.push({ label: '3-4 МЕСТА', points: getPlacePoints(3), icon: Medal, color: 'text-bronze', desc: 'Полуфинал' });
     }
 
-    // Determine if we should show 5-8 as a group or individually
-    const specific5_8 = [5, 6, 7, 8].some(p => {
+    // Обработка 5-8 мест
+    const hasSpecific5_8 = [5, 6, 7, 8].some(p => {
         const val = s[`pointsFor${p}th` as keyof ScoringSettings];
-        return val !== undefined && val > 0 && val !== s.pointsFor5th_8th;
+        return typeof val === 'number' && val > 0 && val !== s.pointsFor5th_8th;
     });
 
-    if (specific5_8) {
+    if (hasSpecific5_8) {
         [5, 6, 7, 8].forEach(p => {
             basePlaces.push({ label: `${p} МЕСТО`, points: getPlacePoints(p), icon: Target, color: 'text-primary', desc: '1/4 финала' });
         });
@@ -207,13 +207,13 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         basePlaces.push({ label: '5-8 МЕСТА', points: getPlacePoints(5), icon: Target, color: 'text-primary', desc: '1/4 финала' });
     }
 
-    // Determine if we should show 9-10 as individual
-    const specific9_10 = [9, 10].some(p => {
+    // Обработка 9-16 мест
+    const hasSpecific9_10 = [9, 10].some(p => {
         const val = s[`pointsFor${p}th` as keyof ScoringSettings];
-        return val !== undefined && val > 0 && val !== s.pointsFor9th_16th;
+        return typeof val === 'number' && val > 0 && val !== s.pointsFor9th_16th;
     });
 
-    if (specific9_10) {
+    if (hasSpecific9_10) {
         basePlaces.push({ label: `9 МЕСТО`, points: getPlacePoints(9), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' });
         basePlaces.push({ label: `10 МЕСТО`, points: getPlacePoints(10), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' });
         basePlaces.push({ label: `11-16 МЕСТА`, points: getPlacePoints(11), icon: TrendingUp, color: 'text-primary/40', desc: '1/8 финала' });
