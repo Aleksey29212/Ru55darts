@@ -17,12 +17,9 @@ import {
     Users, 
     Baby, 
     Moon, 
-    X, 
     Zap, 
     Target, 
-    TrendingUp, 
     Medal, 
-    Flame, 
     Sparkles,
     Wallet,
     Home,
@@ -36,7 +33,7 @@ import {
     Activity,
     ChevronRight
 } from 'lucide-react';
-import type { ScoringSettings, SponsorshipSettings } from '@/lib/types';
+import type { ScoringSettings, SponsorshipSettings, LeagueId } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -86,10 +83,11 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     setMounted(true);
   }, []);
 
+  if (!mounted) return children || null;
+
+  // Безопасное формирование массива настроек
   const settingsArray = (Array.isArray(settings) ? settings : [settings]).filter(s => s && typeof s === 'object');
   const namesArray = Array.isArray(leagueName) ? leagueName : [leagueName];
-
-  if (!mounted) return children || null;
 
   const renderHelpPill = (label: string, val: string | number, Icon: any, colorClass: string, description?: string) => (
     <div key={label} className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/[0.03] border border-white/5 hover:border-primary/30 transition-all group shadow-sm active:scale-[0.98]">
@@ -208,7 +206,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                     {groupedRanks.map((p, idx) => (
-                        renderHelpPill(p.label, p.points, p.icon, p.color, p.desc)
+                        <div key={idx}>{renderHelpPill(p.label, p.points, p.icon, p.color, p.desc)}</div>
                     ))}
                 </div>
             </div>
@@ -221,7 +219,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                         {extraEntries.map(([place, points]) => (
-                            renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Доп. позиция')
+                            <div key={place}>{renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Доп. позиция')}</div>
                         ))}
                     </div>
                 </div>
@@ -236,7 +234,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                     {s.enable180Bonus && renderHelpPill('180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'За каждый максимум')}
                     {s.enableHiOutBonus && renderHelpPill(`OUT ≥${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'Высокое закрытие')}
                     {s.enableAvgBonus && renderHelpPill(`AVG ≥${s.avgThreshold}`, `+${s.avgBonus}`, Activity, 'text-yellow-400', 'Мощный набор')}
-                    {s.enableShortLegBonus && renderHelpPill(`SL ≤${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Flame, 'text-cyan-400', 'Короткий лег')}
+                    {s.enableShortLegBonus && renderHelpPill(`SL ≤${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Activity, 'text-cyan-400', 'Короткий лег')}
                     {s.enable9DarterBonus && renderHelpPill(`9-DARTER`, `+${s.bonusFor9Darter}`, Crown, 'text-primary', 'Идеальный лег')}
                 </div>
             </div>
@@ -319,7 +317,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                 </h3>
                                 <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
                             </div>
-                            
                             {renderLeagueContent(s)}
                         </TabsContent>
                     ))}
@@ -397,7 +394,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 <p className="text-[9px] text-white font-black uppercase tracking-widest leading-none">DartBrig Pro</p>
                 <p className="text-[7px] text-primary/50 font-bold uppercase tracking-[0.2em] mt-1">v2.8 Stable Audit</p>
             </div>
-            
             <Button onClick={() => setOpen(false)} variant="outline" className="rounded-xl font-black uppercase tracking-widest text-[9px] h-9 px-6 border-white/10 bg-white/5 hover:bg-primary hover:text-primary-foreground transition-all active:scale-95">
                 ПОНЯТНО
             </Button>

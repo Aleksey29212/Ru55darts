@@ -1,4 +1,3 @@
-
 'use server';
 
 import { getPlayerProfiles, updatePlayerProfiles, getPlayerProfileById, clearAllPlayerProfiles } from '@/lib/players';
@@ -93,40 +92,31 @@ export async function importTournament(prevState: unknown, formData: FormData) {
   };
 }
 
-export async function updateTournamentResultsAction(tournamentId: string, players: TournamentPlayerResult[]) {
-    try {
-        const db = getDb();
-        const tournament = await getTournamentById(tournamentId);
-        if (!tournament) return { success: false, message: 'Турнир не найден.' };
+export async function saveScoringSettings(leagueId: LeagueId, data: ScoringSettings) {
+  try {
+    await updateScoringSettings(leagueId, data);
+    
+    // Принудительная ревалидация всего приложения для обновления хедера и справки
+    revalidatePath('/', 'layout');
+    revalidatePath('/admin/scoring', 'page');
+    revalidateTag('scoring');
+    
+    return { success: true, message: `Настройки для лиги "${leagueId}" успешно применены.` };
+  } catch (e) {
+    console.error('Save scoring error:', e);
+    return { success: false, message: 'Ошибка сохранения настроек.' };
+  }
+}
 
-        const updatedTournament: Tournament = {
-            ...tournament,
-            players,
-            isManuallyEdited: true
-        };
-
-        const memoryStore = (global as any).demoTournaments as Tournament[];
-        if (memoryStore) {
-            const idx = memoryStore.findIndex(t => t.id === tournamentId);
-            if (idx !== -1) memoryStore[idx] = updatedTournament;
-        }
-
-        if (db) {
-            const docRef = doc(db, 'tournaments', tournamentId);
-            const dataToSet = { ...updatedTournament };
-            delete (dataToSet as any).id;
-            await setDoc(docRef, dataToSet);
-        }
-
-        revalidatePath('/', 'layout');
-        revalidatePath(`/admin/tournaments/${tournamentId}/edit-results`);
-        revalidateTag('tournaments');
-        revalidateTag('leagues');
-
-        return { success: true, message: 'Результаты турнира обновлены и помечены как измененные вручную.' };
-    } catch (e) {
-        return { success: false, message: 'Ошибка при сохранении результатов.' };
-    }
+export async function saveLeagueSettings(data: AllLeagueSettings) {
+  try {
+    await updateLeagueSettings(data);
+    revalidatePath('/', 'layout');
+    revalidateTag('leagues');
+    return { success: true, message: `Настройки лиг обновлены.` };
+  } catch (e) {
+    return { success: false, message: 'Ошибка сохранения лиг.' };
+  }
 }
 
 export async function updatePlayer(player: PlayerProfile) {
@@ -160,49 +150,11 @@ export async function deletePlayerAction(playerId: string) {
     }
 }
 
-export async function clearAllPlayerData() {
-    try {
-        await clearAllPlayerProfiles();
-        revalidatePath('/', 'layout');
-        revalidateTag('players');
-        return { success: true, message: 'Все профили игроков удалены.' };
-    } catch (e) {
-        return { success: false, message: 'Ошибка при очистке.' };
-    }
-}
-
-export async function saveScoringSettings(leagueId: LeagueId, data: ScoringSettings) {
-  try {
-    await updateScoringSettings(leagueId, data);
-    
-    // Принудительная ревалидация всех связанных путей
-    revalidateTag('scoring');
-    revalidatePath('/admin/scoring', 'page');
-    revalidatePath('/', 'layout');
-    
-    return { success: true, message: `Настройки для лиги "${leagueId}" успешно применены.` };
-  } catch (e) {
-    console.error('Save scoring error:', e);
-    return { success: false, message: 'Ошибка сохранения настроек в базу данных.' };
-  }
-}
-
-export async function saveLeagueSettings(data: AllLeagueSettings) {
-  try {
-    await updateLeagueSettings(data);
-    revalidateTag('leagues');
-    revalidatePath('/', 'layout');
-    return { success: true, message: `Настройки лиг обновлены.` };
-  } catch (e) {
-    return { success: false, message: 'Ошибка сохранения лиг.' };
-  }
-}
-
 export async function deleteTournamentAction(tournamentId: string) {
     try {
         await deleteTournamentById(tournamentId);
-        revalidateTag('tournaments');
         revalidatePath('/', 'layout');
+        revalidateTag('tournaments');
         return { success: true, message: `Турнир удален.` };
     } catch (e) {
         return { success: false, message: 'Ошибка удаления турнира.' };
@@ -275,16 +227,13 @@ export async function updatePlayerAvatar(playerId: string, dataUrl: string | nul
 export async function clearAnalyticsAction() {
     try {
         const db = getDb();
-        if (!db) return { success: true, message: 'Аналитика очищена в локальной памяти.' };
-        
+        if (!db) return { success: true, message: 'Аналитика очищена.' };
         const visits = await getDocs(collection(db, 'visits'));
         const clicks = await getDocs(collection(db, 'sponsor_clicks'));
-        
         const batch = writeBatch(db);
         visits.docs.forEach(d => batch.delete(d.ref));
         clicks.docs.forEach(d => batch.delete(d.ref));
         await batch.commit();
-        
         revalidatePath('/admin/analytics');
         return { success: true, message: 'Все логи аналитики удалены.' };
     } catch (e) {
@@ -292,38 +241,17 @@ export async function clearAnalyticsAction() {
     }
 }
 
-export async function clearPartnersAction() {
-    try {
-        const db = getDb();
-        if (!db) return { success: true, message: 'Список партнеров очищен (локально).' };
-        
-        const snapshot = await getDocs(collection(db, 'partners'));
-        const batch = writeBatch(db);
-        snapshot.docs.forEach(d => batch.delete(d.ref));
-        await batch.commit();
-        
-        revalidatePath('/', 'layout');
-        revalidatePath('/partners');
-        return { success: true, message: 'Все партнеры удалены из базы.' };
-    } catch (e) {
-        return { success: false, message: 'Ошибка при удалении партнеров.' };
-    }
-}
-
 export async function exportAllRankingsAction() {
     try {
         const rankings = await getRankings('general');
-        if (!rankings || rankings.length === 0) return { success: false, message: 'Нет данных для экспорта. Сначала импортируйте турниры.' };
-        
+        if (!rankings || rankings.length === 0) return { success: false, message: 'Нет данных для экспорта.' };
         const header = 'Место;Имя;Никнейм;Очки;Игры;AVG;180;Hi-Out\n';
-        const rankingsToExport = Array.isArray(rankings) ? rankings : [];
-        const rows = rankingsToExport.map(p => 
+        const rows = rankings.map(p => 
             `${p.rank};${p.name};${p.nickname};${p.points};${p.matchesPlayed};${p.avg.toFixed(2)};${p.n180s};${p.hiOut}`
         ).join('\n');
-        
         return { success: true, csv: header + rows };
     } catch (e) {
-        return { success: false, message: 'Ошибка при генерации CSV-файла.' };
+        return { success: false, message: 'Ошибка экспорта.' };
     }
 }
 
@@ -332,12 +260,10 @@ export async function updateAllPlayersTemplateAction(templateId: TemplateId) {
         const players = await getPlayerProfiles();
         const updatedPlayers = players.map(p => ({ ...p, cardTemplateId: templateId }));
         await updatePlayerProfiles(updatedPlayers);
-        
         revalidatePath('/', 'layout');
-        revalidateTag('players');
-        return { success: true, message: `Шаблон "${templateId}" успешно применен ко всем игрокам (${players.length}).` };
+        return { success: true, message: `Шаблон применен ко всем игрокам.` };
     } catch (e) {
-        return { success: false, message: 'Ошибка массового обновления шаблонов.' };
+        return { success: false, message: 'Ошибка массового обновления.' };
     }
 }
 

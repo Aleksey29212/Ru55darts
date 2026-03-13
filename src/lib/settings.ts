@@ -1,7 +1,6 @@
-
 import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 import { getDb } from '@/firebase/server';
-import type { ScoringSettings, AllLeagueSettings, LeagueId, SponsorshipSettings, AppearanceSettings, TemplateId } from './types';
+import type { ScoringSettings, AllLeagueSettings, LeagueId, SponsorshipSettings, AppearanceSettings } from './types';
 import { cache } from 'react';
 import defaultScoringSettingsData from './scoring-settings.json';
 import defaultLeagueSettingsData from './league-settings.json';
@@ -47,6 +46,8 @@ export const getAllScoringSettings = cache(
             ...(allDefaults[key] || allDefaults.general), 
             ...(fromDb[key] || {}) 
         };
+        // Гарантируем наличие ID в объекте для справки
+        merged[key].id = key;
     });
     return merged;
   }
