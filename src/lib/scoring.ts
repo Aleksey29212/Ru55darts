@@ -64,40 +64,29 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
 }
 
 /**
- * Unique cumulative scoring for "Evening Omsk" league.
- * Points = Stage Multipliers sum * AVG.
- * Stages are cumulative: if you are in 1/2, you also passed 1/4.
- * 1/4 stage: AVG * 0.25
- * 1/2 stage: AVG * 0.50
- * 2nd place: AVG * 0.70
- * 1st place: AVG * 1.00
+ * Исправленная математика "Вечернего Омска":
+ * Используются абсолютные множители за стадию, а не накопительные.
  */
 function calculateEveningOmskPoints(result: TournamentPlayerResult, settings: ScoringSettings): void {
     const avg = result.avg || 0;
-    let totalPointsMultiplier = 0;
+    let multiplier = 0;
 
-    // Rank 5-8: Quarter-finals reached
-    if (result.rank <= 8) {
-        totalPointsMultiplier += 0.25; 
-    }
-    // Rank 3-4: Semi-finals reached
-    if (result.rank <= 4) {
-        totalPointsMultiplier += 0.50;
-    }
-    // Rank 2: 2nd place reached
-    if (result.rank <= 2) {
-        totalPointsMultiplier += 0.70;
-    }
-    // Rank 1: Winner
+    // Определение множителя по наивысшему достижению в туре
     if (result.rank === 1) {
-        totalPointsMultiplier += 1.00;
+        multiplier = 1.00;
+    } else if (result.rank === 2) {
+        multiplier = 0.70;
+    } else if (result.rank <= 4) {
+        multiplier = 0.50;
+    } else if (result.rank <= 8) {
+        multiplier = 0.25;
     }
 
-    result.basePoints = Math.round(avg * totalPointsMultiplier);
+    result.basePoints = Math.round(avg * multiplier);
     result.bonusPoints = 0; 
     result.points = result.basePoints;
     
-    // Reset specific bonus flags for this league as they aren't used
+    // Сброс флагов бонусов (в этой лиге они не предусмотрены)
     result.is180BonusApplied = false;
     result.isHiOutBonusApplied = false;
     result.isAvgBonusApplied = false;
