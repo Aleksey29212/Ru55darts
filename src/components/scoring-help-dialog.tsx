@@ -42,6 +42,7 @@ import { ScrollArea } from './ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import Link from 'next/link';
+import { getPointsForRank } from '@/lib/scoring';
 
 interface ScoringHelpDialogProps {
   settings: ScoringSettings | ScoringSettings[];
@@ -86,7 +87,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     setMounted(true);
   }, []);
 
-  // Фильтруем пустые значения, чтобы избежать ошибок при рендеринге
   const settingsArray = (Array.isArray(settings) ? settings : [settings]).filter(s => s && typeof s === 'object');
   const namesArray = Array.isArray(leagueName) ? leagueName : [leagueName];
 
@@ -110,7 +110,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
   );
 
   const renderLeagueContent = (s: ScoringSettings) => {
-    // Логика для Evening Omsk
     if (s.isEveningOmsk) {
         return (
             <div className="flex flex-col gap-3 pt-1 pb-10">
@@ -157,38 +156,15 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         );
     }
 
-    // Логика извлечения баллов (идентично scoring.ts)
-    const getPlacePoints = (p: number) => {
-        if (s.customPointsByPlace && s.customPointsByPlace[p.toString()] !== undefined) {
-            return Number(s.customPointsByPlace[p.toString()]);
-        }
-        if (p === 1) return s.pointsFor1st;
-        if (p === 2) return s.pointsFor2nd;
-        if (p === 3 && (s.pointsFor3rd ?? 0) > 0) return s.pointsFor3rd!;
-        if (p === 3 || p === 4) return s.pointsFor3rd_4th;
-        
-        // Индивидуальные 5-10
-        if (p === 5 && (s.pointsFor5th ?? 0) > 0) return s.pointsFor5th!;
-        if (p === 6 && (s.pointsFor6th ?? 0) > 0) return s.pointsFor6th!;
-        if (p === 7 && (s.pointsFor7th ?? 0) > 0) return s.pointsFor7th!;
-        if (p === 8 && (s.pointsFor8th ?? 0) > 0) return s.pointsFor8th!;
-        if (p === 9 && (s.pointsFor9th ?? 0) > 0) return s.pointsFor9th!;
-        if (p === 10 && (s.pointsFor10th ?? 0) > 0) return s.pointsFor10th!;
-
-        // Групповые 5-16
-        if (p >= 5 && p <= 8) return s.pointsFor5th_8th;
-        if (p >= 9 && p <= 16) return s.pointsFor9th_16th;
-        return 0;
-    };
-
-    // Алгоритм группировки мест 1-16
+    // Алгоритм группировки мест 1-16 на основе РЕАЛЬНЫХ настроек из админки
     const groupedRanks: { label: string, points: number, icon: any, color: string, desc: string }[] = [];
     let start = 1;
     while (start <= 16) {
         let end = start;
-        const pts = getPlacePoints(start);
+        const pts = getPointsForRank(start, s);
         
-        while (end + 1 <= 16 && getPlacePoints(end + 1) === pts) {
+        // Продлеваем группу, пока баллы идентичны
+        while (end + 1 <= 16 && getPointsForRank(end + 1, s) === pts) {
             end++;
         }
 
@@ -229,7 +205,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 </div>
             )}
 
-            {/* 2. БАЗОВАЯ СЕТКА (1-16) */}
+            {/* 2. БАЗОВАЯ СЕТКА (1-16) - ПОЛНАЯ СИНХРОНИЗАЦИЯ С АДМИНКОЙ */}
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-orange-500">
                     <Trophy className="h-3 w-3 md:h-4 md:w-4 text-orange-500" />
@@ -311,12 +287,12 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 <div className="relative z-20 shrink-0 px-4 mt-4 mb-2">
                     <TabsList className="bg-black/60 backdrop-blur-3xl p-1.5 border border-white/5 h-auto flex flex-wrap justify-center gap-1.5 rounded-xl mx-auto max-w-full overflow-x-auto no-scrollbar">
                         {settingsArray.map((s, idx) => {
-                            const id = s.id || 'general';
+                            const id = s?.id || 'general';
                             const Icon = leagueIcons[id] || Trophy;
                             const style = leagueBookStyles[id] || leagueBookStyles.general;
                             return (
                                 <TabsTrigger 
-                                    key={`tab-trigger-${id}`} 
+                                    key={`tab-trigger-${id}-${idx}`} 
                                     value={id} 
                                     className={cn(
                                         "relative flex flex-col items-center justify-center w-16 h-12 md:w-20 md:h-14 rounded-lg border transition-all duration-300 active:scale-95",
@@ -346,7 +322,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
 
                 <ScrollArea className="flex-1 px-6 scroll-smooth">
                     {settingsArray.map((s, idx) => (
-                        <TabsContent key={`tab-content-${s.id || idx}`} value={s.id || 'general'} className="outline-none animate-in fade-in duration-500 mt-0">
+                        <TabsContent key={`tab-content-${s?.id || idx}`} value={s?.id || 'general'} className="outline-none animate-in fade-in duration-500 mt-0">
                             <div className="flex items-center gap-3 mb-3 mt-4">
                                 <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
                                 <h3 className="text-sm font-headline uppercase tracking-tight text-white/90">
