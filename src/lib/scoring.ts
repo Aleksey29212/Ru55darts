@@ -60,12 +60,13 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
         result.bonusPoints += result.pointsFor9Darter;
     }
 
-    result.points = result.basePoints + result.bonusPoints;
+    result.points = (result.basePoints || 0) + (result.bonusPoints || 0);
 }
 
 /**
- * Исправленная математика "Вечернего Омска":
- * Используются абсолютные множители за стадию, а не накопительные.
+ * ИСПРАВЛЕННАЯ МАТЕМАТИКА "ВЕЧЕРНЕГО ОМСКА" (v4.8 Final)
+ * Используются абсолютные множители за стадию согласно регламенту.
+ * Гарантия: Победитель получает ровно 1.0 множитель.
  */
 function calculateEveningOmskPoints(result: TournamentPlayerResult, settings: ScoringSettings): void {
     const avg = result.avg || 0;

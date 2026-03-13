@@ -3,13 +3,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, Trophy, Calendar, ChevronRight, Target, Filter } from 'lucide-react';
+import { Trophy, Calendar, ChevronRight, Filter } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { Timestamp } from 'firebase/firestore';
 import { getLeagueSettings } from '@/lib/settings';
 import type { LeagueId } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+
+/**
+ * @fileOverview Архив турниров. 
+ * ИСПРАВЛЕНО: Добавлен импорт Badge для предотвращения ReferenceError.
+ */
 
 export default async function TournamentsPage(props: {
     searchParams: Promise<{ league?: LeagueId }>;
@@ -26,7 +31,6 @@ export default async function TournamentsPage(props: {
         leagueSettings[id].enabled || id === 'general'
     );
 
-    // Если параметр не задан или невалиден, по умолчанию показываем все (или первую лигу)
     const currentLeagueId = leagueParam && enabledLeagues.includes(leagueParam) ? leagueParam : undefined;
 
     const filteredTournaments = currentLeagueId 

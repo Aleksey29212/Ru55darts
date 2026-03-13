@@ -11,67 +11,53 @@ RED='\033[0;31m'
 WHITE='\033[1;37m'
 NC='\033[0m'
 
+TARGET_REPO="https://github.com/Aleksey29212/Ru55darts.git"
+
 echo -e "${BLUE}=======================================${NC}"
 echo -e "${GREEN}   DartBrig Pro: Production Ready      ${NC}"
 echo -e "${BLUE}=======================================${NC}"
 
-# 1. Проверка Git на повреждения
+# 1. Проверка и лечение Git
 if [ ! -d .git ]; then
   echo -e "${YELLOW}🔄 Инициализация нового репозитория...${NC}"
   git init
   git branch -M main
 fi
 
-# Проверка на пустые объекты (частая ошибка в облачных средах)
+# Проверка на пустые объекты (лечение поврежденной базы)
 CHECK_GIT=$(git status 2>&1)
 if [[ $CHECK_GIT == *"empty"* ]] || [[ $CHECK_GIT == *"fatal"* ]]; then
-  echo -e "${RED}⚠️ Обнаружена ошибка Git. Выполняю переинициализацию...${NC}"
-  REMOTE_URL=$(git remote get-url origin 2>/dev/null)
+  echo -e "${RED}⚠️ Обнаружена ошибка Git. Выполняю глубокую очистку...${NC}"
   rm -rf .git
   git init
   git branch -M main
-  if [ ! -z "$REMOTE_URL" ]; then
-    git remote add origin "$REMOTE_URL"
-  fi
 fi
 
-# 2. Добавление изменений
-echo -e "${GREEN}📦 Подготовка файлов DartBrig Pro v2.8...${NC}"
-echo -e "${WHITE}• Оптимизирована читаемость 3-значных цифр${NC}"
-echo -e "${WHITE}• Исправлена математика множителей (Омск)${NC}"
-echo -e "${WHITE}• Подготовлен конфиг для Timeweb (Standalone)${NC}"
-echo -e "${WHITE}• Внедрен Snappy UI (отклик 75мс)${NC}"
+# 2. Настройка удаленного репозитория
+git remote remove origin 2>/dev/null
+git remote add origin "$TARGET_REPO"
+echo -e "${GREEN}✅ Репозиторий подключен: ${WHITE}$TARGET_REPO${NC}"
+
+# 3. Подготовка коммита
+echo -e "${GREEN}📦 Индексация файлов DartBrig Pro v2.8 Stable...${NC}"
+echo -e "${WHITE}• Оптимизация 3-значных чисел (100+)${NC}"
+echo -e "${WHITE}• Исправление множителей (Омск: 1.0 победа)${NC}"
+echo -e "${WHITE}• Настройка Timeweb Cloud (Standalone)${NC}"
+echo -e "${WHITE}• Мобильный Регламент (4 колонки)${NC}"
 
 git add .
 
-# 3. Коммит
-echo -e "${GREEN}💾 Сохранение стабильной сборки...${NC}"
-git commit -m "Stable Build v2.8: Final UI polish, math fix and deployment readiness" --quiet || echo "Изменений нет."
+# 4. Сохранение
+git commit -m "Stable Build v2.8: Final UI/Math Polish and Timeweb Readiness" --quiet || echo "Изменений для фиксации нет."
 
-# 4. Проверка удаленного репозитория
-REMOTE_URL=$(git remote get-url origin 2>/dev/null)
-
-if [ -z "$REMOTE_URL" ]; then
-  echo -e "\n${RED}⚠️ Удаленный репозиторий не подключен!${NC}"
-  echo -e "${YELLOW}Введите ссылку на ваш GitHub репозиторий:${NC}"
-  read -p "URL (https://github.com/...): " USER_URL
-  if [ ! -z "$USER_URL" ]; then
-    git remote add origin "$USER_URL"
-    echo -e "${GREEN}✅ Репозиторий подключен.${NC}"
-  else
-    echo -e "${RED}❌ Отмена. Адрес не введен.${NC}"
-    exit 1
-  fi
-fi
-
-# 5. Отправка
-echo -e "${YELLOW}📤 Отправка кода в GitHub...${NC}"
+# 5. Принудительная отправка
+echo -e "${YELLOW}📤 Отправка в GitHub (Master Push)...${NC}"
 if git push -u origin main --force; then
   echo -e "\n${BLUE}=======================================${NC}"
-  echo -e "${GREEN}✅ КОД УСПЕШНО ОТПРАВЛЕН В GITHUB!${NC}"
+  echo -e "${GREEN}✅ ПРОЕКТ УСПЕШНО ЗАГРУЖЕН В GITHUB!${NC}"
   echo -e "${BLUE}=======================================${NC}"
   echo -e "\n${YELLOW}Следующий шаг:${NC}"
-  echo -e "Просто подключите этот GitHub репозиторий к вашему хостингу (Timeweb/Vercel)."
+  echo -e "Зайдите в Timeweb Cloud и создайте проект из этого репозитория."
 else
-  echo -e "\n${RED}❌ Ошибка отправки. Проверьте соединение и права доступа.${NC}"
+  echo -e "\n${RED}❌ Ошибка отправки. Проверьте ваш Personal Access Token на GitHub.${NC}"
 fi
