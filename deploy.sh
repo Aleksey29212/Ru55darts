@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Скрипт для радикального исправления ошибок Git и деплоя (v2.8 Master)
-# Специально для автоматизации процесса "в один клик" перед деплоем на хостинг
+# Скрипт для радикальной подготовки и деплоя DartBrig Pro v2.8 Stable
+# Специально для автоматизации процесса "в один клик" из среды разработки в GitHub
 
 # Цвета для вывода
 GREEN='\033[0;32m'
@@ -12,49 +12,36 @@ WHITE='\033[1;37m'
 NC='\033[0m'
 
 echo -e "${BLUE}=======================================${NC}"
-echo -e "${GREEN}   DartBrig Pro: Production Deploy     ${NC}"
+echo -e "${GREEN}   DartBrig Pro: Production Ready      ${NC}"
 echo -e "${BLUE}=======================================${NC}"
 
-# 1. Проверка на критическое повреждение Git
-CHECK_GIT=$(git status 2>&1)
-if [[ $CHECK_GIT == *"empty"* ]] || [[ $CHECK_GIT == *"fatal"* ]] || [ ! -d .git ]; then
-  echo -e "${RED}⚠️ Обнаружено повреждение Git или новый проект.${NC}"
-  echo -e "${YELLOW}🔄 Выполняется автоматическая инициализация...${NC}"
-  
-  # Пытаемся сохранить URL удаленного репозитория
-  REMOTE_URL=$(git remote get-url origin 2>/dev/null)
-  if [ -z "$REMOTE_URL" ]; then
-    REMOTE_URL="https://github.com/Aleksey29212/Ru55darts.git"
-  fi
-
-  # Полная очистка и пересоздание
-  rm -rf .git
+# 1. Проверка Git
+if [ ! -d .git ]; then
+  echo -e "${YELLOW}🔄 Инициализация нового репозитория...${NC}"
   git init
   git branch -M main
-  git remote add origin "$REMOTE_URL"
-  echo -e "${GREEN}✅ Репозиторий успешно пересоздан.${NC}"
-else
-  echo -e "${YELLOW}ℹ️ Локальный репозиторий в норме.${NC}"
-  REMOTE_URL=$(git remote get-url origin)
 fi
 
-echo -e "${BLUE}ℹ️ Цель: ${WHITE}$REMOTE_URL${NC}"
-
-# 2. Индексация и коммит
+# 2. Добавление изменений
 echo -e "${GREEN}📦 Подготовка файлов DartBrig Pro v2.8...${NC}"
+echo -e "${WHITE}• Исправлена читаемость цифр во всех 10 шаблонах${NC}"
+echo -e "${WHITE}• Обновлена терминология: AVG, 180, Hi-Out${NC}"
+echo -e "${WHITE}• Оптимизирован отклик интерфейса (Snappy UI)${NC}"
+echo -e "${WHITE}• Подготовлен конфиг для Timeweb${NC}"
+
 git add .
 
+# 3. Коммит
 echo -e "${GREEN}💾 Сохранение стабильной сборки...${NC}"
-git commit -m "Stable Build v2.8: Final UI polish and deployment readiness" --quiet
+git commit -m "Stable Build v2.8: Final UI polish, naming fix and deployment readiness" --quiet
 
-# 3. Отправка кода
-echo -e "${YELLOW}📤 Отправка в GitHub (Force Push)...${NC}"
-echo -e "${RED}ВНИМАНИЕ: Если GitHub запросит пароль, используйте Personal Access Token!${NC}"
-
-if git push -u origin main --force; then
-  echo -e "\n${GREEN}🎉 ПРОЕКТ УСПЕШНО ОТПРАВЛЕН В GITHUB!${NC}"
-  echo -e "${YELLOW}👉 Подключите этот репозиторий к Vercel или любому хостингу для авто-деплоя.${NC}"
-else
-  echo -e "\n${RED}❌ Ошибка доступа. Возможно, нужно обновить Personal Access Token на GitHub.${NC}"
-  echo -e "${YELLOW}Инструкция: Настройки GitHub -> Developer Settings -> Tokens (classic)${NC}"
-fi
+# 4. Инструкция для пользователя
+echo -e "\n${BLUE}=======================================${NC}"
+echo -e "${GREEN}✅ КОД ГОТОВ К ОТПРАВКЕ!${NC}"
+echo -e "${BLUE}=======================================${NC}"
+echo -e "${YELLOW}Следующие шаги:${NC}"
+echo -e "1. Убедитесь, что у вас добавлен удаленный репозиторий:"
+echo -e "   ${WHITE}git remote add origin https://github.com/ВАШ_ЛОГИН/ВАШ_РЕПО.git${NC}"
+echo -e "2. Отправьте код командой:"
+echo -e "   ${WHITE}git push -u origin main --force${NC}"
+echo -e "\n${RED}Затем просто подключите этот GitHub репозиторий к Timeweb!${NC}"
