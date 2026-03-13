@@ -85,7 +85,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
 
   if (!mounted) return children || null;
 
-  // Безопасное формирование массива настроек
   const settingsArray = (Array.isArray(settings) ? settings : [settings]).filter(s => s && typeof s === 'object');
   const namesArray = Array.isArray(leagueName) ? leagueName : [leagueName];
 
