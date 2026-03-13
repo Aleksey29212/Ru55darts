@@ -35,7 +35,6 @@ import {
     Crown,
     PlusCircle,
     Activity,
-    Info,
     ChevronRight
 } from 'lucide-react';
 import type { ScoringSettings, SponsorshipSettings } from '@/lib/types';
@@ -87,7 +86,8 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     setMounted(true);
   }, []);
 
-  const settingsArray = (Array.isArray(settings) ? settings : [settings]).filter(Boolean);
+  // Фильтруем пустые значения, чтобы избежать ошибок "reading id of undefined"
+  const settingsArray = (Array.isArray(settings) ? settings : [settings]).filter(s => s && typeof s === 'object');
   const namesArray = Array.isArray(leagueName) ? leagueName : [leagueName];
 
   if (!mounted) return children || null;
@@ -162,9 +162,12 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         }
         if (p === 1) return s.pointsFor1st;
         if (p === 2) return s.pointsFor2nd;
+        
+        // 3 место имеет приоритет
         if (p === 3 && (s.pointsFor3rd ?? 0) > 0) return s.pointsFor3rd!;
         if (p === 3 || p === 4) return s.pointsFor3rd_4th;
         
+        // Индивидуальные 5-10
         if (p === 5 && (s.pointsFor5th ?? 0) > 0) return s.pointsFor5th!;
         if (p === 6 && (s.pointsFor6th ?? 0) > 0) return s.pointsFor6th!;
         if (p === 7 && (s.pointsFor7th ?? 0) > 0) return s.pointsFor7th!;
@@ -172,6 +175,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         if (p === 9 && (s.pointsFor9th ?? 0) > 0) return s.pointsFor9th!;
         if (p === 10 && (s.pointsFor10th ?? 0) > 0) return s.pointsFor10th!;
 
+        // Групповые 5-16
         if (p >= 5 && p <= 8) return s.pointsFor5th_8th;
         if (p >= 9 && p <= 16) return s.pointsFor9th_16th;
         return 0;
@@ -211,6 +215,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
 
     return (
         <div className="flex flex-col gap-4 pt-1 pb-16">
+            {/* 1. БОНУС ЗА УЧАСТИЕ (Выносим вверх как приветственный) */}
             {s.participationPoints > 0 && (
                 <div className="py-2 px-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-lg active:scale-95 transition-transform">
                     <div className="flex items-center gap-2">
@@ -224,6 +229,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 </div>
             )}
 
+            {/* 2. БАЗОВАЯ СЕТКА (1-16) */}
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-orange-500">
                     <Trophy className="h-3 w-3 text-orange-500" />
@@ -236,20 +242,22 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 </div>
             </div>
 
+            {/* 3. ДОПОЛНИТЕЛЬНЫЕ МЕСТА (17+) - Новые введения НИЖЕ базы */}
             {extraEntries.length > 0 && (
                 <div className="space-y-2">
-                    <div className="flex items-center gap-3 px-3 md:px-4 border-l-4 border-purple-500 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
-                        <PlusCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-purple-500" />
-                        <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Дополнительные позиции</h4>
+                    <div className="flex items-center gap-3 px-3 border-l-4 border-purple-500 bg-white/5 py-1.5 rounded-r-xl shadow-xl">
+                        <PlusCircle className="h-3.5 w-3.5 text-purple-500" />
+                        <h4 className="font-headline text-[9px] uppercase tracking-widest text-white leading-none">Дополнительные позиции</h4>
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                         {extraEntries.map(([place, points]) => (
-                            renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Расширение', `extra-place-${place}`)
+                            renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Расширение сетки', `extra-place-${place}`)
                         ))}
                     </div>
                 </div>
             )}
 
+            {/* 4. ТЕХНИЧЕСКИЕ БОНУСЫ (AVG, 180 и др) - Новые введения НИЖЕ базы */}
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-cyan-400">
                     <Star className="h-3 w-3 text-cyan-400" />

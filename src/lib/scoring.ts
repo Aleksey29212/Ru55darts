@@ -45,7 +45,7 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
         return calculateEveningOmskPoints(result, settings);
     }
 
-    // 1. Сброс текущих баллов перед расчетом
+    // 1. Сброс текущих баллов перед расчетом (важно для пересчета)
     result.points = 0;
     result.basePoints = 0;
     result.bonusPoints = 0;
