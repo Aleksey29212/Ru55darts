@@ -43,17 +43,15 @@ const StatItem = ({
     const valueString = String(value);
     const len = valueString.length;
     
-    // УЛЬТРА-АДАПТИВНЫЙ МАСШТАБ ЦИФР (Защита от переполнения)
+    // ИДЕАЛЬНОЕ МАСШТАБИРОВАНИЕ ДЛЯ ЧИТАЕМОСТИ
     let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
-    if (len >= 7) {
-        fontSizeClass = "text-sm sm:text-base lg:text-xl"; 
-    } else if (len >= 5) {
-        fontSizeClass = "text-base sm:text-lg lg:text-2xl"; 
+    if (len >= 6) {
+        fontSizeClass = "text-base sm:text-lg lg:text-xl"; 
     } else if (len >= 4) {
-        fontSizeClass = "text-lg sm:text-xl lg:text-3xl"; 
+        fontSizeClass = "text-xl sm:text-2xl lg:text-3xl"; 
     } else if (len >= 3) {
-        fontSizeClass = "text-xl sm:text-2xl lg:text-4xl";
+        fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl";
     }
     
     const baseClasses = "flex flex-col items-center justify-between p-1.5 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] transition-transform border shadow-2xl relative w-full h-full min-h-[120px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none overflow-hidden bg-black/40 duration-75";
@@ -91,7 +89,7 @@ const StatItem = ({
             onClick={() => setIsRevealed(!isRevealed)}
         >
             <div className="w-full flex items-center justify-center gap-0.5 mb-1 relative z-10 px-1">
-                <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-tighter text-muted-foreground/90 leading-none shrink-0">
+                <span className="text-[9px] font-black uppercase tracking-tight text-muted-foreground/90 leading-none shrink-0">
                     {label}
                 </span>
                 
@@ -101,7 +99,7 @@ const StatItem = ({
                             className="p-0.5 hover:text-primary transition-colors duration-150 active:scale-90 shrink-0 outline-none"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <AlertCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-primary/40 hover:text-primary" />
+                            <AlertCircle className="h-3 w-3 text-primary/40 hover:text-primary" />
                         </button>
                     </PopoverTrigger>
                     <PopoverContent 
@@ -127,16 +125,16 @@ const StatItem = ({
                 ) : (
                     <div className="flex flex-col items-center gap-1.5 animate-in fade-in duration-150">
                         <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-2xl bg-primary/10 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform duration-75">
-                            <Lock className="h-3.5 w-3.5 sm:h-7 sm:w-7 text-primary opacity-60 group-hover:opacity-100" />
+                            <Lock className="h-4 w-4 sm:h-7 sm:w-7 text-primary opacity-60 group-hover:opacity-100" />
                         </div>
-                        <span className="text-[5px] sm:text-[6px] font-black uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary/60">OPEN</span>
+                        <span className="text-[6px] font-black uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary/60">OPEN</span>
                     </div>
                 )}
             </div>
 
             <div className="w-full mt-auto relative z-10">
                 <div className="h-px w-full bg-white/10 mb-1.5" />
-                <p className="text-[7px] sm:text-[9px] font-black uppercase text-primary/60 tracking-[0.15em] text-center leading-none truncate px-0.5">
+                <p className="text-[8px] sm:text-[9px] font-black uppercase text-primary/60 tracking-[0.15em] text-center leading-none truncate px-0.5">
                     {caption || "METRIC"}
                 </p>
             </div>
