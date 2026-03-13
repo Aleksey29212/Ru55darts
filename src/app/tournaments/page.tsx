@@ -9,6 +9,7 @@ import { Timestamp } from 'firebase/firestore';
 import { getLeagueSettings } from '@/lib/settings';
 import type { LeagueId } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 export default async function TournamentsPage(props: {
     searchParams: Promise<{ league?: LeagueId }>;
