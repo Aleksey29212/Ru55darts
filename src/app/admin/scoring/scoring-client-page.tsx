@@ -7,13 +7,10 @@ import type { AllLeagueSettings, LeagueId, ScoringSettings } from '@/lib/types';
 import { useState, useMemo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Trophy, Shield, Star, Award, BarChart2, ChevronsUp, Diamond, Users, Sunset, Baby, CircleUser } from 'lucide-react';
-import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, doc } from 'firebase/firestore';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
-import defaultScoringSettingsData from '@/lib/scoring-settings.json';
-import defaultLeagueSettings from '@/lib/league-settings.json';
 import { useIsClient } from '@/hooks/use-is-client';
-
 
 const leagueVisuals: Record<string, { icon: React.ElementType; color: string }> = {
     general: { icon: Trophy, color: 'text-primary' },
@@ -29,44 +26,32 @@ const leagueVisuals: Record<string, { icon: React.ElementType; color: string }> 
     women: { icon: CircleUser, color: 'text-indigo-400' },
 };
 
+interface ScoringClientPageProps {
+  initialScoringSettings: Record<LeagueId, ScoringSettings>;
+  initialLeagueSettings: AllLeagueSettings;
+}
 
-export function ScoringClientPage() {
+export function ScoringClientPage({ initialScoringSettings, initialLeagueSettings }: ScoringClientPageProps) {
   const db = useFirestore();
   const isClient = useIsClient();
 
-  // Fetch scoring settings
+  // Пытаемся получить живые данные из Firestore, если он настроен
   const scoringSettingsQuery = useMemoFirebase(() => db ? collection(db, 'scoring_configurations') : null, [db]);
   const { data: scoringSettingsFromDb, isLoading: isLoadingScoring } = useCollection<ScoringSettings>(scoringSettingsQuery);
 
-  // Fetch league settings
-  const leagueSettingsRef = useMemoFirebase(() => db ? doc(db, 'app_settings', 'leagues') : null, [db]);
-  const { data: leagueSettingsFromDb, isLoading: isLoadingLeagues } = useDoc<AllLeagueSettings>(leagueSettingsRef);
+  const allScoringSettings = useMemo(() => {
+    // Если есть данные из БД, объединяем их. Иначе используем то, что пришло с сервера (память/дефолты)
+    if (scoringSettingsFromDb && scoringSettingsFromDb.length > 0) {
+        const merged = { ...initialScoringSettings };
+        scoringSettingsFromDb.forEach(setting => {
+            merged[setting.id as LeagueId] = { ...merged[setting.id as LeagueId], ...setting };
+        });
+        return merged;
+    }
+    return initialScoringSettings;
+  }, [scoringSettingsFromDb, initialScoringSettings]);
 
-  const allScoringSettings: Record<LeagueId, ScoringSettings> = useMemo(() => {
-    const fromDbMap: Partial<Record<LeagueId, ScoringSettings>> = {};
-    (scoringSettingsFromDb || []).forEach(setting => {
-        fromDbMap[setting.id as LeagueId] = setting;
-    });
-
-    const allDefaults: Record<LeagueId, ScoringSettings> = defaultScoringSettingsData as any;
-    const leagueIds: LeagueId[] = ['general', 'evening_omsk', 'premier', 'first', 'cricket', 'second', 'third', 'fourth', 'senior', 'youth', 'women'];
-    
-    const result: any = {};
-    leagueIds.forEach(id => {
-        result[id] = { 
-            ...(allDefaults[id] || allDefaults.general), 
-            ...(fromDbMap[id] || {}) 
-        };
-    });
-    
-    return result;
-  }, [scoringSettingsFromDb]);
-
-  const leagueSettings: AllLeagueSettings = useMemo(() => {
-    return { ...(defaultLeagueSettings as AllLeagueSettings), ...leagueSettingsFromDb };
-  }, [leagueSettingsFromDb]);
-
-  const isLoading = isLoadingScoring || isLoadingLeagues;
+  const leagueSettings = initialLeagueSettings;
   
   const enabledLeagues = useMemo(() => (Object.keys(leagueSettings) as LeagueId[]).filter(key => leagueSettings[key].enabled), [leagueSettings]);
   const [selectedLeague, setSelectedLeague] = useState<LeagueId>('general');
@@ -77,7 +62,7 @@ export function ScoringClientPage() {
       }
   }, [enabledLeagues, selectedLeague]);
 
-  if (isLoading || !isClient) {
+  if (!isClient) {
       return (
          <div className="max-w-4xl mx-auto">
             <Card className="glassmorphism">

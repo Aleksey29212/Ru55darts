@@ -36,7 +36,7 @@ import {
     Activity,
     ChevronRight
 } from 'lucide-react';
-import type { ScoringSettings, SponsorshipSettings, LeagueId } from '@/lib/types';
+import type { ScoringSettings, SponsorshipSettings } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -95,7 +95,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     <div key={label} className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/[0.03] border border-white/5 hover:border-primary/30 transition-all group shadow-sm active:scale-[0.98]">
         <div className="flex items-center gap-2 min-w-0">
             <div className={cn("p-1 rounded-md bg-black/40 border border-white/5 shrink-0", colorClass)}>
-                <Icon className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                <Icon className="h-3.5 w-3.5" />
             </div>
             <div className="flex flex-col min-w-0">
                 <span className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-tight truncate leading-none">{label}</span>
@@ -203,7 +203,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
 
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-orange-500">
-                    <Trophy className="h-3 w-3 md:h-4 md:w-4 text-orange-500" />
+                    <Trophy className="h-4 w-4 text-orange-500" />
                     <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Базовые баллы (ТОП-16)</h4>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
@@ -216,7 +216,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
             {extraEntries.length > 0 && (
                 <div className="space-y-2">
                     <div className="flex items-center gap-3 px-3 border-l-2 border-purple-500">
-                        <PlusCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-purple-500" />
+                        <PlusCircle className="h-4 w-4 text-purple-500" />
                         <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Расширенная сетка</h4>
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
@@ -229,7 +229,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
 
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-cyan-400">
-                    <Star className="h-3 w-3 md:h-4 md:w-4 text-cyan-400" />
+                    <Star className="h-4 w-4 text-cyan-400" />
                     <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Про-статистика (Бонусы)</h4>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
