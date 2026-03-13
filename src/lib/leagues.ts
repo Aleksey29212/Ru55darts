@@ -133,7 +133,7 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                     totalPointsForBestLeg,
                     totalPointsFor9Darter,
                     cashValue: leagueId === 'evening_omsk' ? points * eveningOmskRate : undefined,
-                    isQualifiedForFinal: false // Определится после сортировки
+                    isQualifiedForFinal: false 
                 };
             });
 
@@ -163,7 +163,7 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                 return { 
                     ...p, 
                     rank: currentRank,
-                    // Статус финалиста только для ТОП-16
+                    // Статус финалиста строго для ТОП-16 рейтинга Омска
                     isQualifiedForFinal: leagueId === 'evening_omsk' && currentRank <= 16
                 };
             });

@@ -26,6 +26,7 @@ fi
 echo -e "${GREEN}📦 Подготовка файлов DartBrig Pro v2.8...${NC}"
 echo -e "${WHITE}• Исправлена читаемость цифр во всех 10 шаблонах${NC}"
 echo -e "${WHITE}• Обновлена терминология: AVG, 180, Hi-Out${NC}"
+echo -e "${WHITE}• Исправлена математика множителей и ТОП-16${NC}"
 echo -e "${WHITE}• Оптимизирован отклик интерфейса (Snappy UI)${NC}"
 echo -e "${WHITE}• Подготовлен конфиг для Timeweb${NC}"
 
@@ -33,7 +34,7 @@ git add .
 
 # 3. Коммит
 echo -e "${GREEN}💾 Сохранение стабильной сборки...${NC}"
-git commit -m "Stable Build v2.8: Final UI polish, naming fix and deployment readiness" --quiet
+git commit -m "Stable Build v2.8: Final UI polish, math fix and deployment readiness" --quiet
 
 # 4. Инструкция для пользователя
 echo -e "\n${BLUE}=======================================${NC}"

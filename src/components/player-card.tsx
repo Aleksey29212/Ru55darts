@@ -43,7 +43,7 @@ const StatItem = ({
     const valueString = String(value);
     const len = valueString.length;
     
-    // ИДЕАЛЬНОЕ МАСШТАБИРОВАНИЕ ДЛЯ ЧИТАЕМОСТИ
+    // ИДЕАЛЬНОЕ МАСШТАБИРОВАНИЕ ДЛЯ ЧИТАЕМОСТИ ЦИФР
     let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
     if (len >= 6) {
@@ -54,7 +54,7 @@ const StatItem = ({
         fontSizeClass = "text-2xl sm:text-3xl lg:text-4xl";
     }
     
-    const baseClasses = "flex flex-col items-center justify-between p-1.5 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] transition-transform border shadow-2xl relative w-full h-full min-h-[120px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none overflow-hidden bg-black/40 duration-75";
+    const baseClasses = "flex flex-col items-center justify-between p-1 rounded-[1.5rem] sm:rounded-[2rem] transition-all border shadow-2xl relative w-full h-full min-h-[120px] sm:min-h-[180px] cursor-pointer active:scale-95 select-none overflow-hidden bg-black/40 duration-75";
     
     const templateClasses = {
         classic: "glassmorphism border-white/10 hover:border-primary/40",
