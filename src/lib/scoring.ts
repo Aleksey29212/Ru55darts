@@ -68,6 +68,7 @@ function calculateEveningOmskPoints(result: TournamentPlayerResult, settings: Sc
     const avg = result.avg || 0;
     let multiplier = 0;
 
+    // Исправлено: точный выбор множителя без накопления
     if (result.rank === 1) {
         multiplier = 1.00;
     } else if (result.rank === 2) {
