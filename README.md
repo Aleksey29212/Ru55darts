@@ -6,31 +6,32 @@
 - **Framework**: Next.js 15 (App Router)
 - **Backend**: Firebase Firestore (Облачная БД)
 - **Auth**: Firebase Auth (Anonymous)
-- **Deployment**: Docker / Node.js Standalone
+- **Deployment**: Docker / Firebase App Hosting
 
-## 🚀 Инструкция по деплою на Timeweb Cloud (Docker-compose)
+## 🚀 Варианты деплоя
 
-### Шаг 1: Подготовка данных Firebase
-Для работы сайта вам нужны ключи вашего проекта Firebase.
-1. В [Консоли Firebase](https://console.firebase.google.com/) перейдите в **Project Settings**.
-2. Внизу страницы найдите раздел **Your apps** -> **Web App** -> **SDK setup** -> **Config**.
-3. Вам понадобятся значения: `apiKey`, `authDomain`, `projectId`, `appId`.
+### Вариант А: Firebase App Hosting (Без сторонних серверов)
+Самый простой способ развернуть сайт в той же среде, где находится ваша база данных.
+1. Зайдите в [Консоль Firebase](https://console.firebase.google.com/).
+2. Раздел **Build** -> **App Hosting**.
+3. Нажмите **Get Started** и подключите ваш репозиторий GitHub: `Aleksey29212/Ru55darts`.
+4. Firebase автоматически обнаружит настройки в `apphosting.yaml` и развернет сайт.
 
-### Шаг 2: Настройка в Timeweb Cloud
-1. Создайте проект **«Приложение из Docker-compose»**.
-2. Подключите ваш GitHub репозиторий: `https://github.com/Aleksey29212/Ru55darts.git`.
-3. Перейдите во вкладку **«Переменные окружения»** (Environment Variables) и добавьте следующие ключи:
-   - `NEXT_PUBLIC_FIREBASE_API_KEY` — (ваш apiKey)
-   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` — (ваш authDomain)
-   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID` — (ваш projectId)
-   - `NEXT_PUBLIC_FIREBASE_APP_ID` — (ваш appId)
-   - `NEXT_PUBLIC_ADMIN_PASSWORD` — (ваш пароль для входа в админку)
+### Вариант Б: Timeweb Cloud (Docker-compose)
+Если вам нужен хостинг в РФ с оплатой в рублях.
+1. Создайте проект **«Приложение из Docker-compose»** в Timeweb.
+2. Подключите ваш GitHub репозиторий.
+3. Добавьте переменные окружения в панели Timeweb:
+   - `NEXT_PUBLIC_FIREBASE_API_KEY`
+   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+   - `NEXT_PUBLIC_FIREBASE_APP_ID`
+   - `NEXT_PUBLIC_ADMIN_PASSWORD`
 
-### Шаг 3: Запуск
-После сохранения переменных и запуска сборки, Timeweb Cloud автоматически развернет контейнер.
-- **Внутренний порт**: `3000`
-- **Команда сборки**: определяется автоматически через Dockerfile.
+## 🔑 Где взять ключи Firebase?
+1. В консоли Firebase перейдите в **Project Settings** (шестеренка вверху).
+2. Вкладка **General**, внизу раздел **Your apps** -> **Web App**.
+3. Нажмите **Config** и скопируйте значения.
 
 ---
-**Совет:** Если вы не уверены в выборе тарифа, используйте промт из файла `docs/timeweb-prompt.md` для консультации с TimewebGPT.
 Разработано для профессионального сообщества. Аудит математики и Docker-конфигурации пройден (v2.8 Stable).
