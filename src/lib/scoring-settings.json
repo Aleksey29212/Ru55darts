@@ -2,6 +2,7 @@
   "general": {
     "pointsFor1st": 100,
     "pointsFor2nd": 80,
+    "pointsFor3rd": 0,
     "pointsFor3rd_4th": 60,
     "pointsFor5th_8th": 40,
     "pointsFor9th_16th": 20,
@@ -25,6 +26,7 @@
     "exchangeRate": 7,
     "pointsFor1st": 0,
     "pointsFor2nd": 0,
+    "pointsFor3rd": 0,
     "pointsFor3rd_4th": 0,
     "pointsFor5th_8th": 0,
     "pointsFor9th_16th": 0,
@@ -46,6 +48,7 @@
   "premier": {
     "pointsFor1st": 200,
     "pointsFor2nd": 150,
+    "pointsFor3rd": 0,
     "pointsFor3rd_4th": 100,
     "pointsFor5th_8th": 75,
     "pointsFor9th_16th": 40,
@@ -67,6 +70,7 @@
   "first": {
     "pointsFor1st": 50,
     "pointsFor2nd": 40,
+    "pointsFor3rd": 0,
     "pointsFor3rd_4th": 30,
     "pointsFor5th_8th": 20,
     "pointsFor9th_16th": 10,
@@ -88,6 +92,7 @@
   "cricket": {
     "pointsFor1st": 100,
     "pointsFor2nd": 80,
+    "pointsFor3rd": 0,
     "pointsFor3rd_4th": 60,
     "pointsFor5th_8th": 40,
     "pointsFor9th_16th": 20,

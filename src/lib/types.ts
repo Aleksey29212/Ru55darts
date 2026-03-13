@@ -139,6 +139,7 @@ export type ScoringSettings = {
   id?: LeagueId;
   pointsFor1st: number;
   pointsFor2nd: number;
+  pointsFor3rd: number;
   pointsFor3rd_4th: number;
   pointsFor5th_8th: number;
   pointsFor9th_16th: number;

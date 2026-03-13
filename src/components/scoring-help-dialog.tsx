@@ -27,15 +27,14 @@ import {
     Sparkles,
     Wallet,
     Home,
-    ChevronRight,
     BarChart2,
     ChevronsUp,
     Diamond,
     CircleUser,
     ListOrdered,
-    Activity,
     Crown,
-    PlusCircle
+    PlusCircle,
+    Activity
 } from 'lucide-react';
 import type { ScoringSettings, SponsorshipSettings } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
@@ -157,19 +156,29 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         }
         if (p === 1) return s.pointsFor1st;
         if (p === 2) return s.pointsFor2nd;
-        if (p >= 3 && p <= 4) return s.pointsFor3rd_4th;
+        if (p === 3) return s.pointsFor3rd || s.pointsFor3rd_4th;
+        if (p === 4) return s.pointsFor3rd_4th;
         if (p >= 5 && p <= 8) return s.pointsFor5th_8th;
         if (p >= 9 && p <= 16) return s.pointsFor9th_16th;
         return 0;
     };
 
+    const hasSpecific3rd = s.pointsFor3rd > 0 && s.pointsFor3rd !== s.pointsFor3rd_4th;
+
     const basePlaces = [
         { label: '1 МЕСТО', points: getPlacePoints(1), icon: Medal, color: 'text-gold', desc: 'Победа' },
         { label: '2 МЕСТО', points: getPlacePoints(2), icon: Medal, color: 'text-silver', desc: 'Финал' },
-        { label: '3-4 МЕСТА', points: getPlacePoints(3), icon: Medal, color: 'text-bronze', desc: 'Полуфинал' },
-        { label: '5-8 МЕСТА', points: getPlacePoints(5), icon: Target, color: 'text-primary', desc: '1/4 финала' },
-        { label: '9-16 МЕСТА', points: getPlacePoints(9), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' },
     ];
+
+    if (hasSpecific3rd) {
+        basePlaces.push({ label: '3 МЕСТО', points: getPlacePoints(3), icon: Medal, color: 'text-bronze', desc: 'Бронза' });
+        basePlaces.push({ label: '4 МЕСТО', points: getPlacePoints(4), icon: Award, color: 'text-primary', desc: '1/2 финала' });
+    } else {
+        basePlaces.push({ label: '3-4 МЕСТА', points: getPlacePoints(3), icon: Medal, color: 'text-bronze', desc: 'Полуфинал' });
+    }
+
+    basePlaces.push({ label: '5-8 МЕСТА', points: getPlacePoints(5), icon: Target, color: 'text-primary', desc: '1/4 финала' });
+    basePlaces.push({ label: '9-16 МЕСТА', points: getPlacePoints(9), icon: TrendingUp, color: 'text-primary/60', desc: '1/8 финала' });
 
     const extraEntries = s.customPointsByPlace 
         ? Object.entries(s.customPointsByPlace)
@@ -194,7 +203,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-orange-500">
                     <Trophy className="h-3 w-3 text-orange-500" />
-                    <h4 className="font-headline text-[9px] uppercase tracking-widest text-white/60">Базовые баллы</h4>
+                    <h4 className="font-headline text-[9px] uppercase tracking-widest text-white/60">Базовые баллы (ТОП-16)</h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                     {basePlaces.map((p, idx) => (
@@ -206,11 +215,11 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
             {/* 3. ДОПОЛНИТЕЛЬНЫЕ МЕСТА */}
             {extraEntries.length > 0 && (
                 <div className="space-y-2">
-                    <div className="flex items-center gap-2 px-2 border-l-2 border-purple-500">
-                        <PlusCircle className="h-3 w-3 text-purple-500" />
-                        <h4 className="font-headline text-[9px] uppercase tracking-widest text-white/60">Доп. позиции</h4>
+                    <div className="flex items-center gap-2 px-3 md:px-4 border-l-4 border-purple-500 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
+                        <PlusCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-purple-500" />
+                        <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Дополнительные позиции</h4>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                         {extraEntries.map(([place, points]) => (
                             renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Расширение', `extra-place-${place}`)
                         ))}

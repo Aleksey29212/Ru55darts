@@ -4,21 +4,22 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Save, Loader2, Info, PlusCircle, Trash2, ListOrdered, Sparkles, Zap, Target, TrendingUp, Trophy } from 'lucide-react';
+import { Save, Loader2, Info, PlusCircle, Trash2, ListOrdered, Sparkles, Zap, Target, TrendingUp, Trophy, Flame, Star, Crown, Activity } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import type { ScoringSettings, LeagueId } from '@/lib/types';
-import { useTransition, useState, useEffect, useMemo } from 'react';
+import { useTransition, useEffect, useMemo, useState } from 'react';
 import { saveScoringSettings } from '@/app/actions';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const scoringSchema = z.object({
   pointsFor1st: z.coerce.number().min(0),
   pointsFor2nd: z.coerce.number().min(0),
+  pointsFor3rd: z.coerce.number().min(0),
   pointsFor3rd_4th: z.coerce.number().min(0),
   pointsFor5th_8th: z.coerce.number().min(0),
   pointsFor9th_16th: z.coerce.number().min(0),
@@ -65,10 +66,11 @@ export function ScoringForm({ leagueId, defaultValues }: { leagueId: LeagueId, d
   const [isPending, startTransition] = useTransition();
   const [customPlaces, setCustomPlaces] = useState<{place: string, points: number}[]>([]);
 
-  // Гарантируем, что ни одно поле не будет undefined, чтобы избежать ошибок гидратации и контролируемых компонентов
+  // Гарантируем, что ни одно поле не будет undefined
   const safeDefaultValues = useMemo(() => ({
     pointsFor1st: defaultValues?.pointsFor1st ?? 0,
     pointsFor2nd: defaultValues?.pointsFor2nd ?? 0,
+    pointsFor3rd: defaultValues?.pointsFor3rd ?? 0,
     pointsFor3rd_4th: defaultValues?.pointsFor3rd_4th ?? 0,
     pointsFor5th_8th: defaultValues?.pointsFor5th_8th ?? 0,
     pointsFor9th_16th: defaultValues?.pointsFor9th_16th ?? 0,
@@ -140,15 +142,19 @@ export function ScoringForm({ leagueId, defaultValues }: { leagueId: LeagueId, d
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <FormField control={form.control} name="pointsFor1st" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Победитель" tooltipText="Баллы за 1-е место." /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20 rounded-xl h-12" /></FormControl></FormItem>)} />
-                <FormField control={form.control} name="pointsFor2nd" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Финалист" tooltipText="Баллы за 2-е место." /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20 rounded-xl h-12" /></FormControl></FormItem>)} />
-                <FormField control={form.control} name="participationPoints" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Участие" tooltipText="Баллы каждому игроку за сам факт участия (начисляются всем участникам)." icon={Sparkles} /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-primary/5 border-primary/20 rounded-xl h-12" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor1st" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Победитель (1)" tooltipText="Баллы за 1-е место." /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20 rounded-xl h-12" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor2nd" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Финалист (2)" tooltipText="Баллы за 2-е место." /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20 rounded-xl h-12" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor3rd" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="3-е место" tooltipText="Баллы за 3-е место. Если 0, используются баллы полуфинала." icon={Trophy} /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20 rounded-xl h-12 border-primary/20" /></FormControl></FormItem>)} />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
-                <FormField control={form.control} name="pointsFor3rd_4th" render={({ field }) => (<FormItem><FormLabel className="text-xs">3-4 места (1/2)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20" /></FormControl></FormItem>)} />
-                <FormField control={form.control} name="pointsFor5th_8th" render={({ field }) => (<FormItem><FormLabel className="text-xs">5-8 места (1/4)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20" /></FormControl></FormItem>)} />
-                <FormField control={form.control} name="pointsFor9th_16th" render={({ field }) => (<FormItem><FormLabel className="text-xs">9-16 места (1/8)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor3rd_4th" render={({ field }) => (<FormItem><FormLabel className="text-xs">Полуфиналисты (1/2)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor5th_8th" render={({ field }) => (<FormItem><FormLabel className="text-xs">Четвертьфиналисты (1/4)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor9th_16th" render={({ field }) => (<FormItem><FormLabel className="text-xs">1/8 финала (9-16)</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20" /></FormControl></FormItem>)} />
+            </div>
+
+            <div className="pt-4 border-t border-white/5">
+                <FormField control={form.control} name="participationPoints" render={({ field }) => (<FormItem className="max-w-xs"><FormLabel><LabelWithTooltip label="Баллы за участие" tooltipText="Начисляются всем игрокам турнира дополнительно к месту." icon={Sparkles} /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-primary/5 border-primary/20 rounded-xl h-12" /></FormControl></FormItem>)} />
             </div>
         </div>
 

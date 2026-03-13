@@ -13,7 +13,13 @@ export function getPointsForRank(rank: number, settings: ScoringSettings): numbe
     // 2. Групповые настройки для ТОП-16
     if (r === 1) return Number(settings.pointsFor1st) || 0;
     if (r === 2) return Number(settings.pointsFor2nd) || 0;
-    if (r >= 3 && r <= 4) return Number(settings.pointsFor3rd_4th) || 0;
+    
+    // Специальная обработка 3-го места (если задано)
+    if (r === 3) {
+        return Number(settings.pointsFor3rd || settings.pointsFor3rd_4th) || 0;
+    }
+    
+    if (r === 4) return Number(settings.pointsFor3rd_4th) || 0;
     if (r >= 5 && r <= 8) return Number(settings.pointsFor5th_8th) || 0;
     if (r >= 9 && r <= 16) return Number(settings.pointsFor9th_16th) || 0;
     
@@ -36,7 +42,7 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
     // 2. Очки за участие (начисляются всем, кто есть в протоколе)
     const participationPoints = Number(settings.participationPoints) || 0;
     
-    // Итоговая база
+    // Итоговая база (строгое сложение чисел)
     result.basePoints = Number(placePoints) + Number(participationPoints);
     
     // 3. Сброс и расчет расширенных бонусов
