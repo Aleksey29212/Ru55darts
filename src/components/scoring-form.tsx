@@ -6,16 +6,17 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { CardFooter } from './ui/card';
+import { CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Loader2, Info, PlusCircle, Trash2, ListOrdered } from 'lucide-react';
-import { Switch } from './ui/switch';
-import { Separator } from './ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
 import type { ScoringSettings, LeagueId } from '@/lib/types';
 import { useTransition, useState, useEffect } from 'react';
 import { saveScoringSettings } from '@/app/actions';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Badge } from './ui/badge';
+import { Badge } from '@/components/ui/badge';
 
 const scoringSchema = z.object({
   pointsFor1st: z.coerce.number().min(0, 'Должно быть положительным числом.'),
@@ -55,10 +56,12 @@ interface ScoringFormProps {
 const LabelWithTooltip = ({ label, tooltipText }: { label: string, tooltipText: string }) => (
     <div className="flex items-center gap-1.5">
         {label}
-        <Tooltip>
-            <TooltipTrigger asChild><Info className="h-3 w-3 cursor-help text-muted-foreground" /></TooltipTrigger>
-            <TooltipContent><p>{tooltipText}</p></TooltipContent>
-        </Tooltip>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild><Info className="h-3 w-3 cursor-help text-muted-foreground" /></TooltipTrigger>
+                <TooltipContent><p>{tooltipText}</p></TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     </div>
 );
 
@@ -83,7 +86,6 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
     resolver: zodResolver(scoringSchema),
     defaultValues: {
         ...defaultValues,
-        // participationPoints удален из интерфейса, но сохраняем для совместимости типа, если нужно
     } as any,
   });
   
@@ -138,7 +140,6 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <TooltipProvider>
         <div className="space-y-8">
             <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 flex items-start gap-3">
                 <Info className="h-5 w-5 text-primary mt-0.5 shrink-0" />
@@ -269,7 +270,6 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
                 </div>
             </div>
         </div>
-        </TooltipProvider>
         <CardFooter className="mt-8 px-0">
           <Button type="submit" disabled={isPending} className="ml-auto h-12 px-8 shadow-xl shadow-primary/30 active:scale-95 transition-all">
             {isPending ? <><Loader2 className="animate-spin mr-2" /> Сохранение...</> : <><Save className="mr-2" /> Сохранить настройки</>}
