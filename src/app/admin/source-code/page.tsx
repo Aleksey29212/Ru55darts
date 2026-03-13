@@ -8,52 +8,39 @@ import { Button } from "@/components/ui/button";
 
 const FILES = [
   {
+    id: "deployment",
+    name: "deployment-specs.md",
+    icon: Zap,
+    language: "markdown",
+    description: "СПЕЦИФИКАЦИЯ ДЕПЛОЯ. Технические требования для системного администратора или DevOps-инженера.",
+    content: `# DartBrig Pro: Deployment Specs
+## Стек: Next.js 15 + Node.js 20
+## Режим: standalone (output: 'standalone' в next.config.ts)
+
+### Процесс установки:
+1. Подключить GitHub репозиторий к хостингу (Vercel / Timeweb Cloud).
+2. Настроить Environment Variables (см. README.md).
+3. Firebase: В консоли Firebase включить Firestore и Anonymous Auth.
+4. Security Rules: Использовать правила из файла firestore.rules в корне проекта.
+
+### Особенности:
+- Система использует Memory Cache для демо-режима и Firestore для Production.
+- Фотографии хранятся в Base64 внутри документов Firestore (Collection: 'players').
+- Аналитика (посещения) пишется в коллекцию 'visits' в неблокирующем режиме.`
+  },
+  {
     id: "scraper",
     name: "scraping-master.ts",
     icon: Globe,
     language: "typescript",
-    description: "МАСТЕР-ЛОГИКА ПАРСИНГА. Полный цикл извлечения данных с dartsbase.ru: поиск даты в H1, динамический маппинг колонок и глубокая очистка чисел (extractNumber).",
+    description: "МАСТЕР-ЛОГИКА ПАРСИНГА. Полный цикл извлечения данных с dartsbase.ru: поиск даты в H1, динамический маппинг колонок и глубокая очистка чисел.",
     content: `/**
  * ЭТАЛОННЫЙ ПАРСЕР DARTSBASE (Версия 4.8 Master)
- * ГАРАНТИЯ: Игнорирует текст в скобках, находит реальную дату турнира.
  */
-
 export async function scrapeTournamentData(input, leagueId, scoringSettings) {
-  // 1. Формирование URL (авто-определение ID или прямой ссылки)
   const url = input.startsWith('http') ? input : \`https://dartsbase.ru/tournaments/\${input}/stats\`;
-  
-  // 2. Загрузка с User-Agent десктопа для обхода базовой защиты
-  const response = await fetch(url, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0.0.0' }
-  });
-  const html = await response.text();
-  const $ = cheerio.load(html);
-
-  // 3. Извлечение МЕТАДАННЫХ (Дата из H1 имеет высший приоритет)
-  const h1 = $('h1').first();
-  const dateMatch = h1.text().match(/(\\d{2})\\.(\\d{2})\\.(\\d{4})/);
-  const tournamentDate = dateMatch ? new Date(Date.UTC(dateMatch[3], dateMatch[2]-1, dateMatch[1])) : new Date();
-
-  // 4. SMART MAPPING: Динамический поиск индексов колонок
-  const headerMap = {};
-  const headerRow = $('table').first().find('thead tr').first();
-  
-  headerRow.find('th, td').each((i, el) => {
-    const txt = $(el).text().trim().toLowerCase();
-    if (['avg', 'average'].some(k => txt.includes(k))) headerMap['avg'] = i;
-    if (['180', '180s'].some(k => txt === k)) headerMap['180'] = i;
-    if (['checkout', 'hi-out', 'max out', 'hf'].some(k => txt.includes(k))) headerMap['hiout'] = i;
-    if (['игрок', 'player', 'имя'].some(k => txt.includes(k))) headerMap['player'] = i;
-    if (['#', 'место', 'rank'].some(k => txt.includes(k))) headerMap['rank'] = i;
-  });
-
-  // 5. НОРМАЛИЗАЦИЯ (extractNumber): Очистка "130 (T20, T20, D5)" -> 130
-  const extractNumber = (val) => {
-    const match = String(val).match(/\\d+/); // Берем только ПЕРВОЕ число
-    return match ? parseInt(match[0], 10) : 0;
-  };
-
-  // 6. Формирование TournamentPlayerResult и расчет баллов...
+  const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0...' } });
+  // Динамический маппинг колонок (AVG, 180, Hi-Out) по ключевым словам в thead.
 }`
   },
   {
@@ -61,154 +48,23 @@ export async function scrapeTournamentData(input, leagueId, scoringSettings) {
     name: "scoring-engine.ts",
     icon: Calculator,
     language: "typescript",
-    description: "ДВИГАТЕЛЬ РАСЧЕТОВ. Реализация двух систем: фиксированные баллы (Standard) и кумулятивный множитель (Вечерний Омск).",
+    description: "ДВИГАТЕЛЬ РАСЧЕТОВ. Реализация двух систем: фиксированные баллы и кумулятивный множитель (Вечерний Омск).",
     content: `/**
  * РАСЧЕТ БАЛЛОВ (Standard + Omsk Hybrid)
+ * ИСПРАВЛЕНО: Победитель Омска получает ровно 1.0 множитель.
  */
 function calculatePlayerPoints(result, settings) {
     if (settings.isEveningOmsk) {
-        // Уникальная формула "Вечернего Омска": Баллы = AVG * Накопленный множитель этапа
         let multiplier = 0;
-        if (result.rank <= 8) multiplier += 0.25; 
-        if (result.rank <= 4) multiplier += 0.50;
-        if (result.rank <= 2) multiplier += 0.70;
-        if (result.rank === 1) multiplier += 1.00;
-        
+        if (result.rank === 1) multiplier = 1.00;
+        else if (result.rank === 2) multiplier = 0.70;
+        else if (result.rank <= 4) multiplier = 0.50;
+        else if (result.rank <= 8) multiplier = 0.25;
         result.points = Math.round(result.avg * multiplier);
         return;
     }
-
-    // Стандартная система: Очки за раунд + Бонусы (180, Hi-Out, Short Leg)
-    result.basePoints = getPointsForRank(result.rank, settings);
-    
-    // Применение динамических бонусов из админки
-    if (settings.enable180Bonus) result.bonusPoints += result.n180s * settings.bonusPer180;
-    if (settings.enableHiOutBonus && result.hiOut >= settings.hiOutThreshold) {
-        result.bonusPoints += settings.hiOutBonus;
-    }
+    // Стандартные очки + бонусы за 180 и Hi-Out
 }`
-  },
-  {
-    id: "aggregation",
-    name: "aggregation.ts",
-    icon: Database,
-    language: "typescript",
-    description: "АГРЕГАТОР РЕЙТИНГА. Логика объединения результатов турниров в общую таблицу без дублирования данных.",
-    content: `/**
- * ГЛОБАЛЬНАЯ АГРЕГАЦИЯ (Engine v3.7)
- * ИСПРАВЛЕНО: Предотвращение двойного начисления очков в Общем зачете.
- */
-allTournaments.forEach(t => {
-    const lInfo = leagueSettings[t.league];
-    if (!lInfo || !lInfo.enabled) return;
-
-    t.players.forEach(p => {
-        // 1. Начисление в локальный рейтинг лиги
-        addToLeague(t.league, p);
-
-        // 2. Начисление в Общий зачет
-        // КРИТИЧЕСКОЕ УСЛОВИЕ: Только если лига входит в зачет и это НЕ сама лига 'general'
-        if (t.league !== 'general' && lInfo.includeInGeneralRanking) {
-            addToLeague('general', p);
-        }
-    });
-});`
-  },
-  {
-    id: "theming",
-    name: "theme-engine.ts",
-    icon: Wand2,
-    language: "typescript",
-    description: "СИСТЕМА СТИЛИЗАЦИИ. Динамическое управление HSL-переменными через ИИ и серверные экшены.",
-    content: `/**
- * THEME INJECTION (Engine v2.0)
- * Обновление globals.css через Node.js fs для мгновенного применения стилей
- */
-export async function updateThemeAction(theme) {
-  const cssFilePath = path.join(process.cwd(), 'src/app/globals.css');
-  
-  // Генерация нового блока .dark с HSL-переменными
-  const newVars = {
-    '--background': theme.background,
-    '--primary': theme.primary,
-    '--accent': theme.accent,
-    '--gold': theme.gold,
-    // ...остальные переменные
-  };
-
-  // Регулярное выражение для поиска и замены блока темы в файле
-  const newCss = existingContent.replace(darkThemeRegex, generateNewBlock(newVars));
-  await fs.writeFile(cssFilePath, newCss);
-}`
-  },
-  {
-    id: "security",
-    name: "security-gate.tsx",
-    icon: ShieldAlert,
-    language: "typescript",
-    description: "БЕЗОПАСНОСТЬ. Реализация скрытого триггера (Lambda) и управление административной сессией.",
-    content: `/**
- * LAMBDA ACCESS (Hidden Entrance)
- * Реализация скрытого входа через символ 'λ' в UI
- */
-const handleLambdaClick = () => {
-  // Переключение формы входа под изображением (без перекрытия контента)
-  setShowLoginForm(!showLoginForm);
-};
-
-const login = (password) => {
-  if (password === ADMIN_PASSWORD) {
-    sessionStorage.setItem('db_admin_session', 'true');
-    setIsAdmin(true);
-    router.push('/admin'); // Мгновенный Snappy-переход
-  }
-};`
-  },
-  {
-    id: "analytics",
-    name: "analytics-tracker.ts",
-    icon: BarChart,
-    language: "typescript",
-    description: "АНАЛИТИКА. Трекинг посещений (VisitLogger) и кликов по спонсорским ссылкам для отчетности партнерам.",
-    content: `/**
- * TRACKING SYSTEM (Non-blocking)
- * Логирование действий без замедления работы пользователя
- */
-export async function logVisitAction() {
-  const headersList = headers();
-  // Фильтрация ботов через User-Agent
-  if (/bot|crawl|spider/i.test(headersList.get('user-agent'))) return;
-  
-  await addDoc(collection(db, 'visits'), { 
-    timestamp: serverTimestamp() 
-  });
-}
-
-export async function logSponsorClick(playerId, sponsorName) {
-  // Анонимная запись факта клика
-  await addDoc(collection(db, 'sponsor_clicks'), { 
-    playerId, sponsorName, timestamp: serverTimestamp() 
-  });
-}`
-  },
-  {
-    id: "components",
-    name: "ui-standards.tsx",
-    icon: LayoutTemplate,
-    language: "typescript",
-    description: "UI СТАНДАРТЫ. Описание принципов Glassmorphism, Responsive Cards и Snappy UI (эффект нажатия).",
-    content: `/**
- * DartBrig Pro UI CORE
- * 1. Glassmorphism: bg-card/85 + backdrop-blur-3xl + white/10 border
- * 2. Snappy UI: active:scale-95 + transition-all (200ms)
- * 3. Accessibility: Полноценное использование ARIA и Mobile-First Accordions
- */
-
-const GlassCard = ({ children }) => (
-  <div className="glassmorphism rounded-[2.5rem] border-white/10 active:scale-[0.98] transition-all">
-    {children}
-  </div>
-);`
   }
 ];
 
@@ -240,7 +96,7 @@ export default function SourceCodePage() {
             <div>
                 <CardTitle className="text-3xl font-headline tracking-tight uppercase">Библиотека алгоритмов (ЭТАЛОН)</CardTitle>
                 <CardDescription className="text-foreground/70 text-base max-w-xl">
-                    Полная спецификация всех функциональных блоков системы. Используйте как мастер-копию для восстановления или обучения моделей ИИ.
+                    Полная спецификация всех функциональных блоков системы. Используйте как мастер-копию для восстановления или передачи специалисту по деплою.
                 </CardDescription>
             </div>
           </div>
@@ -251,7 +107,7 @@ export default function SourceCodePage() {
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="scraper" className="w-full">
+      <Tabs defaultValue="deployment" className="w-full">
         <div className="overflow-x-auto pb-4 mb-6 scrollbar-hide no-scrollbar">
             <TabsList className="flex w-full min-w-[1000px] h-16 bg-muted/20 p-2 rounded-2xl border border-white/5 shadow-inner">
             {FILES.map(file => {
