@@ -36,13 +36,30 @@ git add .
 echo -e "${GREEN}💾 Сохранение стабильной сборки...${NC}"
 git commit -m "Stable Build v2.8: Final UI polish, math fix and deployment readiness" --quiet
 
-# 4. Инструкция для пользователя
-echo -e "\n${BLUE}=======================================${NC}"
-echo -e "${GREEN}✅ КОД ГОТОВ К ОТПРАВКЕ!${NC}"
-echo -e "${BLUE}=======================================${NC}"
-echo -e "${YELLOW}Следующие шаги:${NC}"
-echo -e "1. Убедитесь, что у вас добавлен удаленный репозиторий:"
-echo -e "   ${WHITE}git remote add origin https://github.com/ВАШ_ЛОГИН/ВАШ_РЕПО.git${NC}"
-echo -e "2. Отправьте код командой:"
-echo -e "   ${WHITE}git push -u origin main --force${NC}"
-echo -e "\n${RED}Затем просто подключите этот GitHub репозиторий к Timeweb!${NC}"
+# 4. Проверка удаленного репозитория
+REMOTE_URL=$(git remote get-url origin 2>/dev/null)
+
+if [ -z "$REMOTE_URL" ]; then
+  echo -e "\n${RED}⚠️ Удаленный репозиторий не подключен!${NC}"
+  echo -e "${YELLOW}Введите ссылку на ваш GitHub репозиторий:${NC}"
+  read -p "URL (https://github.com/...): " USER_URL
+  if [ ! -z "$USER_URL" ]; then
+    git remote add origin "$USER_URL"
+    echo -e "${GREEN}✅ Репозиторий подключен.${NC}"
+  else
+    echo -e "${RED}❌ Отмена. Адрес не введен.${NC}"
+    exit 1
+  fi
+fi
+
+# 5. Отправка
+echo -e "${YELLOW}📤 Отправка кода в GitHub...${NC}"
+if git push -u origin main --force; then
+  echo -e "\n${BLUE}=======================================${NC}"
+  echo -e "${GREEN}✅ КОД УСПЕШНО ОТПРАВЛЕН В GITHUB!${NC}"
+  echo -e "${BLUE}=======================================${NC}"
+  echo -e "\n${YELLOW}Следующий шаг:${NC}"
+  echo -e "Просто подключите этот GitHub репозиторий к вашему хостингу (Timeweb/Vercel)."
+else
+  echo -e "\n${RED}❌ Ошибка отправки. Проверьте соединение и права доступа.${NC}"
+fi
