@@ -1,16 +1,20 @@
 import type { TournamentPlayerResult, ScoringSettings } from './types';
 
+/**
+ * Возвращает базовые баллы за место согласно настройкам лиги.
+ * ГАРАНТИЯ: Баллы за место начисляются ТОЛЬКО участникам ТОП-16.
+ */
 export function getPointsForRank(rank: number, settings: ScoringSettings): number {
-    // 1. СТРОГОЕ ПРАВИЛО: Баллы начисляются только за места с 1 по 16.
-    // Все, кто ниже 16-го места, получают 0 баллов.
+    // 1. СТРОГОЕ ПРАВИЛО: Баллы за место начисляются только с 1 по 16 место.
+    // Места 17+ всегда получают 0 базовых баллов.
     if (rank < 1 || rank > 16) return 0;
 
-    // 2. Проверяем индивидуальную настройку места (если есть)
+    // 2. Приоритет индивидуальной настройки конкретного места
     if (settings.customPointsByPlace && settings.customPointsByPlace[rank.toString()] !== undefined) {
         return Number(settings.customPointsByPlace[rank.toString()]);
     }
 
-    // 3. Стандартная логика по группам (только до 16 места)
+    // 3. Групповые настройки (применяются, если нет индивидуальной настройки)
     if (rank === 1) return settings.pointsFor1st;
     if (rank === 2) return settings.pointsFor2nd;
     if (rank >= 3 && rank <= 4) return settings.pointsFor3rd_4th;
@@ -20,14 +24,19 @@ export function getPointsForRank(rank: number, settings: ScoringSettings): numbe
     return 0;
 }
 
+/**
+ * Рассчитывает итоговые баллы игрока за турнир (база + бонусы).
+ */
 export function calculatePlayerPoints(result: TournamentPlayerResult, settings: ScoringSettings): void {
-    // Уникальная логика для лиги Вечерний Омск
+    // Уникальная логика для лиги Вечерний Омск (множители)
     if (settings.isEveningOmsk) {
         return calculateEveningOmskPoints(result, settings);
     }
 
+    // Стандартные лиги: базовые очки за место (только ТОП-16)
     result.basePoints = getPointsForRank(result.rank, settings);
     
+    // Сброс и расчет бонусов (бонусы начисляются всем, независимо от места)
     result.bonusPoints = 0;
     result.pointsFor180s = 0;
     result.is180BonusApplied = false;
@@ -40,7 +49,6 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
     result.pointsFor9Darter = 0;
     result.is9DarterBonusApplied = false;
 
-    // Бонусы за достижения начисляются всем участникам, если они включены в лиге
     if (settings.enable180Bonus && result.n180s > 0) {
         result.pointsFor180s = result.n180s * settings.bonusPer180;
         result.is180BonusApplied = true;
@@ -67,13 +75,13 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
         result.bonusPoints += result.pointsFor9Darter;
     }
 
+    // Итоговая сумма за турнир
     result.points = (result.basePoints || 0) + (result.bonusPoints || 0);
 }
 
 /**
- * МАТЕМАТИКА ВЕЧЕРНЕГО ОМСКА (Аудит v2.8)
- * Победитель: 1.0, Финалист: 0.7, 1/2: 0.5, 1/4: 0.25. 
- * Места ниже 8-го (1/4) получают 0 баллов согласно регламенту Омска.
+ * МАТЕМАТИКА ВЕЧЕРНЕГО ОМСКА
+ * Множители применяются только до 8-го места (1/4 финала).
  */
 function calculateEveningOmskPoints(result: TournamentPlayerResult, settings: ScoringSettings): void {
     const avg = result.avg || 0;
@@ -93,6 +101,7 @@ function calculateEveningOmskPoints(result: TournamentPlayerResult, settings: Sc
     result.bonusPoints = 0; 
     result.points = result.basePoints;
     
+    // Бонусы в Омске не применяются отдельно (включены в множитель)
     result.is180BonusApplied = false;
     result.isHiOutBonusApplied = false;
     result.isAvgBonusApplied = false;
