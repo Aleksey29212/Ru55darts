@@ -16,10 +16,12 @@ import { Trash2, Loader2 } from "lucide-react";
 import { clearTournamentsAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { useTransition } from "react";
+import { useIsClient } from "@/hooks/use-is-client";
 
 export function ClearTournamentsButton() {
     const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
+    const isClient = useIsClient();
 
     const handleClear = () => {
         startTransition(async () => {
@@ -39,11 +41,20 @@ export function ClearTournamentsButton() {
         });
     };
 
+    if (!isClient) {
+        return (
+            <Button variant="destructive" disabled className="opacity-50">
+                <Trash2 className="h-4 w-4 mr-2" />
+                Очистить турниры
+            </Button>
+        );
+    }
+
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button variant="destructive">
-                    <Trash2 />
+                    <Trash2 className="h-4 w-4 mr-2" />
                     Очистить турниры
                 </Button>
             </AlertDialogTrigger>
@@ -56,9 +67,9 @@ export function ClearTournamentsButton() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Отмена</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleClear} disabled={isPending}>
-                        {isPending && <Loader2 className="animate-spin" />}
-                        {isPending ? 'Удаление...' : 'Да, очистить'}
+                    <AlertDialogAction onClick={handleClear} disabled={isPending} className="bg-destructive hover:bg-destructive/90">
+                        {isPending ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
+                        Да, очистить
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

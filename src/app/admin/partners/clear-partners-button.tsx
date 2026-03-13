@@ -16,10 +16,12 @@ import { Trash2, Loader2 } from "lucide-react";
 import { clearPartnersAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { useTransition } from "react";
+import { useIsClient } from "@/hooks/use-is-client";
 
 export function ClearPartnersButton() {
     const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
+    const isClient = useIsClient();
 
     const handleClear = () => {
         startTransition(async () => {
@@ -38,6 +40,15 @@ export function ClearPartnersButton() {
             }
         });
     };
+
+    if (!isClient) {
+        return (
+            <Button variant="destructive" size="sm" disabled className="opacity-50">
+                <Trash2 className="h-4 w-4 mr-2" />
+                Удалить всех партнеров
+            </Button>
+        );
+    }
 
     return (
         <AlertDialog>
