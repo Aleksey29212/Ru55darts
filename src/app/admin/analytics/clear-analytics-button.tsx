@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -15,13 +16,16 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Loader2 } from "lucide-react";
 import { clearAnalyticsAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
-import { useTransition } from "react";
-import { useIsClient } from "@/hooks/use-is-client";
+import { useTransition, useState, useEffect } from "react";
 
 export function ClearAnalyticsButton() {
     const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
-    const isClient = useIsClient();
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const handleClear = () => {
         startTransition(async () => {
@@ -41,7 +45,7 @@ export function ClearAnalyticsButton() {
         });
     };
 
-    if (!isClient) {
+    if (!isMounted) {
         return (
             <Button variant="outline" size="sm" disabled className="text-destructive/50 border-destructive/10">
                 <Trash2 className="h-4 w-4 mr-2" />
