@@ -34,7 +34,10 @@ import {
     ListOrdered,
     Crown,
     PlusCircle,
-    Activity
+    Activity,
+    Info,
+    ChevronRight,
+    ArrowRightCircle
 } from 'lucide-react';
 import type { ScoringSettings, SponsorshipSettings } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
@@ -127,7 +130,11 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                         {renderHelpPill('1/2', `× 0.50`, Medal, 'text-bronze', 'Полуфинал', 'omsk-3-4')}
                         {renderHelpPill('1/4', `× 0.25`, Target, 'text-primary', 'Четвертьфинал', 'omsk-5-8')}
                     </div>
-                    <p className="text-[9px] text-white/60 text-center italic mt-1 relative z-10">Формула: AVG × Множитель. Округление до целого.</p>
+                    <div className="p-3 bg-black/40 rounded-xl border border-white/5 mt-2 relative z-10">
+                        <p className="text-[10px] text-white/80 leading-relaxed italic text-center">
+                            <span className="text-primary font-bold">Формула:</span> AVG × Множитель. Баланс игрока — это сумма 5 лучших туров сезона, умноженная на курс рубля.
+                        </p>
+                    </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
@@ -188,18 +195,19 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
 
     return (
         <div className="flex flex-col gap-4 pt-1 pb-16">
-            {/* 1. БАЗОВОЕ УЧАСТИЕ */}
             {s.participationPoints > 0 && (
                 <div className="py-2 px-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-lg">
                     <div className="flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-primary" />
                         <span className="text-[10px] font-black uppercase tracking-tight">Бонус за участие</span>
                     </div>
-                    <span className="font-headline text-lg text-primary">+{s.participationPoints}</span>
+                    <div className="flex flex-col items-end">
+                        <span className="font-headline text-lg text-primary">+{s.participationPoints}</span>
+                        <span className="text-[6px] font-bold uppercase text-primary/60">ВСЕМ ИГРОКАМ ТУРА</span>
+                    </div>
                 </div>
             )}
 
-            {/* 2. ТАБЛИЦА РЕЙТИНГА */}
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-orange-500">
                     <Trophy className="h-3 w-3 text-orange-500" />
@@ -212,10 +220,9 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 </div>
             </div>
 
-            {/* 3. ДОПОЛНИТЕЛЬНЫЕ МЕСТА */}
             {extraEntries.length > 0 && (
                 <div className="space-y-2">
-                    <div className="flex items-center gap-2 px-3 md:px-4 border-l-4 border-purple-500 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
+                    <div className="flex items-center gap-3 px-3 md:px-4 border-l-4 border-purple-500 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
                         <PlusCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-purple-500" />
                         <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Дополнительные позиции</h4>
                     </div>
@@ -227,18 +234,17 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 </div>
             )}
 
-            {/* 4. УНИВЕРСАЛЬНЫЕ БОНУСЫ */}
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-cyan-400">
                     <Star className="h-3 w-3 text-cyan-400" />
-                    <h4 className="font-headline text-[9px] uppercase tracking-widest text-white/60">Бонусы за стат.</h4>
+                    <h4 className="font-headline text-[9px] uppercase tracking-widest text-white/60">Про-статистика (Бонусы)</h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
-                    {s.enable180Bonus && renderHelpPill('180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'Максимум', 'bonus-180')}
-                    {s.enableHiOutBonus && renderHelpPill(`OUT ≥${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'Закрытие', 'bonus-hiout')}
-                    {s.enableAvgBonus && renderHelpPill(`AVG ≥${s.avgThreshold}`, `+${s.avgBonus}`, Activity, 'text-yellow-400', 'Средний', 'bonus-avg')}
-                    {s.enableShortLegBonus && renderHelpPill(`SL ≤${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Flame, 'text-cyan-400', 'Короткий лег', 'bonus-shortleg')}
-                    {s.enable9DarterBonus && renderHelpPill(`9-DARTER`, `+${s.bonusFor9Darter}`, Crown, 'text-primary', 'Идеальный', 'bonus-9darter')}
+                    {s.enable180Bonus && renderHelpPill('180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'За каждый максимум', 'bonus-180')}
+                    {s.enableHiOutBonus && renderHelpPill(`OUT ≥${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'За высокое закрытие', 'bonus-hiout')}
+                    {s.enableAvgBonus && renderHelpPill(`AVG ≥${s.avgThreshold}`, `+${s.avgBonus}`, Activity, 'text-yellow-400', 'За мощный набор', 'bonus-avg')}
+                    {s.enableShortLegBonus && renderHelpPill(`SL ≤${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Flame, 'text-cyan-400', 'За короткий лег', 'bonus-shortleg')}
+                    {s.enable9DarterBonus && renderHelpPill(`9-DARTER`, `+${s.bonusFor9Darter}`, Crown, 'text-primary', 'Идеальный лег', 'bonus-9darter')}
                 </div>
             </div>
         </div>
@@ -330,24 +336,53 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                     ))}
 
                     <TabsContent value="ranking-logic" className="outline-none animate-in fade-in duration-500 mt-0">
-                        <div className="flex items-center gap-3 mb-3 mt-4">
+                        <div className="flex items-center gap-3 mb-6 mt-4">
                             <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
                             <h3 className="text-sm font-headline uppercase tracking-tight text-white/90">
-                                Правила ранжирования
+                                Порядок формирования рейтинга
                             </h3>
                             <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
                         </div>
 
-                        <div className="grid gap-2 pb-16">
-                            {renderHelpPill('1. Сумма баллов', 'Основа', Trophy, 'text-gold', 'Места + Бонусы', 'logic-1')}
-                            {renderHelpPill('2. Дублирование', 'Задвоение', Users, 'text-primary', 'Места могут делиться', 'logic-2')}
-                            {renderHelpPill('3. Набор (AVG)', 'Тай-брейк 1', Zap, 'text-yellow-400', 'Приоритет у высшего AVG', 'logic-3')}
-                            {renderHelpPill('4. Финиш (MAX)', 'Тай-брейк 2', Target, 'text-pink-500', 'Приоритет у высшего чекаута', 'logic-4')}
-                            
-                            <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/20 mt-2">
-                                <p className="text-[10px] text-indigo-200/60 leading-relaxed italic text-center">
-                                    Система автоматически применяет эти правила для формирования максимально честного рейтинга.
-                                </p>
+                        <div className="space-y-6 pb-20">
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 text-indigo-400">
+                                    <ChevronRight className="h-4 w-4" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Шаг 1: Первичная сортировка</span>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
+                                    <p className="text-xs text-white/90 leading-relaxed font-bold">
+                                        Система суммирует все <span className="text-primary">базовые баллы</span> за занятые места во всех турах и прибавляет к ним накопленные <span className="text-primary">бонусные баллы</span>.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 text-indigo-400">
+                                    <ChevronRight className="h-4 w-4" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Шаг 2: Система Тай-брейков</span>
+                                </div>
+                                <div className="space-y-2">
+                                    <p className="text-[10px] text-muted-foreground uppercase font-black ml-2 mb-2">При равенстве очков приоритет отдается:</p>
+                                    <div className="grid gap-2">
+                                        {renderHelpPill('1. Средний набор (AVG)', 'РЕШАЮЩИЙ', Zap, 'text-yellow-400', 'Точность до тысячных', 'logic-3')}
+                                        {renderHelpPill('2. Макс. чекаут (HF)', 'ВТОРИЧНЫЙ', Target, 'text-pink-500', 'Умение закрывать леги', 'logic-4')}
+                                        {renderHelpPill('3. Максимумы (180)', 'ТРЕТИЧНЫЙ', Sparkles, 'text-orange-400', 'Взрывная мощь', 'logic-5')}
+                                        {renderHelpPill('4. Опыт (Матчи)', 'ФИНАЛЬНЫЙ', Activity, 'text-blue-400', 'Количество туров', 'logic-6')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 text-indigo-400">
+                                    <ChevronRight className="h-4 w-4" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Шаг 3: Дублирование мест</span>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/20">
+                                    <p className="text-xs text-indigo-200/80 leading-relaxed italic">
+                                        В спортивной системе DartBrig Pro места могут делиться (Competition Ranking). Если у двух игроков идентичны Баллы, AVG и HF — они оба занимают, например, 3-е место. Следующий по списку игрок получит 5-е.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </TabsContent>
@@ -359,11 +394,11 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
           <div className="flex justify-between items-center max-w-2xl mx-auto">
             <div className="flex flex-col">
                 <p className="text-[9px] text-white font-black uppercase tracking-widest leading-none">DartBrig Pro</p>
-                <p className="text-[7px] text-primary/50 font-bold uppercase tracking-[0.2em] mt-1">v2.8 Stable</p>
+                <p className="text-[7px] text-primary/50 font-bold uppercase tracking-[0.2em] mt-1">v2.8 Stable Audit</p>
             </div>
             
             <Button onClick={() => setOpen(false)} variant="outline" className="rounded-xl font-black uppercase tracking-widest text-[9px] h-9 px-6 border-white/10 bg-white/5 hover:bg-primary hover:text-primary-foreground transition-all">
-                ЗАКРЫТЬ
+                ПОНЯТНО
             </Button>
           </div>
         </div>
