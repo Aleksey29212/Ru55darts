@@ -1,19 +1,23 @@
 import type { TournamentPlayerResult, ScoringSettings } from './types';
 
 export function getPointsForRank(rank: number, settings: ScoringSettings): number {
-    // 1. Проверяем индивидуальную настройку места (если есть)
+    // 1. СТРОГОЕ ПРАВИЛО: Баллы начисляются только за места с 1 по 16.
+    // Все, кто ниже 16-го места, получают 0 баллов.
+    if (rank < 1 || rank > 16) return 0;
+
+    // 2. Проверяем индивидуальную настройку места (если есть)
     if (settings.customPointsByPlace && settings.customPointsByPlace[rank.toString()] !== undefined) {
         return Number(settings.customPointsByPlace[rank.toString()]);
     }
 
-    // 2. Стандартная логика по группам
+    // 3. Стандартная логика по группам (только до 16 места)
     if (rank === 1) return settings.pointsFor1st;
     if (rank === 2) return settings.pointsFor2nd;
     if (rank >= 3 && rank <= 4) return settings.pointsFor3rd_4th;
     if (rank >= 5 && rank <= 8) return settings.pointsFor5th_8th;
     if (rank >= 9 && rank <= 16) return settings.pointsFor9th_16th;
     
-    return settings.participationPoints;
+    return 0;
 }
 
 export function calculatePlayerPoints(result: TournamentPlayerResult, settings: ScoringSettings): void {
@@ -36,7 +40,7 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
     result.pointsFor9Darter = 0;
     result.is9DarterBonusApplied = false;
 
-    // Бонусы за достижения
+    // Бонусы за достижения начисляются всем участникам, если они включены в лиге
     if (settings.enable180Bonus && result.n180s > 0) {
         result.pointsFor180s = result.n180s * settings.bonusPer180;
         result.is180BonusApplied = true;
@@ -68,14 +72,13 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
 
 /**
  * МАТЕМАТИКА ВЕЧЕРНЕГО ОМСКА (Аудит v2.8)
- * Используются фиксированные множители согласно регламенту.
- * Победитель: 1.0, Финалист: 0.7, 1/2: 0.5, 1/4: 0.25
+ * Победитель: 1.0, Финалист: 0.7, 1/2: 0.5, 1/4: 0.25. 
+ * Места ниже 8-го (1/4) получают 0 баллов согласно регламенту Омска.
  */
 function calculateEveningOmskPoints(result: TournamentPlayerResult, settings: ScoringSettings): void {
     const avg = result.avg || 0;
     let multiplier = 0;
 
-    // Исправлено: точный выбор множителя без накопления
     if (result.rank === 1) {
         multiplier = 1.00;
     } else if (result.rank === 2) {
@@ -90,7 +93,6 @@ function calculateEveningOmskPoints(result: TournamentPlayerResult, settings: Sc
     result.bonusPoints = 0; 
     result.points = result.basePoints;
     
-    // Сброс бонусов для чистоты (в Омске только множитель AVG)
     result.is180BonusApplied = false;
     result.isHiOutBonusApplied = false;
     result.isAvgBonusApplied = false;

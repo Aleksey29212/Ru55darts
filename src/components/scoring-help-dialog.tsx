@@ -33,7 +33,8 @@ import {
     Diamond,
     CircleUser,
     ListOrdered,
-    History
+    History,
+    AlertCircle
 } from 'lucide-react';
 import type { ScoringSettings, LeagueId, SponsorshipSettings } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
@@ -156,51 +157,45 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         );
     }
 
-    // Собираем все индивидуальные места для отображения
     const customEntries = s.customPointsByPlace ? Object.entries(s.customPointsByPlace)
         .sort((a, b) => Number(a[0]) - Number(b[0])) : [];
 
     return (
         <div className="flex flex-col gap-6 md:gap-8 pt-2 pb-20">
+            <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 flex items-center gap-3 mb-2">
+                <AlertCircle className="h-5 w-5 text-primary shrink-0" />
+                <p className="text-[10px] md:text-xs text-muted-foreground font-medium">
+                    Баллы за место начисляются <strong>только участникам ТОП-16</strong>. При равных показателях (AVG + HiOut) игроки делят место и получают одинаковые баллы.
+                </p>
+            </div>
+
             <div className="space-y-2 md:space-y-3">
                 <div className="flex items-center gap-3 px-3 md:px-4 border-l-4 border-orange-500 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
                     <Trophy className="h-3.5 w-3.5 md:h-4 md:w-4 text-orange-500" />
-                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Баллы за итоговые места</h4>
+                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Таблица рейтинга ТОП-16</h4>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                    {/* Показываем кастомные места в начале */}
                     {customEntries.map(([place, points]) => (
                         renderHelpPill(`${place} МЕСТО`, points, Medal, Number(place) <= 3 ? (Number(place) === 1 ? 'text-gold' : Number(place) === 2 ? 'text-silver' : 'text-bronze') : 'text-primary', 'Точная настройка')
                     ))}
                     
-                    {/* Стандартные группы показываем только если нет пересекающихся кастомных или для полноты картины */}
                     {renderHelpPill('1 МЕСТО', s.pointsFor1st, Medal, 'text-gold', 'Победа')}
                     {renderHelpPill('2 МЕСТО', s.pointsFor2nd, Medal, 'text-silver', 'Финал')}
                     {renderHelpPill('3-4 МЕСТА', s.pointsFor3rd_4th, Medal, 'text-bronze', 'Полуфинал')}
                     {renderHelpPill('5-8 МЕСТА', s.pointsFor5th_8th, Target, 'text-primary', '1/4 финала')}
                     {renderHelpPill('9-16 МЕСТА', s.pointsFor9th_16th, TrendingUp, 'text-primary/60', '1/8 финала')}
-                    {renderHelpPill('УЧАСТИЕ', s.participationPoints, Users, 'text-muted-foreground', 'Групповой этап')}
                 </div>
             </div>
 
             <div className="space-y-2 md:space-y-3">
                 <div className="flex items-center gap-3 px-3 md:px-4 border-l-4 border-cyan-400 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
                     <Star className="h-3.5 w-3.5 md:h-4 md:w-4 text-cyan-400" />
-                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Бонусные начисления</h4>
+                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Универсальные бонусы</h4>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                     {s.enable180Bonus && renderHelpPill('MAX 180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'За каждый 180')}
                     {s.enableHiOutBonus && renderHelpPill(`HI-OUT ≥ ${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'Высокое закрытие')}
                     {s.enableAvgBonus && renderHelpPill(`AVG ≥ ${s.avgThreshold}`, `+${s.avgBonus}`, TrendingUp, 'text-cyan-400', 'Высокий средний')}
-                    {s.enableShortLegBonus && renderHelpPill(`ЛЕГ ≤ ${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Flame, 'text-rose-500', 'Скоростной лег')}
-                    {s.enable9DarterBonus && renderHelpPill('9-DARTER', `+${s.bonusFor9Darter}`, Star, 'text-purple-400', 'Идеальный лег')}
-                    
-                    {!(s.enable180Bonus || s.enableHiOutBonus || s.enableAvgBonus || s.enableShortLegBonus || s.enable9DarterBonus) && (
-                        <div className="flex flex-col items-center justify-center py-6 border-2 border-dashed border-white/5 rounded-2xl opacity-30 bg-black/20 col-span-full">
-                            <Zap className="h-5 w-5 text-muted-foreground mb-1" />
-                            <p className="text-[8px] md:text-[10px] uppercase font-black tracking-widest">Бонусы отсутствуют</p>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
@@ -231,7 +226,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
             
             <DialogTitle className="flex flex-col items-center">
                 <span className="text-base md:text-2xl uppercase font-headline tracking-tighter text-white text-glow leading-none">Регламент</span>
-                <span className="text-[7px] md:text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 mt-1 md:mt-1.5">Официальные правила</span>
+                <span className="text-[7px] md:text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 mt-1 md:mt-1.5">Система ТОП-16</span>
             </DialogTitle>
         </DialogHeader>
 
@@ -271,7 +266,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                             className="relative flex flex-col items-center justify-center w-[calc(25%-8px)] sm:w-24 h-12 md:w-28 md:h-16 rounded-lg md:rounded-xl border-2 transition-all duration-500 shrink-0 shadow-lg bg-gradient-to-br from-indigo-600 to-purple-900 border-indigo-400/50 data-[state=active]:-translate-y-1 data-[state=active]:scale-105 data-[state=active]:border-white/60"
                         >
                             <ListOrdered className="h-4 w-4 md:h-6 md:w-6 mb-0.5 md:mb-1 text-white" />
-                            <span className="text-[6px] md:text-[8px] font-black uppercase tracking-tight text-white">МЕСТА</span>
+                            <span className="text-[6px] md:text-[8px] font-black uppercase tracking-tight text-white">ТАЙ-БРЕЙК</span>
                         </TabsTrigger>
                     </TabsList>
                 </div>
@@ -297,21 +292,20 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                         <div className="flex items-center gap-3 mb-3 mt-4 md:mb-4 md:mt-6">
                             <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
                             <h3 className="text-xs md:text-lg font-headline uppercase tracking-tight text-white/95 text-glow-white">
-                                Основа распределения мест в лигах
+                                Правила распределения мест
                             </h3>
                             <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent" />
                         </div>
 
                         <div className="space-y-2 md:space-y-3 pb-20">
-                            {renderHelpPill('1. Сумма баллов', 'Основа', Trophy, 'text-gold', 'Главный критерий. Суммируются все очки за места и бонусы.')}
-                            {renderHelpPill('2. Средний набор (AVG)', 'Набор', Zap, 'text-yellow-400', 'При равных баллах выше стоит игрок с более высоким качеством игры.')}
-                            {renderHelpPill('3. Max Out (Hi-Out)', 'Финиш', Target, 'text-pink-500', 'Если баллы и AVG равны, учитывается хладнокровие на закрытии.')}
-                            {renderHelpPill('4. Количество 180-к', 'Снайпер', Star, 'text-orange-500', 'Частота попадания всеми дротиками в утроение 20.')}
-                            {renderHelpPill('5. Количество турниров', 'Опыт', History, 'text-blue-400', 'При равенстве выше стоит игрок с большим числом туров.')}
+                            {renderHelpPill('1. Сумма баллов', 'Основа', Trophy, 'text-gold', 'Суммируются очки только за места 1-16 и бонусы.')}
+                            {renderHelpPill('2. Дублирование мест', 'Задвоение', Users, 'text-primary', 'При равных суммарных показателях игроки делят одну позицию.')}
+                            {renderHelpPill('3. Средний набор (AVG)', 'Набор', Zap, 'text-yellow-400', 'Первый тай-брейк: при равных баллах выше стоит игрок с большим AVG.')}
+                            {renderHelpPill('4. Max Out (Hi-Out)', 'Финиш', Target, 'text-pink-500', 'Второй тай-брейк: преимущество у игрока с более высоким чекаутом.')}
                             
                             <div className="p-4 md:p-6 rounded-xl md:rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 mt-4 md:mt-6 shadow-2xl">
                                 <p className="text-[10px] md:text-xs text-indigo-200/80 leading-relaxed italic font-medium">
-                                    Система tie-breakers гарантирует честное распределение позиций в таблице лидеров DartBrig Pro.
+                                    Если все 4 критерия (Баллы, AVG, HiOut, 180s) идентичны — система присваивает игрокам одинаковый ранг в общей таблице.
                                 </p>
                             </div>
                         </div>
@@ -328,7 +322,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 <div className="h-6 w-6 md:h-8 md:w-8 rounded-lg md:rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center font-headline text-primary text-[8px] md:text-xs shadow-inner">D</div>
                 <div className="flex flex-col">
                     <p className="text-[8px] md:text-[10px] text-white font-black uppercase tracking-widest leading-none">DartBrig Pro</p>
-                    <p className="text-[6px] md:text-[7px] text-primary/50 font-bold uppercase tracking-[0.3em] mt-0.5 md:mt-1">v2.8 Stable • Mobile optimized</p>
+                    <p className="text-[6px] md:text-[7px] text-primary/50 font-bold uppercase tracking-[0.3em] mt-0.5 md:mt-1">v2.8 Stable • Rules Audit v4.0</p>
                 </div>
             </div>
             

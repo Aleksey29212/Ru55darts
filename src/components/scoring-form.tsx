@@ -23,7 +23,6 @@ const scoringSchema = z.object({
   pointsFor3rd_4th: z.coerce.number().min(0, 'Должно быть положительным числом.'),
   pointsFor5th_8th: z.coerce.number().min(0, 'Должно быть положительным числом.'),
   pointsFor9th_16th: z.coerce.number().min(0, 'Должно быть положительным числом.'),
-  participationPoints: z.coerce.number().min(0, 'Должно быть положительным числом.'),
 
   enable180Bonus: z.boolean().default(false),
   bonusPer180: z.coerce.number().min(0, 'Должно быть положительным числом.'),
@@ -82,7 +81,10 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
 
   const form = useForm<ScoringFormValues>({
     resolver: zodResolver(scoringSchema),
-    defaultValues: defaultValues as any,
+    defaultValues: {
+        ...defaultValues,
+        // participationPoints удален из интерфейса, но сохраняем для совместимости типа, если нужно
+    } as any,
   });
   
   const { setValue, watch } = form;
@@ -104,15 +106,15 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
   async function onSubmit(data: ScoringFormValues) {
     startTransition(async () => {
         try {
-            // Превращаем массив пользовательских мест обратно в Record
             const customRecord: Record<string, number> = {};
             customPlaces.forEach(item => {
-                if (item.place && !isNaN(Number(item.place))) {
+                const pNum = Number(item.place);
+                if (item.place && !isNaN(pNum) && pNum >= 1 && pNum <= 16) {
                     customRecord[item.place] = Number(item.points);
                 }
             });
 
-            const finalData = { ...data, customPointsByPlace: customRecord };
+            const finalData = { ...data, customPointsByPlace: customRecord, participationPoints: 0 };
             const result = await saveScoringSettings(leagueId, finalData as any);
             
             toast({
@@ -126,7 +128,7 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
         } catch (e) {
             toast({
                 title: 'Ошибка сервера',
-                description: 'Не удалось сохранить настройки. Проверьте подключение к базе.',
+                description: 'Не удалось сохранить настройки.',
                 variant: 'destructive',
             });
         }
@@ -138,19 +140,24 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <TooltipProvider>
         <div className="space-y-8">
+            <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 flex items-start gap-3">
+                <Info className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                    <strong>Правило системы:</strong> Начисление баллов за место работает только для игроков, занявших места с 1 по 16. Места 17+ всегда получают 0 базовых баллов (но могут получать бонусы за статистику, если они включены).
+                </p>
+            </div>
+
             <div>
                 <h3 className="text-lg mb-2 font-medium flex items-center gap-2">
                     <ListOrdered className="h-5 w-5 text-primary" />
-                    Баллы за место (группы)
+                    Баллы за ТОП-16 (Группы)
                 </h3>
-                <p className="mb-4 text-sm text-muted-foreground">Настройте стандартные очки за занятые места в турнире. Если место указано в «Точной настройке» ниже, оно будет иметь приоритет.</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="pointsFor1st" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="1-е место" tooltipText="Очки за победу в турнире." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="pointsFor2nd" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="2-е место" tooltipText="Очки за второе место." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="pointsFor3rd_4th" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="3-4 места" tooltipText="Очки за выход в полуфинал." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="pointsFor5th_8th" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="5-8 места" tooltipText="Очки за выход в четвертьфинал." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <FormField control={form.control} name="pointsFor1st" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="1-е место" tooltipText="Очки за победу." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="pointsFor2nd" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="2-е место" tooltipText="Очки за финал." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="pointsFor3rd_4th" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="3-4 места" tooltipText="Очки за полуфинал." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="pointsFor5th_8th" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="5-8 места" tooltipText="Очки за четвертьфинал." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
                     <FormField control={form.control} name="pointsFor9th_16th" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="9-16 места" tooltipText="Очки за выход в 1/8 финала." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="participationPoints" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="За участие (остальные)" tooltipText="Очки для всех игроков, не попавших в ТОП-16." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
                 </div>
             </div>
 
@@ -161,9 +168,9 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
                     <div>
                         <h3 className="text-lg font-medium flex items-center gap-2">
                             <PlusCircle className="h-5 w-5 text-accent" />
-                            Точная настройка (по местам)
+                            Точная настройка (1-16 место)
                         </h3>
-                        <p className="text-sm text-muted-foreground">Задайте баллы для конкретного места. Эти значения перекрывают групповые настройки выше.</p>
+                        <p className="text-sm text-muted-foreground">Задайте баллы для конкретного места. Максимум — 16-е место.</p>
                     </div>
                     <Button type="button" variant="outline" size="sm" onClick={handleAddCustomPlace} className="gap-2 rounded-xl">
                         <PlusCircle className="h-4 w-4" /> Добавить место
@@ -175,9 +182,11 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
                         <div key={index} className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10 animate-in fade-in slide-in-from-left-2">
                             <div className="grid grid-cols-2 gap-4 flex-1">
                                 <div className="space-y-1">
-                                    <Label className="text-[10px] uppercase font-black text-muted-foreground ml-1">Место</Label>
+                                    <Label className="text-[10px] uppercase font-black text-muted-foreground ml-1">Место (1-16)</Label>
                                     <Input 
                                         type="number" 
+                                        min="1"
+                                        max="16"
                                         placeholder="Напр: 3" 
                                         value={item.place} 
                                         onChange={(e) => handleCustomPlaceChange(index, 'place', e.target.value)}
@@ -200,19 +209,14 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
                             </Button>
                         </div>
                     ))}
-                    {customPlaces.length === 0 && (
-                        <div className="py-8 text-center border-2 border-dashed border-white/5 rounded-2xl opacity-30">
-                            <p className="text-sm italic">Индивидуальные настройки мест отсутствуют</p>
-                        </div>
-                    )}
                 </div>
             </div>
 
             <Separator className="opacity-20" />
 
             <div>
-                <h3 className="text-lg mb-2 font-medium">Бонусы за статистику</h3>
-                <p className="mb-4 text-sm text-muted-foreground">Включите и настройте бонусы за статистические достижения.</p>
+                <h3 className="text-lg mb-2 font-medium">Бонусы за статистику (всем участникам)</h3>
+                <p className="mb-4 text-sm text-muted-foreground">Бонусы начисляются всем, кто достиг показателей, независимо от итогового места.</p>
                 <div className="space-y-6">
                     <div className="flex flex-col space-y-4 rounded-lg border border-white/10 bg-white/5 p-4">
                         <FormField
@@ -220,7 +224,7 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
                             name="enable180Bonus"
                             render={({ field }) => (
                                 <FormItem className="flex flex-row items-center justify-between">
-                                    <FormLabel><LabelWithTooltip label="Бонус за 180" tooltipText="Включает или выключает начисление бонусных очков за каждый 'максимум'." /></FormLabel>
+                                    <FormLabel><LabelWithTooltip label="Бонус за 180" tooltipText="За каждый 'максимум'." /></FormLabel>
                                     <FormControl><Switch checked={field.value} onCheckedChange={checked => {
                                         field.onChange(checked);
                                         if (!checked) setValue('bonusPer180', 0);
@@ -233,8 +237,8 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
                             name="bonusPer180"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-xs text-muted-foreground"><LabelWithTooltip label="Очки за каждый 180" tooltipText="Количество бонусных очков, начисляемых за каждый 'максимум'." /></FormLabel>
-                                    <FormControl><Input type="number" placeholder="Кол-во очков" {...field} disabled={!watch('enable180Bonus')} className="bg-black/20" /></FormControl>
+                                    <FormLabel className="text-xs text-muted-foreground">Очки за каждый 180</FormLabel>
+                                    <FormControl><Input type="number" {...field} disabled={!watch('enable180Bonus')} className="bg-black/20" /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -246,7 +250,7 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
                             name="enableHiOutBonus"
                             render={({ field }) => (
                                 <FormItem className="flex flex-row items-center justify-between">
-                                    <FormLabel><LabelWithTooltip label="Бонус за Hi-Out" tooltipText="Включает или выключает бонус за высокое закрытие лега." /></FormLabel>
+                                    <FormLabel><LabelWithTooltip label="Бонус за Hi-Out" tooltipText="За высокое закрытие." /></FormLabel>
                                     <FormControl><Switch checked={field.value} onCheckedChange={checked => {
                                         field.onChange(checked);
                                         if (!checked) {
@@ -258,30 +262,8 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
                             )}
                         />
                          <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="hiOutThreshold" render={({ field }) => (<FormItem><FormLabel className="text-xs text-muted-foreground"><LabelWithTooltip label="Порог" tooltipText="Минимальное значение закрытия (Hi-Out)." /></FormLabel><FormControl><Input type="number" placeholder="Мин. Hi-Out" {...field} disabled={!watch('enableHiOutBonus')} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
-                            <FormField control={form.control} name="hiOutBonus" render={({ field }) => (<FormItem><FormLabel className="text-xs text-muted-foreground"><LabelWithTooltip label="Бонус" tooltipText="Количество бонусных очков за достижение порога Hi-Out." /></FormLabel><FormControl><Input type="number" placeholder="Кол-во очков" {...field} disabled={!watch('enableHiOutBonus')} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
-                         </div>
-                    </div>
-                     <div className="flex flex-col space-y-4 rounded-lg border border-white/10 bg-white/5 p-4">
-                        <FormField
-                            control={form.control}
-                            name="enableAvgBonus"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between">
-                                    <FormLabel><LabelWithTooltip label="Бонус за средний набор (AVG)" tooltipText="Включает или выключает бонус за высокий средний набор." /></FormLabel>
-                                    <FormControl><Switch checked={field.value} onCheckedChange={checked => {
-                                        field.onChange(checked);
-                                        if (!checked) {
-                                            setValue('avgThreshold', 0);
-                                            setValue('avgBonus', 0);
-                                        }
-                                    }} /></FormControl>
-                                </FormItem>
-                            )}
-                        />
-                         <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="avgThreshold" render={({ field }) => (<FormItem><FormLabel className="text-xs text-muted-foreground"><LabelWithTooltip label="Порог" tooltipText="Минимальное значение AVG за турнир." /></FormLabel><FormControl><Input type="number" step="0.01" placeholder="Мин. AVG" {...field} disabled={!watch('enableAvgBonus')} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
-                            <FormField control={form.control} name="avgBonus" render={({ field }) => (<FormItem><FormLabel className="text-xs text-muted-foreground"><LabelWithTooltip label="Бонус" tooltipText="Количество бонусных очков за достижение порога AVG." /></FormLabel><FormControl><Input type="number" placeholder="Кол-во очков" {...field} disabled={!watch('enableAvgBonus')} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="hiOutThreshold" render={({ field }) => (<FormItem><FormLabel className="text-xs text-muted-foreground">Порог закрытия</FormLabel><FormControl><Input type="number" {...field} disabled={!watch('enableHiOutBonus')} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="hiOutBonus" render={({ field }) => (<FormItem><FormLabel className="text-xs text-muted-foreground">Бонусные очки</FormLabel><FormControl><Input type="number" {...field} disabled={!watch('enableHiOutBonus')} className="bg-black/20" /></FormControl><FormMessage /></FormItem>)} />
                          </div>
                     </div>
                 </div>
@@ -289,18 +271,8 @@ export function ScoringForm({ leagueId, defaultValues }: ScoringFormProps) {
         </div>
         </TooltipProvider>
         <CardFooter className="mt-8 px-0">
-          <Button type="submit" disabled={!form.formState.isDirty && customPlaces.length === (defaultValues.customPointsByPlace ? Object.keys(defaultValues.customPointsByPlace).length : 0) || isPending} className="ml-auto h-12 px-8 shadow-xl shadow-primary/30 active:scale-95 transition-all">
-            {isPending ? (
-              <>
-                <Loader2 className="animate-spin mr-2" />
-                Сохранение...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2" />
-                Сохранить настройки
-              </>
-            )}
+          <Button type="submit" disabled={isPending} className="ml-auto h-12 px-8 shadow-xl shadow-primary/30 active:scale-95 transition-all">
+            {isPending ? <><Loader2 className="animate-spin mr-2" /> Сохранение...</> : <><Save className="mr-2" /> Сохранить настройки</>}
           </Button>
         </CardFooter>
       </form>
