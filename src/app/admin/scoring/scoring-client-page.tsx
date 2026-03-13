@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import type { AllLeagueSettings, LeagueId, ScoringSettings } from '@/lib/types';
 import { useState, useMemo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Trophy, Shield, Star, Award, BarChart2, ChevronsUp, Diamond, Users, Sunset } from 'lucide-react';
+import { Trophy, Shield, Star, Award, BarChart2, ChevronsUp, Diamond, Users, Sunset, Baby, CircleUser } from 'lucide-react';
 import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,9 +24,9 @@ const leagueVisuals: Record<string, { icon: React.ElementType; color: string }> 
     second: { icon: BarChart2, color: 'text-sky-400' },
     third: { icon: ChevronsUp, color: 'text-emerald-400' },
     fourth: { icon: Diamond, color: 'text-rose-400' },
-    senior: { icon: Users, color: 'text-orange-400' },
-    youth: { icon: Users, color: 'text-lime-400' },
-    women: { icon: Users, color: 'text-indigo-400' },
+    senior: { icon: Users, color: 'text-blue-400' },
+    youth: { icon: Baby, color: 'text-lime-400' },
+    women: { icon: CircleUser, color: 'text-indigo-400' },
 };
 
 
@@ -48,21 +48,18 @@ export function ScoringClientPage() {
         fromDbMap[setting.id as LeagueId] = setting;
     });
 
-    const allDefaults: Record<LeagueId, ScoringSettings> = defaultScoringSettingsData;
+    const allDefaults: Record<LeagueId, ScoringSettings> = defaultScoringSettingsData as any;
+    const leagueIds: LeagueId[] = ['general', 'evening_omsk', 'premier', 'first', 'cricket', 'second', 'third', 'fourth', 'senior', 'youth', 'women'];
     
-    return {
-      general: { ...allDefaults.general, ...fromDbMap.general },
-      evening_omsk: { ...allDefaults.evening_omsk, ...fromDbMap.evening_omsk },
-      premier: { ...allDefaults.premier, ...fromDbMap.premier },
-      first: { ...allDefaults.first, ...fromDbMap.first },
-      cricket: { ...allDefaults.cricket, ...fromDbMap.cricket },
-      second: { ...allDefaults.second, ...fromDbMap.second },
-      third: { ...allDefaults.third, ...fromDbMap.third },
-      fourth: { ...allDefaults.fourth, ...fromDbMap.fourth },
-      senior: { ...allDefaults.senior, ...fromDbMap.senior },
-      youth: { ...allDefaults.youth, ...fromDbMap.youth },
-      women: { ...allDefaults.women, ...fromDbMap.women },
-    };
+    const result: any = {};
+    leagueIds.forEach(id => {
+        result[id] = { 
+            ...(allDefaults[id] || allDefaults.general), 
+            ...(fromDbMap[id] || {}) 
+        };
+    });
+    
+    return result;
   }, [scoringSettingsFromDb]);
 
   const leagueSettings: AllLeagueSettings = useMemo(() => {

@@ -16,6 +16,8 @@ if (!(global as any).memoSponsorshipSettings) (global as any).memoSponsorshipSet
 if (!(global as any).memoBackgroundUrl) (global as any).memoBackgroundUrl = '';
 if (!(global as any).memoAppearance) (global as any).memoAppearance = null;
 
+const ALL_LEAGUE_IDS: LeagueId[] = ['general', 'evening_omsk', 'premier', 'first', 'cricket', 'second', 'third', 'fourth', 'senior', 'youth', 'women'];
+
 export const getAllScoringSettings = cache(
   async (): Promise<Record<LeagueId, ScoringSettings>> => {
     const allDefaults: Record<LeagueId, ScoringSettings> = defaultScoringSettingsData as any;
@@ -39,8 +41,11 @@ export const getAllScoringSettings = cache(
     }
 
     const merged: any = {};
-    (Object.keys(allDefaults) as LeagueId[]).forEach(key => {
-        merged[key] = { ...allDefaults[key], ...(fromDb[key] || {}) };
+    ALL_LEAGUE_IDS.forEach(key => {
+        merged[key] = { 
+            ...(allDefaults[key] || allDefaults.general), 
+            ...(fromDb[key] || {}) 
+        };
     });
     return merged;
   }
