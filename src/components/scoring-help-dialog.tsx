@@ -34,7 +34,8 @@ import {
     CircleUser,
     ListOrdered,
     History,
-    AlertCircle
+    AlertCircle,
+    Activity
 } from 'lucide-react';
 import type { ScoringSettings, LeagueId, SponsorshipSettings } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
@@ -162,17 +163,20 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
 
     return (
         <div className="flex flex-col gap-6 md:gap-8 pt-2 pb-20">
-            <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 flex items-center gap-3 mb-2">
-                <AlertCircle className="h-5 w-5 text-primary shrink-0" />
-                <p className="text-[10px] md:text-xs text-muted-foreground font-medium">
-                    Баллы за место начисляются <strong>только участникам ТОП-16</strong>. При равных показателях (AVG + HiOut) игроки делят место и получают одинаковые баллы.
-                </p>
-            </div>
+            {s.participationPoints > 0 && (
+                <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-2xl animate-pulse">
+                    <div className="flex items-center gap-3">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        <span className="text-xs md:text-sm font-bold uppercase tracking-tight">Бонус за участие (всем)</span>
+                    </div>
+                    <span className="font-headline text-lg md:text-2xl text-primary">+{s.participationPoints}</span>
+                </div>
+            )}
 
             <div className="space-y-2 md:space-y-3">
                 <div className="flex items-center gap-3 px-3 md:px-4 border-l-4 border-orange-500 bg-white/5 py-1.5 md:py-2 rounded-r-xl md:rounded-r-2xl shadow-xl">
                     <Trophy className="h-3.5 w-3.5 md:h-4 md:w-4 text-orange-500" />
-                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Таблица рейтинга ТОП-16</h4>
+                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white leading-none">Таблица рейтинга</h4>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                     {customEntries.map(([place, points]) => (
@@ -195,7 +199,9 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                     {s.enable180Bonus && renderHelpPill('MAX 180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'За каждый 180')}
                     {s.enableHiOutBonus && renderHelpPill(`HI-OUT ≥ ${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'Высокое закрытие')}
-                    {s.enableAvgBonus && renderHelpPill(`AVG ≥ ${s.avgThreshold}`, `+${s.avgBonus}`, TrendingUp, 'text-cyan-400', 'Высокий средний')}
+                    {s.enableAvgBonus && renderHelpPill(`AVG ≥ ${s.avgThreshold}`, `+${s.avgBonus}`, Activity, 'text-yellow-400', 'Высокий средний')}
+                    {s.enableShortLegBonus && renderHelpPill(`SHORT LEG ≤ ${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Flame, 'text-cyan-400', 'Короткий лег')}
+                    {s.enable9DarterBonus && renderHelpPill(`9-DARTER`, `+${s.bonusFor9Darter}`, Crown, 'text-primary', 'Идеальный лег')}
                 </div>
             </div>
         </div>
@@ -226,7 +232,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
             
             <DialogTitle className="flex flex-col items-center">
                 <span className="text-base md:text-2xl uppercase font-headline tracking-tighter text-white text-glow leading-none">Регламент</span>
-                <span className="text-[7px] md:text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 mt-1 md:mt-1.5">Система ТОП-16</span>
+                <span className="text-[7px] md:text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 mt-1 md:mt-1.5">Официальные правила лиг</span>
             </DialogTitle>
         </DialogHeader>
 
@@ -298,14 +304,14 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                         </div>
 
                         <div className="space-y-2 md:space-y-3 pb-20">
-                            {renderHelpPill('1. Сумма баллов', 'Основа', Trophy, 'text-gold', 'Суммируются очки только за места 1-16 и бонусы.')}
-                            {renderHelpPill('2. Дублирование мест', 'Задвоение', Users, 'text-primary', 'При равных суммарных показателях игроки делят одну позицию.')}
+                            {renderHelpPill('1. Сумма баллов', 'Основа', Trophy, 'text-gold', 'Суммируются очки за места и бонусы за статистику.')}
+                            {renderHelpPill('2. Дублирование мест', 'Задвоение', Users, 'text-primary', 'При равных показателях игроки делят одну позицию в рейтинге.')}
                             {renderHelpPill('3. Средний набор (AVG)', 'Набор', Zap, 'text-yellow-400', 'Первый тай-брейк: при равных баллах выше стоит игрок с большим AVG.')}
                             {renderHelpPill('4. Max Out (Hi-Out)', 'Финиш', Target, 'text-pink-500', 'Второй тай-брейк: преимущество у игрока с более высоким чекаутом.')}
                             
                             <div className="p-4 md:p-6 rounded-xl md:rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 mt-4 md:mt-6 shadow-2xl">
                                 <p className="text-[10px] md:text-xs text-indigo-200/80 leading-relaxed italic font-medium">
-                                    Если все 4 критерия (Баллы, AVG, HiOut, 180s) идентичны — система присваивает игрокам одинаковый ранг в общей таблице.
+                                    Система DartBrig Pro автоматически проводит аудит каждого турнира, применяя правила тай-брейка для обеспечения максимально честного рейтинга.
                                 </p>
                             </div>
                         </div>
@@ -322,7 +328,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 <div className="h-6 w-6 md:h-8 md:w-8 rounded-lg md:rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center font-headline text-primary text-[8px] md:text-xs shadow-inner">D</div>
                 <div className="flex flex-col">
                     <p className="text-[8px] md:text-[10px] text-white font-black uppercase tracking-widest leading-none">DartBrig Pro</p>
-                    <p className="text-[6px] md:text-[7px] text-primary/50 font-bold uppercase tracking-[0.3em] mt-0.5 md:mt-1">v2.8 Stable • Rules Audit v4.0</p>
+                    <p className="text-[6px] md:text-[7px] text-primary/50 font-bold uppercase tracking-[0.3em] mt-0.5 md:mt-1">v2.8 Stable • Rules Engine v4.0</p>
                 </div>
             </div>
             

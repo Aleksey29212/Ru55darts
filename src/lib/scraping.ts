@@ -17,7 +17,6 @@ export interface ScrapedTournament {
 
 /**
  * Извлекает дату из текстового заголовка турнира.
- * Формат: ДД.ММ.ГГГГ
  */
 function parseDateFromText(text: string): Date {
   const dateRegex = /(\d{2})\.(\d{2})\.(\d{4})/;
@@ -29,13 +28,12 @@ function parseDateFromText(text: string): Date {
 }
 
 /**
- * ЭТАЛОННЫЙ АЛГОРИТМ: Извлекает только ПЕРВОЕ число из строки.
- * Решает проблему: "130 (T20, T20, D5)" -> 130 или "180 (x2)" -> 180
+ * Извлекает только ПЕРВОЕ число из строки.
  */
 const extractNumber = (val: any): number => {
     if (val === null || val === undefined) return 0;
     const cleanVal = String(val).trim();
-    const match = cleanVal.match(/\d+/); // Берем только первое вхождение цифр
+    const match = cleanVal.match(/\d+/);
     return match ? parseInt(match[0], 10) : 0;
 };
 
@@ -67,22 +65,20 @@ export async function scrapeTournamentData(
   const html = await response.text();
   const $ = cheerio.load(html);
 
-  // 1. Извлечение метаданных (Название и Дата)
   const h1 = $('h1').first();
   const fullTitle = h1.text().trim();
   const tournamentDate = parseDateFromText(fullTitle);
   
   const h1Clone = h1.clone();
-  h1Clone.find('span').remove(); // Убираем вложенные элементы для чистоты имени
+  h1Clone.find('span').remove();
   let tournamentName = h1Clone.text().trim() || `Турнир #${tournamentId}`;
 
-  // 2. Поиск главной таблицы статистики (Smart Search)
   let table = $('table').first();
   let maxMatchScore = -1;
 
   $('table').each((_, el) => {
       const headText = $(el).text().toLowerCase();
-      const keywords = ['avg', 'игрок', 'место', '180', 'checkout', 'hi-out', 'max out', 'finish'];
+      const keywords = ['avg', 'игрок', 'место', '180', 'checkout', 'hi-out', 'max out', 'finish', 'sl', 'leg'];
       let score = 0;
       keywords.forEach(k => { if (headText.includes(k)) score++; });
       if (score > maxMatchScore) {
@@ -91,19 +87,13 @@ export async function scrapeTournamentData(
       }
   });
 
-  // 3. SMART MAPPING: Динамическое определение индексов колонок
   const headerMap: Record<string, number> = {};
   const headerRow = table.find('thead tr').length > 0 ? table.find('thead tr').first() : table.find('tr').first();
   
   headerRow.find('th, td').each((i, el) => {
     const txt = $(el).text().trim().toLowerCase();
     
-    // Поиск колонки чекаута (Max Out)
-    const isHiOutColumn = [
-        'max out', 'max finish', 'max.co', 'hi-out', 'checkout', 'hf', 'finish'
-    ].some(k => txt === k || (txt.includes(k) && !txt.includes('%')));
-
-    if (isHiOutColumn && !headerMap['hiout']) {
+    if (['max out', 'max finish', 'hi-out', 'checkout', 'hf', 'finish'].some(k => txt === k || (txt.includes(k) && !txt.includes('%'))) && !headerMap['hiout']) {
         headerMap['hiout'] = i;
     }
     else if ((txt.includes('best leg') || txt.includes('short leg') || txt === 'sl') && !headerMap['bestleg']) {
@@ -121,9 +111,11 @@ export async function scrapeTournamentData(
     else if ((txt === '180' || txt === '180s') && !headerMap['180']) {
         headerMap['180'] = i;
     }
+    else if ((txt.includes('9') || txt.includes('darter')) && !headerMap['nine']) {
+        headerMap['nine'] = i;
+    }
   });
 
-  // 4. Парсинг строк игроков
   const results: TournamentPlayerResult[] = [];
   const rows = table.find('tbody tr').length > 0 ? table.find('tbody tr') : table.find('tr').slice(1);
 
@@ -138,7 +130,6 @@ export async function scrapeTournamentData(
     const name = playerLink.text().trim() || nameCell.text().trim();
     if (!name || name.length < 2) return;
 
-    // Формируем ID игрока (из ссылки или slug)
     const pId = playerLink.attr('href')?.split('/').pop() || name.replace(/\s+/g, '-').toLowerCase();
     
     const playerResult: TournamentPlayerResult = {
@@ -165,9 +156,9 @@ export async function scrapeTournamentData(
       n180s: extractNumber(getVal(headerMap['180'])),
       hiOut: extractNumber(getVal(headerMap['hiout'])),
       bestLeg: extractNumber(getVal(headerMap['bestleg'])),
+      nineDarters: extractNumber(getVal(headerMap['nine'])),
     };
 
-    // Применяем правила начисления баллов выбранной лиги
     calculatePlayerPoints(playerResult, scoringSettings);
     results.push(playerResult);
   });
