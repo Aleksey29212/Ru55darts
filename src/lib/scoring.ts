@@ -10,7 +10,7 @@ export function getPointsForRank(rank: number, settings: ScoringSettings): numbe
 }
 
 export function calculatePlayerPoints(result: TournamentPlayerResult, settings: ScoringSettings): void {
-    // Unique logic for Evening Omsk league
+    // Уникальная логика для лиги Вечерний Омск
     if (settings.isEveningOmsk) {
         return calculateEveningOmskPoints(result, settings);
     }
@@ -29,31 +29,27 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
     result.pointsFor9Darter = 0;
     result.is9DarterBonusApplied = false;
 
-    // Bonus for each 180 thrown
+    // Бонусы за достижения
     if (settings.enable180Bonus && result.n180s > 0) {
         result.pointsFor180s = result.n180s * settings.bonusPer180;
         result.is180BonusApplied = true;
         result.bonusPoints += result.pointsFor180s;
     }
-    // Bonus if Hi-Out meets or exceeds the threshold
     if (settings.enableHiOutBonus && result.hiOut >= settings.hiOutThreshold) {
         result.pointsForHiOut = settings.hiOutBonus;
         result.isHiOutBonusApplied = true;
         result.bonusPoints += result.pointsForHiOut;
     }
-    // Bonus if AVG meets or exceeds the threshold
     if (settings.enableAvgBonus && result.avg >= settings.avgThreshold) {
         result.pointsForAvg = settings.avgBonus;
         result.isAvgBonusApplied = true;
         result.bonusPoints += result.pointsForAvg;
     }
-    // Bonus if best leg is less than or equal to the threshold (and > 0)
     if (settings.enableShortLegBonus && result.bestLeg > 0 && result.bestLeg <= settings.shortLegThreshold) {
         result.pointsForBestLeg = settings.shortLegBonus;
         result.isBestLegBonusApplied = true;
         result.bonusPoints += result.pointsForBestLeg;
     }
-    
     if (settings.enable9DarterBonus && result.nineDarters && result.nineDarters > 0) {
         result.pointsFor9Darter = result.nineDarters * settings.bonusFor9Darter;
         result.is9DarterBonusApplied = true;
@@ -64,15 +60,14 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
 }
 
 /**
- * ИСПРАВЛЕННАЯ МАТЕМАТИКА "ВЕЧЕРНЕГО ОМСКА" (v4.8 Final)
- * Используются абсолютные множители за стадию согласно регламенту.
- * Гарантия: Победитель получает ровно 1.0 множитель.
+ * МАТЕМАТИКА ВЕЧЕРНЕГО ОМСКА (Аудит v2.8)
+ * Используются фиксированные множители согласно регламенту.
+ * Победитель: 1.0, Финалист: 0.7, 1/2: 0.5, 1/4: 0.25
  */
 function calculateEveningOmskPoints(result: TournamentPlayerResult, settings: ScoringSettings): void {
     const avg = result.avg || 0;
     let multiplier = 0;
 
-    // Определение множителя по наивысшему достижению в туре
     if (result.rank === 1) {
         multiplier = 1.00;
     } else if (result.rank === 2) {
@@ -87,7 +82,7 @@ function calculateEveningOmskPoints(result: TournamentPlayerResult, settings: Sc
     result.bonusPoints = 0; 
     result.points = result.basePoints;
     
-    // Сброс флагов бонусов (в этой лиге они не предусмотрены)
+    // Сброс бонусов для чистоты (в Омске только множитель AVG)
     result.is180BonusApplied = false;
     result.isHiOutBonusApplied = false;
     result.isAvgBonusApplied = false;

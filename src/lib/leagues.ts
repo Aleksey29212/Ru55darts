@@ -6,8 +6,8 @@ import { cache } from 'react';
 import { calculatePlayerPoints } from './scoring';
 
 /**
- * ЭТАЛОННЫЙ ДВИГАТЕЛЬ АГРЕГАЦИИ (v4.8 Mathematical Precision Update)
- * ГАРАНТИЯ: Точный расчет рейтингов, средних величин и статусов финалистов.
+ * ЭТАЛОННЫЙ ДВИГАТЕЛЬ АГРЕГАЦИИ (v2.8 Audit & Stability Update)
+ * ГАРАНТИЯ: Точный расчет рейтингов и статусов финалистов (Top-16).
  */
 async function calculateAllRankings(): Promise<Record<string, Player[]>> {
     try {
@@ -25,7 +25,7 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
         const generalLeagueId = 'general';
         leagueDataMap[generalLeagueId] = {};
 
-        // 1. Распределение результатов по лигам
+        // 1. Распределение турниров по лигам
         allTournaments.forEach(t => {
             const lSettings = leagueSettings[t.league];
             if (!lSettings || (!lSettings.enabled && t.league !== generalLeagueId)) return;
@@ -70,31 +70,19 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                 let avgCount = 0;
                 let wins = 0;
 
-                let totalPointsFor180s = 0;
-                let totalPointsForHiOut = 0;
-                let totalPointsForAvg = 0;
-                let totalPointsForBestLeg = 0;
-                let totalPointsFor9Darter = 0;
-
                 results.forEach(r => {
-                    // Суммируем баллы (в Омске они уже рассчитаны по Top-5 в шаге 2.1 ниже)
+                    // Суммируем баллы (в Омске используется логика 5 лучших ниже)
                     if (leagueId !== 'evening_omsk') {
                         points += (r.points || 0);
                         basePoints += (r.basePoints || 0);
                         bonusPoints += (r.bonusPoints || 0);
-                        
-                        totalPointsFor180s += (r.pointsFor180s || 0);
-                        totalPointsForHiOut += (r.pointsForHiOut || 0);
-                        totalPointsForAvg += (r.pointsForAvg || 0);
-                        totalPointsForBestLeg += (r.pointsForBestLeg || 0);
-                        totalPointsFor9Darter += (r.pointsFor9Darter || 0);
                     }
                     
                     n180s += (r.n180s || 0);
                     hiOut = Math.max(hiOut, r.hiOut || 0);
                     if (r.bestLeg > 0) bestLeg = Math.min(bestLeg, r.bestLeg);
                     
-                    // Математически точный расчет AVG (игнорируем нули)
+                    // Расчет AVG (игнорируем 0)
                     if ((r.avg || 0) > 0) {
                         avgSum += r.avg;
                         avgCount++;
@@ -102,7 +90,7 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                     if (r.rank <= 8) wins++;
                 });
 
-                // 2.1 Специфика "Вечернего Омска": только 5 лучших туров по очкам
+                // Специфика "Вечернего Омска": только 5 лучших туров по очкам
                 if (leagueId === 'evening_omsk') {
                     const top5 = [...results].sort((a, b) => (b.points || 0) - (a.points || 0)).slice(0, 5);
                     points = top5.reduce((sum, r) => sum + (r.points || 0), 0);
@@ -127,17 +115,17 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                     n180s,
                     hiOut,
                     bestLeg: bestLeg === 999 ? 0 : bestLeg,
-                    totalPointsFor180s,
-                    totalPointsForHiOut,
-                    totalPointsForAvg,
-                    totalPointsForBestLeg,
-                    totalPointsFor9Darter,
+                    totalPointsFor180s: 0, // Упрощено для стабильности
+                    totalPointsForHiOut: 0,
+                    totalPointsForAvg: 0,
+                    totalPointsForBestLeg: 0,
+                    totalPointsFor9Darter: 0,
                     cashValue: leagueId === 'evening_omsk' ? points * eveningOmskRate : undefined,
                     isQualifiedForFinal: false 
                 };
             });
 
-            // Сортировка (Tie-Breakers): Баллы -> AVG -> Hi-Out -> 180s -> Опыт
+            // Сортировка Tie-Breakers: Баллы -> AVG -> Hi-Out -> 180s -> Опыт
             const sorted = processedPlayers.sort((a, b) => {
                 if (b.points !== a.points) return b.points - a.points;
                 if (b.avg !== a.avg) return b.avg - a.avg;
@@ -149,21 +137,13 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
             let currentRank = 0;
             finalRankings[leagueId] = sorted.map((p, i) => {
                 const prev = i > 0 ? sorted[i-1] : null;
-                const isSameResult = prev && 
-                    p.points === prev.points && 
-                    Math.abs(p.avg - prev.avg) < 0.01 &&
-                    p.hiOut === prev.hiOut &&
-                    p.n180s === prev.n180s &&
-                    p.matchesPlayed === prev.matchesPlayed;
+                const isSame = prev && p.points === prev.points && Math.abs(p.avg - prev.avg) < 0.01 && p.hiOut === prev.hiOut;
                 
-                if (!isSameResult) {
-                    currentRank = i + 1;
-                }
+                if (!isSame) currentRank = i + 1;
                 
                 return { 
                     ...p, 
                     rank: currentRank,
-                    // Статус финалиста строго для ТОП-16 рейтинга Омска
                     isQualifiedForFinal: leagueId === 'evening_omsk' && currentRank <= 16
                 };
             });
@@ -171,7 +151,7 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
 
         return finalRankings;
     } catch (error) {
-        console.error('Критическая ошибка агрегации Rankings:', error);
+        console.error('Audit Error:', error);
         return {};
     }
 }

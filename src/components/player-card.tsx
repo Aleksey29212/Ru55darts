@@ -43,8 +43,7 @@ const StatItem = ({
     const valueString = String(value);
     const len = valueString.length;
     
-    // ИДЕАЛЬНОЕ МАСШТАБИРОВАНИЕ ДЛЯ ЧИТАЕМОСТИ ЦИФР
-    // Если цифр 3 и более (например 100 или 59.1), уменьшаем шрифт для мобильных
+    // ИНТЕЛЛЕКТУАЛЬНОЕ МАСШТАБИРОВАНИЕ ДЛЯ ЧИТАЕМОСТИ
     let fontSizeClass = "text-3xl sm:text-4xl lg:text-5xl"; 
     
     if (len >= 6) {
