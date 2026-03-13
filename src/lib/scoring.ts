@@ -2,7 +2,7 @@ import type { TournamentPlayerResult, ScoringSettings } from './types';
 
 /**
  * Возвращает базовые баллы за место согласно настройкам лиги.
- * ГАРАНТИЯ: Иерархия приоритетов (Custom -> Specific TOP-10 -> Group 16).
+ * ГАРАНТИЯ: Иерархия приоритетов (Custom -> Specific 1-10 -> Group fallback).
  */
 export function getPointsForRank(rank: number, settings: ScoringSettings): number {
     const r = Number(rank);
@@ -12,7 +12,7 @@ export function getPointsForRank(rank: number, settings: ScoringSettings): numbe
         return Number(settings.customPointsByPlace[r.toString()]);
     }
 
-    // 2. Индивидуальные настройки ТОП-10 (высокий приоритет)
+    // 2. Индивидуальные настройки 1-10 мест (высокий приоритет)
     if (r === 1) return Number(settings.pointsFor1st) || 0;
     if (r === 2) return Number(settings.pointsFor2nd) || 0;
     
@@ -20,7 +20,7 @@ export function getPointsForRank(rank: number, settings: ScoringSettings): numbe
     if (r === 3 && (settings.pointsFor3rd ?? 0) > 0) return Number(settings.pointsFor3rd);
     if (r === 3 || r === 4) return Number(settings.pointsFor3rd_4th) || 0;
 
-    // Места 5-10 индивидуально
+    // Места 5-10 проверяются индивидуально перед групповым fallback
     if (r === 5 && (settings.pointsFor5th ?? 0) > 0) return Number(settings.pointsFor5th);
     if (r === 6 && (settings.pointsFor6th ?? 0) > 0) return Number(settings.pointsFor6th);
     if (r === 7 && (settings.pointsFor7th ?? 0) > 0) return Number(settings.pointsFor7th);
@@ -28,7 +28,7 @@ export function getPointsForRank(rank: number, settings: ScoringSettings): numbe
     if (r === 9 && (settings.pointsFor9th ?? 0) > 0) return Number(settings.pointsFor9th);
     if (r === 10 && (settings.pointsFor10th ?? 0) > 0) return Number(settings.pointsFor10th);
 
-    // 3. Групповые настройки для ТОП-16 (финальный fallback)
+    // 3. Групповые настройки для ТОП-16 (fallback)
     if (r >= 5 && r <= 8) return Number(settings.pointsFor5th_8th) || 0;
     if (r >= 9 && r <= 16) return Number(settings.pointsFor9th_16th) || 0;
     
@@ -45,12 +45,12 @@ export function calculatePlayerPoints(result: TournamentPlayerResult, settings: 
         return calculateEveningOmskPoints(result, settings);
     }
 
-    // 1. Сброс текущих баллов перед расчетом (предотвращение "задвоения")
+    // 1. Сброс текущих баллов перед расчетом
     result.points = 0;
     result.basePoints = 0;
     result.bonusPoints = 0;
 
-    // 2. Базовые очки за место (только для 1-16 мест или кастомных)
+    // 2. Базовые очки за место (с учетом индивидуальных приоритетов 1-10)
     const placePoints = getPointsForRank(result.rank, settings);
     
     // 3. Очки за участие (начисляются всем, кто есть в протоколе)

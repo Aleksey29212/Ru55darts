@@ -6,8 +6,8 @@ import { cache } from 'react';
 import { calculatePlayerPoints } from './scoring';
 
 /**
- * ЭТАЛОННЫЙ ДВИГАТЕЛЬ АГРЕГАЦИИ И РАНЖИРОВАНИЯ (v3.1 Audit Ready)
- * ИСПРАВЛЕНО: Устранена "задвоенность" рангов за счет строгой проверки всех критериев сортировки.
+ * ЭТАЛОННЫЙ ДВИГАТЕЛЬ АГРЕГАЦИИ И РАНЖИРОВАНИЯ (v3.2 Audit Ready)
+ * ГАРАНТИЯ: Точный расчет тай-брейков и соблюдение приоритетов начислений.
  */
 async function calculateAllRankings(): Promise<Record<string, Player[]>> {
     try {
@@ -38,8 +38,7 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
             t.players.forEach(p => {
                 const pResult = { ...p };
                 
-                // ВАЖНО: Если турнир редактировался вручную — берем готовые баллы.
-                // Иначе пересчитываем на основе текущих правил (ретроактивность).
+                // ВАЖНО: Приоритет ручных правок. Если турнир отредактирован — расчет не производится.
                 if (!t.isManuallyEdited && scoring) {
                     calculatePlayerPoints(pResult, scoring);
                 }
@@ -50,7 +49,7 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                 if (!leagueDataMap[t.league][p.id]) leagueDataMap[t.league][p.id] = [];
                 leagueDataMap[t.league][p.id].push(entry);
 
-                // Накопление в общий рейтинг
+                // Накопление в общий рейтинг (если включен в настройках)
                 if (t.league !== generalLeagueId && lSettings.includeInGeneralRanking) {
                     if (!leagueDataMap[generalLeagueId][p.id]) leagueDataMap[generalLeagueId][p.id] = [];
                     leagueDataMap[generalLeagueId][p.id].push(entry);
@@ -79,12 +78,10 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                 let playoffAppearances = 0;
 
                 results.forEach(r => {
-                    // Стандартный расчет
-                    if (leagueId !== 'evening_omsk') {
-                        pointsTotal += Number(r.points || 0);
-                        basePointsTotal += Number(r.basePoints || 0);
-                        bonusPointsTotal += Number(r.bonusPoints || 0);
-                    }
+                    // Стандартный расчет для всех, кроме Омска (внутри Омска тоже суммируем для промежуточной статистики)
+                    pointsTotal += Number(r.points || 0);
+                    basePointsTotal += Number(r.basePoints || 0);
+                    bonusPointsTotal += Number(r.bonusPoints || 0);
                     
                     n180sTotal += Number(r.n180s || 0);
                     hiOutMax = Math.max(hiOutMax, Number(r.hiOut || 0));
@@ -101,13 +98,13 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                     if (Number(r.rank) <= 8) playoffAppearances++;
                 });
 
-                // ОМСК: Только 5 лучших результатов
+                // СПЕЦ-ПРАВИЛО ОМСКА: Только 5 лучших результатов сезона
                 if (leagueId === 'evening_omsk') {
                     const sortedByPoints = [...results].sort((a, b) => Number(b.points || 0) - Number(a.points || 0));
                     const top5 = sortedByPoints.slice(0, 5);
                     pointsTotal = top5.reduce((sum, r) => sum + Number(r.points || 0), 0);
                     basePointsTotal = pointsTotal;
-                    bonusPointsTotal = 0;
+                    bonusPointsTotal = 0; // В Омске бонусы уже включены в базу через множитель AVG
                 }
 
                 const finalAvg = avgCount > 0 ? avgSum / avgCount : 0;
@@ -139,7 +136,7 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
                 };
             });
 
-            // 3. СОРТИРОВКА (Тай-брейки Pro уровня)
+            // 3. СОРТИРОВКА (Тай-брейки)
             const sorted = processedPlayers.sort((a, b) => {
                 if (b.points !== a.points) return b.points - a.points;
                 if (Math.abs(b.avg - a.avg) > 0.001) return b.avg - a.avg;
@@ -149,12 +146,10 @@ async function calculateAllRankings(): Promise<Record<string, Player[]>> {
             });
 
             // 4. ПРИСВОЕНИЕ РАНГОВ (Standard Competition Ranking)
-            // ИСПРАВЛЕНО: Теперь ранг "замораживается" только если ВСЕ критерии сортировки идентичны.
             let currentRank = 0;
             finalRankings[leagueId] = sorted.map((p, i) => {
                 const prev = i > 0 ? sorted[i-1] : null;
                 
-                // Проверка на полную идентичность для "задвоения" места
                 const isSameAsPrev = prev && 
                     p.points === prev.points && 
                     Math.abs(p.avg - prev.avg) < 0.001 && 
