@@ -8,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { 
     Trophy, 
@@ -37,7 +36,7 @@ import {
     Activity,
     ChevronRight
 } from 'lucide-react';
-import type { ScoringSettings, SponsorshipSettings } from '@/lib/types';
+import type { ScoringSettings, SponsorshipSettings, LeagueId } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -92,8 +91,8 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
 
   if (!mounted) return children || null;
 
-  const renderHelpPill = (label: string, val: string | number, Icon: any, colorClass: string, description?: string, key?: string | number) => (
-    <div key={key} className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/[0.03] border border-white/5 hover:border-primary/30 transition-all group shadow-sm active:scale-[0.98]">
+  const renderHelpPill = (label: string, val: string | number, Icon: any, colorClass: string, description?: string) => (
+    <div key={label} className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/[0.03] border border-white/5 hover:border-primary/30 transition-all group shadow-sm active:scale-[0.98]">
         <div className="flex items-center gap-2 min-w-0">
             <div className={cn("p-1 rounded-md bg-black/40 border border-white/5 shrink-0", colorClass)}>
                 <Icon className="h-3 w-3 md:h-3.5 md:w-3.5" />
@@ -124,10 +123,10 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                         <h4 className="font-headline text-xs md:text-sm uppercase tracking-tight text-orange-400">Множители этапов</h4>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 relative z-10">
-                        {renderHelpPill('1-е', `× 1.00`, Medal, 'text-gold', 'Победа', 'omsk-1')}
-                        {renderHelpPill('2-е', `× 0.70`, Medal, 'text-silver', 'Финал', 'omsk-2')}
-                        {renderHelpPill('1/2', `× 0.50`, Medal, 'text-bronze', 'Полуфинал', 'omsk-3-4')}
-                        {renderHelpPill('1/4', `× 0.25`, Target, 'text-primary', 'Четвертьфинал', 'omsk-5-8')}
+                        {renderHelpPill('1-е', `× 1.00`, Medal, 'text-gold', 'Победа')}
+                        {renderHelpPill('2-е', `× 0.70`, Medal, 'text-silver', 'Финал')}
+                        {renderHelpPill('1/2', `× 0.50`, Medal, 'text-bronze', 'Полуфинал')}
+                        {renderHelpPill('1/4', `× 0.25`, Target, 'text-primary', 'Четвертьфинал')}
                     </div>
                     <div className="p-3 bg-black/40 rounded-xl border border-white/5 mt-2 relative z-10">
                         <p className="text-[10px] md:text-[11px] text-white/80 leading-relaxed italic text-center">
@@ -156,14 +155,12 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
         );
     }
 
-    // Алгоритм группировки мест 1-16 на основе РЕАЛЬНЫХ настроек из админки
     const groupedRanks: { label: string, points: number, icon: any, color: string, desc: string }[] = [];
     let start = 1;
     while (start <= 16) {
         let end = start;
         const pts = getPointsForRank(start, s);
         
-        // Продлеваем группу, пока баллы идентичны
         while (end + 1 <= 16 && getPointsForRank(end + 1, s) === pts) {
             end++;
         }
@@ -191,21 +188,19 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
 
     return (
         <div className="flex flex-col gap-4 pt-1 pb-16">
-            {/* 1. БОНУС ЗА УЧАСТИЕ */}
             {s.participationPoints > 0 && (
                 <div className="py-2.5 px-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-lg active:scale-95 transition-transform">
                     <div className="flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-primary" />
+                        <div className="p-1 rounded-md bg-black/40"><Sparkles className="h-4 w-4 text-primary" /></div>
                         <span className="text-[10px] md:text-[11px] font-black uppercase tracking-tight">Бонус за участие</span>
                     </div>
                     <div className="flex flex-col items-end">
                         <span className="font-headline text-lg md:text-xl text-primary">+{s.participationPoints}</span>
-                        <span className="text-[6px] md:text-[7px] font-bold uppercase text-primary/60">ВСЕМ УЧАСТНИКАМ ТУРА</span>
+                        <span className="text-[6px] font-bold uppercase text-primary/60">ВСЕМ УЧАСТНИКАМ</span>
                     </div>
                 </div>
             )}
 
-            {/* 2. БАЗОВАЯ СЕТКА (1-16) - ПОЛНАЯ СИНХРОНИЗАЦИЯ С АДМИНКОЙ */}
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-orange-500">
                     <Trophy className="h-3 w-3 md:h-4 md:w-4 text-orange-500" />
@@ -213,12 +208,11 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                     {groupedRanks.map((p, idx) => (
-                        renderHelpPill(p.label, p.points, p.icon, p.color, p.desc, `base-rank-${idx}`)
+                        renderHelpPill(p.label, p.points, p.icon, p.color, p.desc)
                     ))}
                 </div>
             </div>
 
-            {/* 3. ДОПОЛНИТЕЛЬНЫЕ МЕСТА (17+) */}
             {extraEntries.length > 0 && (
                 <div className="space-y-2">
                     <div className="flex items-center gap-3 px-3 border-l-2 border-purple-500">
@@ -227,24 +221,23 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                         {extraEntries.map(([place, points]) => (
-                            renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Доп. позиция', `extra-place-${place}`)
+                            renderHelpPill(`${place} МЕСТО`, points, Medal, 'text-primary/40', 'Доп. позиция')
                         ))}
                     </div>
                 </div>
             )}
 
-            {/* 4. ПРО-БОНУСЫ */}
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-cyan-400">
                     <Star className="h-3 w-3 md:h-4 md:w-4 text-cyan-400" />
                     <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Про-статистика (Бонусы)</h4>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
-                    {s.enable180Bonus && renderHelpPill('180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'За каждый максимум', 'bonus-180')}
-                    {s.enableHiOutBonus && renderHelpPill(`OUT ≥${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'Высокое закрытие', 'bonus-hiout')}
-                    {s.enableAvgBonus && renderHelpPill(`AVG ≥${s.avgThreshold}`, `+${s.avgBonus}`, Activity, 'text-yellow-400', 'Мощный набор', 'bonus-avg')}
-                    {s.enableShortLegBonus && renderHelpPill(`SL ≤${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Flame, 'text-cyan-400', 'Короткий лег', 'bonus-shortleg')}
-                    {s.enable9DarterBonus && renderHelpPill(`9-DARTER`, `+${s.bonusFor9Darter}`, Crown, 'text-primary', 'Идеальный лег', 'bonus-9darter')}
+                    {s.enable180Bonus && renderHelpPill('180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'За каждый максимум')}
+                    {s.enableHiOutBonus && renderHelpPill(`OUT ≥${s.hiOutThreshold}`, `+${s.hiOutBonus}`, Zap, 'text-yellow-400', 'Высокое закрытие')}
+                    {s.enableAvgBonus && renderHelpPill(`AVG ≥${s.avgThreshold}`, `+${s.avgBonus}`, Activity, 'text-yellow-400', 'Мощный набор')}
+                    {s.enableShortLegBonus && renderHelpPill(`SL ≤${s.shortLegThreshold}`, `+${s.shortLegBonus}`, Flame, 'text-cyan-400', 'Короткий лег')}
+                    {s.enable9DarterBonus && renderHelpPill(`9-DARTER`, `+${s.bonusFor9Darter}`, Crown, 'text-primary', 'Идеальный лег')}
                 </div>
             </div>
         </div>
@@ -268,10 +261,6 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                     <Home className="h-4 w-4 text-primary" />
                 </Link>
             </Button>
-
-            <DialogClose className="absolute right-4 top-1/2 -translate-y-1/2 h-9 w-9 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-all z-20 flex items-center justify-center border border-white/5 active:scale-90">
-                <X className="h-4 w-4 text-muted-foreground" />
-            </DialogClose>
             
             <DialogTitle className="flex flex-col items-center">
                 <span className="text-lg uppercase font-headline tracking-tighter text-white leading-none">Регламент</span>
@@ -365,10 +354,22 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                 <div className="space-y-2">
                                     <p className="text-[10px] text-muted-foreground uppercase font-black ml-2 mb-2">При равенстве очков приоритет отдается:</p>
                                     <div className="grid gap-2">
-                                        {renderHelpPill('1. Средний набор (AVG)', 'РЕШАЮЩИЙ', Zap, 'text-yellow-400', 'Точность до тысячных', 'logic-3')}
-                                        {renderHelpPill('2. Макс. чекаут (HF)', 'ВТОРИЧНЫЙ', Target, 'text-pink-500', 'Умение закрывать леги', 'logic-4')}
-                                        {renderHelpPill('3. Максимумы (180)', 'ТРЕТИЧНЫЙ', Sparkles, 'text-orange-400', 'Взрывная мощь', 'logic-5')}
-                                        {renderHelpPill('4. Опыт (Матчи)', 'ФИНАЛЬНЫЙ', Activity, 'text-blue-400', 'Количество туров', 'logic-6')}
+                                        <div className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/[0.03] border border-white/5">
+                                            <span className="text-[10px] font-black text-white uppercase tracking-tight">1. Средний набор (AVG)</span>
+                                            <span className="text-[10px] font-headline text-primary">РЕШАЮЩИЙ</span>
+                                        </div>
+                                        <div className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/[0.03] border border-white/5">
+                                            <span className="text-[10px] font-black text-white uppercase tracking-tight">2. Макс. чекаут (HF)</span>
+                                            <span className="text-[10px] font-headline text-primary">ВТОРИЧНЫЙ</span>
+                                        </div>
+                                        <div className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/[0.03] border border-white/5">
+                                            <span className="text-[10px] font-black text-white uppercase tracking-tight">3. Максимумы (180)</span>
+                                            <span className="text-[10px] font-headline text-primary">ТРЕТИЧНЫЙ</span>
+                                        </div>
+                                        <div className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white/[0.03] border border-white/5">
+                                            <span className="text-[10px] font-black text-white uppercase tracking-tight">4. Опыт (Матчи)</span>
+                                            <span className="text-[10px] font-headline text-primary">ФИНАЛЬНЫЙ</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -380,7 +381,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                 </div>
                                 <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/20">
                                     <p className="text-xs text-indigo-200/80 leading-relaxed italic">
-                                        В спортивной системе DartBrig Pro места могут делиться (Competition Ranking). Если у двух игроков идентичны Баллы, AVG, HF и 180-ки — они оба занимают одно место.
+                                        В спортивной системе DartBrig Pro места могут делиться. Если у двух игроков идентичны все показатели тай-брейка — они оба занимают одно место.
                                     </p>
                                 </div>
                             </div>
