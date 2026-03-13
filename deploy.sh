@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# DartBrig Pro: Production Deployment Script (v3.1 Stable)
-# Автоматизация подготовки и отправки кода в репозиторий
+# DartBrig Pro: Production Deployment Script (v3.2 Stable)
+# Автоматизация подготовки и отправки кода с обходом неисправных помощников Git
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -13,7 +13,7 @@ NC='\033[0m'
 TARGET_REPO="https://github.com/Aleksey29212/Ru55darts.git"
 
 echo -e "${BLUE}=======================================${NC}"
-echo -e "${GREEN}   DartBrig Pro: Deployment Manager v3  ${NC}"
+echo -e "${GREEN}   DartBrig Pro: Deployment Manager v3.2  ${NC}"
 echo -e "${BLUE}=======================================${NC}"
 
 # 1. Проверка на целостность Git
@@ -37,7 +37,8 @@ fi
 
 # 2. Подготовка файлов
 echo -e "${BLUE}📦 Индексация файлов проекта...${NC}"
-rm -f src/app/deploy.sh 2>/dev/null
+# Удаляем возможные копии скрипта в подпапках для чистоты
+find src/app -name "deploy.sh" -delete 2>/dev/null
 git add .
 
 # 3. Фиксация изменений
@@ -45,11 +46,11 @@ COMMIT_MSG="Production Build v2.8+: Math Audit, Senior League Support and UI Sta
 echo -e "${BLUE}💾 Создание коммита: ${WHITE}$COMMIT_MSG${NC}"
 git commit -m "$COMMIT_MSG" --quiet || echo -e "${YELLOW}ℹ️ Изменений для фиксации не обнаружено.${NC}"
 
-# 4. Отправка
+# 4. Отправка (С обходом сломанных помощников)
 echo -e "${YELLOW}📤 Отправка в GitHub (Force Push)...${NC}"
-echo -e "${WHITE}Примечание: Используйте Personal Access Token при запросе пароля.${NC}"
+echo -e "${WHITE}Примечание: Используйте Personal Access Token.${NC}"
 
-# Пытаемся запушить, временно отключая сломанный помощник учетных данных, если он мешает
+# ПРИНУДИТЕЛЬНО отключаем credential helper, который вызывает ECONNREFUSED
 if git -c credential.helper= push -u origin main --force; then
   echo -e "\n${BLUE}=======================================${NC}"
   echo -e "${GREEN}✅ ПРОЕКТ УСПЕШНО ДОСТАВЛЕН В ОБЛАКО!${NC}"

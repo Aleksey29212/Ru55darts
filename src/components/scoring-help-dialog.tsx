@@ -276,7 +276,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 <div className="relative z-20 shrink-0 px-4 mt-4 mb-2">
                     <TabsList className="bg-black/60 backdrop-blur-3xl p-1.5 border border-white/5 h-auto flex flex-wrap justify-center gap-1.5 rounded-xl mx-auto max-w-full overflow-x-auto no-scrollbar">
                         {settingsArray.map((s, idx) => {
-                            const id = s?.id || 'general';
+                            const id = (s as any).id || 'general';
                             const Icon = leagueIcons[id] || Trophy;
                             const style = leagueBookStyles[id] || leagueBookStyles.general;
                             return (
@@ -311,7 +311,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
 
                 <ScrollArea className="flex-1 px-6 scroll-smooth">
                     {settingsArray.map((s, idx) => (
-                        <TabsContent key={`tab-content-${s?.id || idx}`} value={s?.id || 'general'} className="outline-none animate-in fade-in duration-500 mt-0">
+                        <TabsContent key={`tab-content-${(s as any).id || idx}`} value={(s as any).id || 'general'} className="outline-none animate-in fade-in duration-500 mt-0">
                             <div className="flex items-center gap-3 mb-3 mt-4">
                                 <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
                                 <h3 className="text-sm font-headline uppercase tracking-tight text-white/90">
