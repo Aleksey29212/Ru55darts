@@ -185,7 +185,7 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
             <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 space-y-6">
                 <div className="flex items-center gap-2 mb-4">
                     <ChevronRight className="h-4 w-4 text-primary" />
-                    <h4 className="text-xs font-black uppercase tracking-widest text-white/80">Детализация ТОП-10</h4>
+                    <h4 className="text-xs font-black uppercase tracking-widest text-white/80">Детализация ТОП-10 ({leagueName})</h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                     <FormField control={form.control} name="pointsFor5th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">5 МЕСТО</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
@@ -212,7 +212,7 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-accent/10 text-accent"><Trophy className="h-5 w-5" /></div>
-                    <h3 className="text-lg font-bold">Расширенная сетка (17+)</h3>
+                    <h3 className="text-lg font-bold">Расширенная сетка (17+) - {leagueName}</h3>
                 </div>
                 <Button type="button" variant="outline" size="sm" onClick={handleAddCustomPlace} className="rounded-xl gap-2">
                     <PlusCircle className="h-4 w-4" /> Добавить место
@@ -307,7 +307,7 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
                         <FormItem className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <Crown className="h-6 w-6 text-primary animate-pulse" />
-                                <FormLabel className="text-lg font-headline uppercase text-white">Идеальный лег (9-Darter)</FormLabel>
+                                <FormLabel className="text-lg font-headline uppercase text-white">Идеальный лег (9-Darter) - {leagueName}</FormLabel>
                             </div>
                             <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                         </FormItem>

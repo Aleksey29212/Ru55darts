@@ -111,7 +111,7 @@ export default async function AdminPage() {
                                 <section.icon className={cn("h-6 w-6", section.color || 'text-muted-foreground/80')} />
                             </div>
                             <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-                                <span className="font-headline text-sm md:text-base tracking-tight leading-tight mb-1 text-white group-hover:text-primary transition-colors line-clamp-2">
+                                <span className="font-headline text-base md:text-lg tracking-tight leading-tight mb-1 text-white group-hover:text-primary transition-colors line-clamp-2">
                                     {section.title}
                                 </span>
                                 <span className="text-[9px] text-muted-foreground line-clamp-1 opacity-50 uppercase font-black tracking-widest">

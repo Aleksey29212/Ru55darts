@@ -40,11 +40,11 @@ export function ScoringClientPage({ initialScoringSettings, initialLeagueSetting
   const { data: scoringSettingsFromDb, isLoading: isLoadingScoring } = useCollection<ScoringSettings>(scoringSettingsQuery);
 
   const allScoringSettings = useMemo(() => {
-    // Если есть данные из БД, объединяем их. Иначе используем то, что пришло с сервера (память/дефолты)
+    // ВАЖНО: В демо-режиме используем initialScoringSettings, который пришел с сервера (из памяти)
     if (scoringSettingsFromDb && scoringSettingsFromDb.length > 0) {
         const merged = { ...initialScoringSettings };
         scoringSettingsFromDb.forEach(setting => {
-            merged[setting.id as LeagueId] = { ...merged[setting.id as LeagueId], ...setting };
+            if (setting.id) merged[setting.id as LeagueId] = { ...merged[setting.id as LeagueId], ...setting };
         });
         return merged;
     }
