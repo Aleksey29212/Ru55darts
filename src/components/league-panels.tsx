@@ -137,12 +137,12 @@ function LeagueSection({
             </div>
             
             {activePlayers.length > 0 ? (
-                <div className="space-y-16">
+                <div className="space-y-16 pb-20">
                     {topPlayers.length > 0 && <LeaderboardHero players={topPlayers} />}
                     <PlayerRankings players={activePlayers} leagueId={leagueId} />
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center py-32 md:py-48 glassmorphism rounded-[4rem] border-2 border-dashed border-primary/25 text-center px-12 relative overflow-hidden group">
+                <div className="flex flex-col items-center justify-center py-32 md:py-48 glassmorphism rounded-[4rem] border-2 border-dashed border-primary/25 text-center px-12 relative overflow-hidden group mb-20">
                     <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
                     <div className="relative z-10 space-y-8">
                         <div className="p-12 rounded-[3rem] bg-primary/10 mb-4 ring-[12px] ring-primary/5 inline-block group-hover:scale-110 transition-all duration-500 shadow-3xl">

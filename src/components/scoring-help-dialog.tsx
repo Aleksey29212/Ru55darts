@@ -105,7 +105,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
     </div>
   );
 
-  const renderLeagueContent = (s: ScoringSettings) => {
+  const renderLeagueContent = (s: ScoringSettings, name: string) => {
     if (s.isEveningOmsk) {
         return (
             <div className="flex flex-col gap-3 pt-1 pb-10">
@@ -117,7 +117,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                         <div className="p-1.5 bg-orange-500/20 rounded-lg border border-orange-500/30">
                             <Sparkles className="text-orange-400 h-4 w-4" />
                         </div>
-                        <h4 className="font-headline text-xs md:text-sm uppercase tracking-tight text-orange-400">Множители этапов</h4>
+                        <h4 className="font-headline text-xs md:text-sm uppercase tracking-tight text-orange-400">Множители этапов ({name})</h4>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 relative z-10">
                         {renderHelpPill('1-е', `× 1.00`, Medal, 'text-gold', 'Победа')}
@@ -189,7 +189,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 <div className="py-2.5 px-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between shadow-lg active:scale-95 transition-transform">
                     <div className="flex items-center gap-2">
                         <div className="p-1 rounded-md bg-black/40"><Sparkles className="h-4 w-4 text-primary" /></div>
-                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-tight">Бонус за участие</span>
+                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-tight">Бонус за участие ({name})</span>
                     </div>
                     <div className="flex flex-col items-end">
                         <span className="font-headline text-lg md:text-xl text-primary">+{s.participationPoints}</span>
@@ -316,7 +316,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                                 </h3>
                                 <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
                             </div>
-                            {renderLeagueContent(s)}
+                            {renderLeagueContent(s, namesArray[idx])}
                         </TabsContent>
                     ))}
 

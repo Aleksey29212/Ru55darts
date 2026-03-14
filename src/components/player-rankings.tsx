@@ -43,8 +43,8 @@ const DESKTOP_GRID_COLS = "grid-cols-[80px_1.8fr_100px_100px_100px_100px_120px_1
 function FederalHeader({ theme }: { theme: any }) {
     return (
         <div className={cn(
-            "grid gap-6 px-10 opacity-60 select-none items-center font-headline text-[11px] uppercase tracking-[0.3em] font-black",
-            "sticky top-[372px] z-30 bg-black/95 backdrop-blur-3xl py-6 border-b border-white/10 -mx-4 px-10 rounded-t-3xl shadow-2xl",
+            "grid gap-6 px-10 opacity-60 select-none items-center font-headline text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-black",
+            "sticky top-[380px] z-30 bg-black/95 backdrop-blur-3xl py-6 border-b border-white/10 -mx-4 px-10 rounded-t-3xl shadow-2xl transition-all duration-300",
             DESKTOP_GRID_COLS
         )}>
             <span className="text-center">МЕСТО</span>
@@ -52,7 +52,7 @@ function FederalHeader({ theme }: { theme: any }) {
             <span className="text-center">ТУРЫ</span>
             <span className="text-center">БАЗА</span>
             <span className="text-center">180</span>
-            <span className="text-center">МАКС</span>
+            <span className="text-center">HF</span>
             <span className="text-center">AVG</span>
             <span className="text-right">БОНУС</span>
             <span className="text-right pr-6">ВСЕГО</span>
@@ -73,16 +73,16 @@ function FederalCapsule({ player, leagueUrlParam, theme, intensity }: { player: 
             <div className={cn(
                 "relative grid gap-6 border rounded-[2.5rem] p-3 pr-10 transition-all duration-300 items-center mb-4",
                 DESKTOP_GRID_COLS,
-                "hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98] hover:border-white/30",
+                "hover:scale-[1.01] hover:bg-white/10 active:scale-[0.99] hover:border-white/30",
                 theme.bg,
                 theme.border,
                 theme.glow,
                 "group-active:ring-4 group-active:ring-white/20 group-active:shadow-[0_0_50px_rgba(255,255,255,0.4)] shadow-2xl"
             )}>
-                <div className="flex justify-center items-center gap-2">
+                <div className="flex justify-center items-center">
                     <span 
                         className={cn(
-                            "text-4xl font-headline transition-all duration-500 group-active:text-white drop-shadow-lg", 
+                            "text-4xl font-headline transition-all duration-500 drop-shadow-lg", 
                             isTop3 ? medalColors[player.rank as 1|2|3] : theme.text
                         )}
                         style={{ opacity: intensity, textShadow: intensity > 0.8 ? '0 0 25px currentColor' : 'none' }}
@@ -106,7 +106,7 @@ function FederalCapsule({ player, leagueUrlParam, theme, intensity }: { player: 
                     <div className="flex flex-col min-w-0 gap-1">
                         <span className="font-headline text-lg uppercase tracking-tighter truncate group-hover:text-glow-white transition-all duration-500">{player.name}</span>
                         <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="text-[10px] uppercase font-black tracking-widest w-fit py-0.5 px-3 opacity-70 group-hover:opacity-100 bg-white/10 text-white border-white/5">{player.nickname || 'MASTER'}</Badge>
+                            <Badge variant="secondary" className="text-[9px] uppercase font-black tracking-widest w-fit py-0.5 px-3 opacity-70 group-hover:opacity-100 bg-white/10 text-white border-white/5">{player.nickname || 'MASTER'}</Badge>
                             {player.isQualifiedForFinal && (
                                 <span className="h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse shadow-[0_0_8px_rgba(249,115,22,0.8)]" />
                             )}
@@ -114,15 +114,15 @@ function FederalCapsule({ player, leagueUrlParam, theme, intensity }: { player: 
                     </div>
                 </div>
 
-                <div className="text-center font-headline font-bold text-lg opacity-80 group-hover:opacity-100 text-white/90">{player.matchesPlayed}</div>
-                <div className="text-center font-headline font-bold text-lg opacity-80 group-hover:opacity-100 text-white/90">{player.basePoints}</div>
-                <div className="text-center font-headline font-bold text-lg text-orange-400 group-hover:text-glow-accent transition-all">{player.n180s || 0}</div>
-                <div className="text-center font-headline font-bold text-lg text-pink-500 group-hover:text-glow-accent transition-all">{player.hiOut || 0}</div>
-                <div className="text-center font-headline font-bold text-lg text-yellow-400 group-hover:text-glow-accent transition-all">{player.avg.toFixed(1)}</div>
-                <div className="text-right font-headline font-bold text-lg text-success group-hover:text-glow-white transition-all">+{player.bonusPoints}</div>
+                <div className="text-center font-headline font-bold text-lg opacity-80 group-hover:opacity-100 text-white/90 tabular-nums">{player.matchesPlayed}</div>
+                <div className="text-center font-headline font-bold text-lg opacity-80 group-hover:opacity-100 text-white/90 tabular-nums">{player.basePoints}</div>
+                <div className="text-center font-headline font-bold text-lg text-orange-400 group-hover:text-glow-accent transition-all tabular-nums">{player.n180s || 0}</div>
+                <div className="text-center font-headline font-bold text-lg text-pink-500 group-hover:text-glow-accent transition-all tabular-nums">{player.hiOut || 0}</div>
+                <div className="text-center font-headline font-bold text-lg text-yellow-400 group-hover:text-glow-accent transition-all tabular-nums">{player.avg.toFixed(1)}</div>
+                <div className="text-right font-headline font-bold text-lg text-success group-hover:text-glow-white transition-all tabular-nums">+{player.bonusPoints}</div>
 
                 <div className="text-right pr-6">
-                    <span className={cn("text-4xl font-headline text-glow transition-all duration-700 group-hover:scale-125 inline-block", theme.text)}>
+                    <span className={cn("text-4xl font-headline text-glow transition-all duration-700 group-hover:scale-110 inline-block", theme.text)}>
                         {player.points}
                     </span>
                 </div>
@@ -170,7 +170,7 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
         ) : (
             <div className="animate-in fade-in duration-700 px-1">
                 {/* Mobile Sticky Title */}
-                <div className="sticky top-[360px] z-30 bg-black/95 backdrop-blur-3xl py-4 mb-6 border-b border-white/10 rounded-t-[2rem] px-6 shadow-2xl">
+                <div className="sticky top-[360px] z-30 bg-black/95 backdrop-blur-3xl py-4 mb-6 border-b border-white/10 rounded-t-[2rem] px-6 shadow-2xl transition-all duration-300">
                     <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">СПИСОК УЧАСТНИКОВ</span>
                         <div className="flex items-center gap-2">
@@ -180,7 +180,7 @@ export function PlayerRankings({ players, leagueId }: PlayerRankingsProps) {
                     </div>
                 </div>
 
-                <Accordion type="multiple" className="w-full space-y-8">
+                <Accordion type="multiple" className="w-full space-y-8 pb-20">
                 {players.map((player, idx) => {
                     const intensity = getIntensity(idx, players.length);
                     const isTop3 = player.rank >= 1 && player.rank <= 3;
