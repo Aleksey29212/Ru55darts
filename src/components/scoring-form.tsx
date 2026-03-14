@@ -8,9 +8,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Input } from '@/components/ui/input';
 import { CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Save, Loader2, Info, PlusCircle, Trash2, ListOrdered, Sparkles, Zap, Target, TrendingUp, Trophy, Flame, Star, Crown, Activity, HelpCircle, ChevronRight } from 'lucide-react';
+import { Save, Loader2, Info, ListOrdered, Sparkles, Zap, Trophy, ChevronRight, HelpCircle } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import type { ScoringSettings, LeagueId } from '@/lib/types';
 import { useTransition, useEffect, useMemo, useState } from 'react';
 import { saveScoringSettings } from '@/app/actions';
@@ -129,14 +128,6 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
     }
     form.reset(safeDefaultValues as any);
   }, [defaultValues, safeDefaultValues, form]);
-
-  const handleAddCustomPlace = () => setCustomPlaces([...customPlaces, { place: '', points: 0 }]);
-  const handleRemoveCustomPlace = (index: number) => setCustomPlaces(customPlaces.filter((_, i) => i !== index));
-  const handleCustomPlaceChange = (index: number, field: 'place' | 'points', value: any) => {
-      const updated = [...customPlaces];
-      updated[index] = { ...updated[index], [field]: value };
-      setCustomPlaces(updated);
-  };
 
   async function onSubmit(data: ScoringFormValues) {
     startTransition(async () => {

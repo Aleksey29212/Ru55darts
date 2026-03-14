@@ -26,3 +26,4 @@ GitHub блокирует отправку, если видит токен в к
 - **Scoring Context**: При настройке баллов админ видит, какую именно лигу он правит.
 - **Security**: Токены удалены из истории коммитов для обхода защиты GitHub.
 - **Senior League**: Полная поддержка лиги ветеранов.
+git remote set-url origin https://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@github.com/Aleksey29212/Ru55darts.git
