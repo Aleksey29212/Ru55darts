@@ -91,8 +91,7 @@ export function ScoringClientPage({ initialScoringSettings, initialLeagueSetting
                     Сначала включите хотя бы одну лигу в разделе "Управление лигами", чтобы настроить для нее очки.
                 </CardDescription>
                 </CardHeader>
-            </Card>
-        </div>
+            </div>
       );
   }
 

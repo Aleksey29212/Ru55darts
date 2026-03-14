@@ -1,8 +1,8 @@
 
 #!/bin/bash
 
-# DartBrig Pro: Clean Deployment Script v18.0
-# Скрипт без токена внутри для обхода GitHub Push Protection.
+# DartBrig Pro: Clean Deployment Script v16.0
+# Скрипт БЕЗ токена внутри для обхода GitHub Push Protection.
 
 echo "--- DARTBRIG PRO DEPLOYMENT ---"
 
