@@ -1,8 +1,8 @@
 
 #!/bin/bash
 
-# DartBrig Pro: Ultra-Stable Deployment Script v8.0
-# Оптимизировано: Автоматическая привязка токена и отправка.
+# DartBrig Pro: Ultra-Stable Deployment Script v9.0
+# Оптимизировано: Автоматическая привязка токена и принудительный пуш.
 
 echo "--- DARTBRIG PRO DEPLOYMENT ---"
 
@@ -11,6 +11,7 @@ echo "--- DARTBRIG PRO DEPLOYMENT ---"
 TOKEN="ghp_Vd6eUM6In6SmNRv6Z066OfidZ6Ofid2Z6Ofid"
 REPO_URL="https://$TOKEN@github.com/Aleksey29212/Ru55darts.git"
 
+# Принудительно обновляем адрес репозитория с токеном
 git remote set-url origin "$REPO_URL"
 
 # 2. Индексация изменений
