@@ -8,7 +8,6 @@
 - **Language:** TypeScript
 - **Database/Auth:** Firebase (Firestore, Authentication)
 - **UI:** ShadCN, Tailwind CSS, Lucide Icons
-- **AI:** Genkit (Google Gemini)
 - **Deployment:** Docker (standalone mode)
 
 ## Задача
@@ -21,7 +20,7 @@
    - Включить Firestore Database (регион eur3 или us-central1).
    - Включить Authentication (метод "Anonymous").
    - Применить правила безопасности из файла `firestore.rules`.
-3. **Environment Variables:** Настроить следующие переменные:
+3. **Environment Variables:** Настроить следующие переменные в панели хостинга:
    - `NEXT_PUBLIC_FIREBASE_API_KEY`
    - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
    - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
@@ -34,7 +33,7 @@
 
 ## Требования к результату:
 - Сайт доступен по внешнему URL.
-- Работает импорт турниров с dartsbase.ru (проверить в админке).
+- Работает импорт турниров с dartsbase.ru.
 - Работает авторизация администратора (через страницу `/gate`).
 - Аналитика посещений корректно пишется в Firestore.
 
