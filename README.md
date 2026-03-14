@@ -1,3 +1,4 @@
+git remote set-url origin https://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@github.com/Aleksey29212/Ru55darts.git
 
 # DartBrig Pro - Система управления рейтингами (v2.8 Stable)
 
