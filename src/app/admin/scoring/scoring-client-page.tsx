@@ -41,7 +41,6 @@ export function ScoringClientPage({ initialScoringSettings, initialLeagueSetting
   const { data: scoringSettingsFromDb, isLoading: isLoadingScoring } = useCollection<ScoringSettings>(scoringSettingsQuery);
 
   const allScoringSettings = useMemo(() => {
-    // ВАЖНО: В демо-режиме используем initialScoringSettings, который пришел с сервера (из памяти)
     if (scoringSettingsFromDb && scoringSettingsFromDb.length > 0) {
         const merged = { ...initialScoringSettings };
         scoringSettingsFromDb.forEach(setting => {
@@ -92,7 +91,8 @@ export function ScoringClientPage({ initialScoringSettings, initialLeagueSetting
                     Сначала включите хотя бы одну лигу в разделе "Управление лигами", чтобы настроить для нее очки.
                 </CardDescription>
                 </CardHeader>
-            </div>
+            </Card>
+        </div>
       );
   }
 
@@ -104,7 +104,7 @@ export function ScoringClientPage({ initialScoringSettings, initialLeagueSetting
             Настройка очков ({leagueSettings[selectedLeague].name})
           </CardTitle>
           <CardDescription>
-            Определите систему начисления очков для каждой лиги. Изменения повлияют на все будущие расчеты рейтинга.
+            Определите систему начисления очков для лиги «{leagueSettings[selectedLeague].name}». Изменения повлияют на все будущие расчеты рейтинга.
           </CardDescription>
         </CardHeader>
         <CardContent>
