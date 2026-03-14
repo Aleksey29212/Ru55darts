@@ -1,7 +1,8 @@
+
 'use server';
 
 import { getPlayerProfiles, updatePlayerProfiles, getPlayerProfileById, clearAllPlayerProfiles } from '@/lib/players';
-import { addTournaments, clearAllTournamentData, deleteTournamentById, getTournamentById } from '@/lib/tournaments';
+import { addTournaments, clearAllTournamentData, deleteTournamentById, getTournamentById, updateTournamentResults } from '@/lib/tournaments';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import type { PlayerProfile, ScoringSettings, LeagueId, AllLeagueSettings, SponsorshipSettings, Tournament, TournamentPlayerResult, TemplateId } from '@/lib/types';
 import { updateScoringSettings, updateLeagueSettings, getScoringSettings, updateBackgroundUrl, updateSponsorshipSettings, updateAppearanceSettings } from '@/lib/settings';
@@ -274,5 +275,54 @@ export async function saveGlobalTemplateAction(templateId: TemplateId) {
         return { success: true, message: 'Глобальный шаблон по умолчанию обновлен.' };
     } catch (e) {
         return { success: false, message: 'Ошибка сохранения глобальных настроек.' };
+    }
+}
+
+export async function updateTournamentResultsAction(tournamentId: string, players: TournamentPlayerResult[]) {
+    try {
+        const tournament = await getTournamentById(tournamentId);
+        if (!tournament) return { success: false, message: 'Турнир не найден.' };
+
+        await updateTournamentResults(tournamentId, players);
+        
+        revalidatePath('/', 'layout');
+        revalidatePath(`/tournaments/${tournamentId}`);
+        revalidatePath(`/admin/tournaments/${tournamentId}/edit-results`);
+        revalidateTag('tournaments');
+        revalidateTag('players');
+        revalidateTag('leagues');
+        
+        return { success: true, message: 'Результаты турнира успешно обновлены.' };
+    } catch (e) {
+        console.error('Manual update error:', e);
+        return { success: false, message: 'Ошибка при сохранении результатов.' };
+    }
+}
+
+export async function clearPartnersAction() {
+    try {
+        const db = getDb();
+        if (!db) return { success: true, message: 'Память очищена.' };
+        const col = collection(db, 'partners');
+        const snap = await getDocs(col);
+        const batch = writeBatch(db);
+        snap.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+        revalidatePath('/admin/partners');
+        revalidateTag('partners');
+        return { success: true, message: 'Все партнеры удалены.' };
+    } catch (e) {
+        return { success: false, message: 'Ошибка при удалении.' };
+    }
+}
+
+export async function clearAllPlayerData() {
+    try {
+        await clearAllPlayerProfiles();
+        revalidatePath('/', 'layout');
+        revalidateTag('players');
+        return { success: true, message: 'Все профили и статистика удалены.' };
+    } catch (e) {
+        return { success: false, message: 'Ошибка при очистке.' };
     }
 }

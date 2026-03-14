@@ -1,3 +1,4 @@
+
 'use client';
 
 import { ScoringForm } from '@/components/scoring-form';
@@ -100,7 +101,9 @@ export function ScoringClientPage({ initialScoringSettings, initialLeagueSetting
     <div className="max-w-4xl mx-auto">
       <Card className="glassmorphism">
         <CardHeader>
-          <CardTitle className="text-2xl">Настройка подсчета очков</CardTitle>
+          <CardTitle className="text-2xl">
+            Настройка очков ({leagueSettings[selectedLeague].name})
+          </CardTitle>
           <CardDescription>
             Определите систему начисления очков для каждой лиги. Изменения повлияют на все будущие расчеты рейтинга.
           </CardDescription>
