@@ -1,23 +1,24 @@
 
 #!/bin/bash
 
-# DartBrig Pro: Ultimate Deployment Script v16.0
+# DartBrig Pro: Ultimate Deployment Script v17.0
 # Автоматическая привязка токена и принудительная отправка.
 
 REPO_URL="https://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@github.com/Aleksey29212/Ru55darts.git"
 
 echo "--- DARTBRIG PRO DEPLOYMENT ---"
 
-# 0. Принудительная привязка к репозиторию
+# 0. Принудительная привязка к репозиторию (сброс старых настроек)
 echo "0. Обновление связи с GitHub (через токен)..."
-git remote set-url origin "$REPO_URL" 2>/dev/null || git remote add origin "$REPO_URL"
+git remote remove origin 2>/dev/null
+git remote add origin "$REPO_URL"
 
 # 1. Индексация изменений
 echo "1. Индексация файлов проекта..."
 git add .
 
 # 2. Коммит
-COMMIT_MSG="Production Update: Ultimate Readability and Linked Repository"
+COMMIT_MSG="Production Update: UI Readability and Final Repository Link"
 echo "2. Создание коммита..."
 git commit -m "$COMMIT_MSG" --quiet || echo "Инфо: Изменений для фиксации нет."
 
