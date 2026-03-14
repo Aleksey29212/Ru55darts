@@ -6,18 +6,23 @@
 
 echo "--- DARTBRIG PRO DEPLOYMENT ---"
 
-# 1. Проверка изменений
+# 1. Привязка токена (для работы одной командой)
+TOKEN="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"
+REPO="github.com/Aleksey29212/Ru55darts.git"
+git remote set-url origin "https://$TOKEN@$REPO"
+
+# 2. Проверка изменений
 echo "1. Индексация изменений..."
 git add .
 
-# 2. Коммит
+# 3. Коммит
 COMMIT_MSG="Production Update: UI Readability and Deploy Stability"
 git commit -m "$COMMIT_MSG" --quiet || echo "Инфо: Изменений для фиксации нет."
 
-# 3. Отправка
+# 4. Отправка
 echo "2. Отправка в GitHub..."
 # Принудительно отключаем помощники паролей и пушим в ветку main
-if git push origin main; then
+if git -c credential.helper= push origin main; then
   echo "---------------------------------------"
   echo "УСПЕХ: Проект отправлен в GitHub!"
   echo "---------------------------------------"
