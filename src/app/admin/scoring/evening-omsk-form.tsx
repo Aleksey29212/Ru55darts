@@ -42,7 +42,6 @@ export function EveningOmskForm({ defaultValues, leagueName }: EveningOmskFormPr
   async function onSubmit(data: EveningOmskFormValues) {
     startTransition(async () => {
         try {
-            // We preserve other values but update exchange rate
             const fullData: ScoringSettings = {
                 ...defaultValues,
                 ...data,
@@ -76,7 +75,7 @@ export function EveningOmskForm({ defaultValues, leagueName }: EveningOmskFormPr
                     <Info className="h-6 w-6" />
                 </div>
                 <div className="space-y-2">
-                    <h3 className="text-xl font-headline uppercase tracking-tight text-orange-500">Автоматическая система ({leagueName})</h3>
+                    <h3 className="text-lg md:text-xl font-headline uppercase tracking-tight text-orange-500">Автоматическая система ({leagueName})</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                         Для лиги «Вечерний Омск» правила начисления очков фиксированы согласно регламенту:
                     </p>
@@ -96,7 +95,7 @@ export function EveningOmskForm({ defaultValues, leagueName }: EveningOmskFormPr
         <div className="space-y-6">
             <div className="flex items-center gap-3">
                 <Wallet className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-medium">Финансовые настройки</h3>
+                <h3 className="text-lg font-medium">Финансовые настройки ({leagueName})</h3>
             </div>
             
             <FormField

@@ -153,8 +153,8 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
             <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                 <div className="p-2 rounded-lg bg-primary/10 text-primary shadow-inner"><ListOrdered className="h-5 w-5" /></div>
                 <div>
-                    <h3 className="text-xl font-headline uppercase tracking-tight">Основные позиции (Лига {leagueName})</h3>
-                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest opacity-60">Базовое распределение баллов (1-16)</p>
+                    <h3 className="text-lg md:text-xl font-headline uppercase tracking-tight">Основные позиции (Лига {leagueName})</h3>
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest opacity-60">Базовое распределение баллов (1-16)</p>
                 </div>
             </div>
 
@@ -167,7 +167,7 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
             <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 space-y-6">
                 <div className="flex items-center gap-2 mb-4">
                     <ChevronRight className="h-4 w-4 text-primary" />
-                    <h4 className="text-xs font-black uppercase tracking-widest text-white/80">Детализация ТОП-10 (Лига {leagueName})</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-white/80">Детализация ТОП-10 (Лига {leagueName})</h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                     <FormField control={form.control} name="pointsFor5th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">5 МЕСТО</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
@@ -194,8 +194,8 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
             <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                 <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500 shadow-inner"><Zap className="h-5 w-5" /></div>
                 <div>
-                    <h3 className="text-xl font-headline uppercase tracking-tight">Про-Бонусы (Лига {leagueName})</h3>
-                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest opacity-60">Начисления за технические достижения</p>
+                    <h3 className="text-lg md:text-xl font-headline uppercase tracking-tight">Про-Бонусы (Лига {leagueName})</h3>
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest opacity-60">Начисления за технические достижения</p>
                 </div>
             </div>
 
