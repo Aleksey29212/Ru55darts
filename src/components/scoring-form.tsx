@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Save, Loader2, Info, ListOrdered, Sparkles, Zap, Trophy, ChevronRight, HelpCircle } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import type { ScoringSettings, LeagueId } from '@/lib/types';
-import { useTransition, useEffect, useMemo, useState } from 'react';
+import { useTransition, useEffect, useMemo } from 'react';
 import { saveScoringSettings } from '@/app/actions';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -50,8 +50,6 @@ const scoringSchema = z.object({
 
   enable9DarterBonus: z.boolean().default(false),
   bonusFor9Darter: z.coerce.number().min(0).default(0),
-  
-  customPointsByPlace: z.record(z.string(), z.coerce.number()).optional(),
 });
 
 type ScoringFormValues = z.infer<typeof scoringSchema>;
@@ -80,21 +78,18 @@ interface ScoringFormProps {
 export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringFormProps) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
-  const [customPlaces, setCustomPlaces] = useState<{place: string, points: number}[]>([]);
 
   const safeDefaultValues = useMemo(() => ({
     pointsFor1st: defaultValues?.pointsFor1st ?? 0,
     pointsFor2nd: defaultValues?.pointsFor2nd ?? 0,
     pointsFor3rd: defaultValues?.pointsFor3rd ?? 0,
     pointsFor3rd_4th: defaultValues?.pointsFor3rd_4th ?? 0,
-    
     pointsFor5th: defaultValues?.pointsFor5th ?? 0,
     pointsFor6th: defaultValues?.pointsFor6th ?? 0,
     pointsFor7th: defaultValues?.pointsFor7th ?? 0,
     pointsFor8th: defaultValues?.pointsFor8th ?? 0,
     pointsFor9th: defaultValues?.pointsFor9th ?? 0,
     pointsFor10th: defaultValues?.pointsFor10th ?? 0,
-
     pointsFor5th_8th: defaultValues?.pointsFor5th_8th ?? 0,
     pointsFor9th_16th: defaultValues?.pointsFor9th_16th ?? 0,
     participationPoints: defaultValues?.participationPoints ?? 0,
@@ -115,29 +110,16 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
 
   const form = useForm<ScoringFormValues>({
     resolver: zodResolver(scoringSchema),
-    defaultValues: safeDefaultValues as any,
+    defaultValues: safeDefaultValues,
   });
 
   useEffect(() => {
-    if (defaultValues.customPointsByPlace) {
-        const initial = Object.entries(defaultValues.customPointsByPlace)
-            .map(([place, points]) => ({ place, points }))
-            .sort((a, b) => Number(a.place) - Number(b.place));
-        setCustomPlaces(initial);
-    } else {
-        setCustomPlaces([]);
-    }
-    form.reset(safeDefaultValues as any);
-  }, [defaultValues, safeDefaultValues, form]);
+    form.reset(safeDefaultValues);
+  }, [safeDefaultValues, form]);
 
   async function onSubmit(data: ScoringFormValues) {
     startTransition(async () => {
-        const customRecord: Record<string, number> = {};
-        customPlaces.forEach(item => {
-            if (item.place) customRecord[item.place] = Number(item.points);
-        });
-
-        const result = await saveScoringSettings(leagueId, { ...data, customPointsByPlace: customRecord } as any);
+        const result = await saveScoringSettings(leagueId, { ...data } as any);
         if (result.success) {
             toast({ title: 'Успешно', description: result.message });
             form.reset(data);
@@ -154,15 +136,15 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
             <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                 <div className="p-2 rounded-lg bg-primary/10 text-primary shadow-inner"><ListOrdered className="h-5 w-5" /></div>
                 <div>
-                    <h3 className="text-lg md:text-xl font-headline uppercase tracking-tight">Основные позиции (Лига {leagueName})</h3>
+                    <h3 className="text-lg md:text-xl font-headline uppercase tracking-tight">Основные позиции ({leagueName})</h3>
                     <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest opacity-60">Базовое распределение баллов (1-16)</p>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <FormField control={form.control} name="pointsFor1st" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Победитель (1)" tooltipText="Баллы за первое место." /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20 rounded-xl h-12" /></FormControl></FormItem>)} />
-                <FormField control={form.control} name="pointsFor2nd" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Финалист (2)" tooltipText="Баллы за второе место." /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20 rounded-xl h-12" /></FormControl></FormItem>)} />
-                <FormField control={form.control} name="pointsFor3rd" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="3-е место" tooltipText="Балл только для 3-го места. Если 0 — используется балл из группы 3-4." icon={Trophy} /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20 rounded-xl h-12 border-primary/20" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor1st" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Победитель (1)" tooltipText="Баллы за первое место." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20 rounded-xl h-12" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor2nd" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Финалист (2)" tooltipText="Баллы за второе место." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20 rounded-xl h-12" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor3rd" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="3-е место" tooltipText="Балл только для 3-го места." icon={Trophy} /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20 rounded-xl h-12 border-primary/20" /></FormControl></FormItem>)} />
             </div>
 
             <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 space-y-6">
@@ -171,23 +153,23 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-white/80">Детализация ТОП-10 ({leagueName})</h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                    <FormField control={form.control} name="pointsFor5th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">5 МЕСТО</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
-                    <FormField control={form.control} name="pointsFor6th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">6 МЕСТО</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
-                    <FormField control={form.control} name="pointsFor7th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">7 МЕСТО</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
-                    <FormField control={form.control} name="pointsFor8th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">8 МЕСТО</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
-                    <FormField control={form.control} name="pointsFor9th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">9 МЕСТО</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
-                    <FormField control={form.control} name="pointsFor10th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">10 МЕСТО</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
+                    <FormField control={form.control} name="pointsFor5th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">5 МЕСТО</FormLabel><FormControl><Input type="number" {...field} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
+                    <FormField control={form.control} name="pointsFor6th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">6 МЕСТО</FormLabel><FormControl><Input type="number" {...field} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
+                    <FormField control={form.control} name="pointsFor7th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">7 МЕСТО</FormLabel><FormControl><Input type="number" {...field} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
+                    <FormField control={form.control} name="pointsFor8th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">8 МЕСТО</FormLabel><FormControl><Input type="number" {...field} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
+                    <FormField control={form.control} name="pointsFor9th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">9 МЕСТО</FormLabel><FormControl><Input type="number" {...field} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
+                    <FormField control={form.control} name="pointsFor10th" render={({ field }) => (<FormItem><FormLabel className="text-[10px] font-bold opacity-60">10 МЕСТО</FormLabel><FormControl><Input type="number" {...field} className="bg-black/40 h-10" /></FormControl></FormItem>)} />
                 </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
-                <FormField control={form.control} name="pointsFor3rd_4th" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Группа 1/2 (3-4)" tooltipText="Базовый балл для полуфиналистов." /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20 rounded-lg h-10" /></FormControl></FormItem>)} />
-                <FormField control={form.control} name="pointsFor5th_8th" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Группа 1/4 (5-8)" tooltipText="Базовый балл для четвертьфиналистов." /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20 rounded-lg h-10" /></FormControl></FormItem>)} />
-                <FormField control={form.control} name="pointsFor9th_16th" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Группа 1/8 (9-16)" tooltipText="Базовый балл для 1/8 финала." /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-black/20 rounded-lg h-10" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor3rd_4th" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Группа 1/2 (3-4)" tooltipText="Базовый балл для полуфиналистов." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20 rounded-lg h-10" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor5th_8th" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Группа 1/4 (5-8)" tooltipText="Базовый балл для четвертьфиналистов." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20 rounded-lg h-10" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="pointsFor9th_16th" render={({ field }) => (<FormItem><FormLabel><LabelWithTooltip label="Группа 1/8 (9-16)" tooltipText="Базовый балл для 1/8 финала." /></FormLabel><FormControl><Input type="number" {...field} className="bg-black/20 rounded-lg h-10" /></FormControl></FormItem>)} />
             </div>
 
             <div className="pt-4 border-t border-white/5">
-                <FormField control={form.control} name="participationPoints" render={({ field }) => (<FormItem className="max-w-xs"><FormLabel><LabelWithTooltip label="Баллы за участие" tooltipText="Начисляются всем игрокам турнира." icon={Sparkles} /></FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} className="bg-primary/5 border-primary/20 rounded-xl h-12" /></FormControl></FormItem>)} />
+                <FormField control={form.control} name="participationPoints" render={({ field }) => (<FormItem className="max-w-xs"><FormLabel><LabelWithTooltip label="Баллы за участие" tooltipText="Начисляются всем игрокам турнира." icon={Sparkles} /></FormLabel><FormControl><Input type="number" {...field} className="bg-primary/5 border-primary/20 rounded-xl h-12" /></FormControl></FormItem>)} />
             </div>
         </div>
 
@@ -195,7 +177,7 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
             <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                 <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500 shadow-inner"><Zap className="h-5 w-5" /></div>
                 <div>
-                    <h3 className="text-lg md:text-xl font-headline uppercase tracking-tight">Про-Бонусы (Лига {leagueName})</h3>
+                    <h3 className="text-lg md:text-xl font-headline uppercase tracking-tight">Про-Бонусы ({leagueName})</h3>
                     <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest opacity-60">Начисления за технические достижения</p>
                 </div>
             </div>
@@ -210,8 +192,8 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
                     )} />
                     <FormField control={form.control} name="bonusPer180" render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-xs opacity-60">Баллов за заход в 180 (Лига {leagueName})</FormLabel>
-                            <FormControl><Input type="number" {...field} value={field.value ?? 0} disabled={!form.watch('enable180Bonus')} className="h-12 bg-black/40" /></FormControl>
+                            <FormLabel className="text-xs opacity-60">Баллов за каждый заход 180 ({leagueName})</FormLabel>
+                            <FormControl><Input type="number" {...field} disabled={!form.watch('enable180Bonus')} className="h-12 bg-black/40" /></FormControl>
                         </FormItem>
                     )} />
                 </div>
@@ -224,8 +206,8 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
                         </FormItem>
                     )} />
                     <div className="grid grid-cols-2 gap-4">
-                        <FormField control={form.control} name="hiOutThreshold" render={({ field }) => (<FormItem><FormLabel className="text-[10px]">Порог HF</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} disabled={!form.watch('enableHiOutBonus')} className="bg-black/40" /></FormControl></FormItem>)} />
-                        <FormField control={form.control} name="hiOutBonus" render={({ field }) => (<FormItem><FormLabel className="text-[10px]">Баллы (Лига {leagueName})</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} disabled={!form.watch('enableHiOutBonus')} className="bg-black/40" /></FormControl></FormItem>)} />
+                        <FormField control={form.control} name="hiOutThreshold" render={({ field }) => (<FormItem><FormLabel className="text-[10px]">Порог HF</FormLabel><FormControl><Input type="number" {...field} disabled={!form.watch('enableHiOutBonus')} className="bg-black/40" /></FormControl></FormItem>)} />
+                        <FormField control={form.control} name="hiOutBonus" render={({ field }) => (<FormItem><FormLabel className="text-[10px]">Баллы ({leagueName})</FormLabel><FormControl><Input type="number" {...field} disabled={!form.watch('enableHiOutBonus')} className="bg-black/40" /></FormControl></FormItem>)} />
                     </div>
                 </div>
             </div>

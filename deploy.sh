@@ -1,29 +1,23 @@
 
 #!/bin/bash
 
-# DartBrig Pro: Ultra-Stable Deployment Script v4.5
-# Оптимизировано для работы одной командой и автоматической привязки токена.
+# DartBrig Pro: Ultra-Stable Deployment Script v5.0
+# Оптимизировано: убраны токены из кода, чтобы GitHub не блокировал отправку.
 
 echo "--- DARTBRIG PRO DEPLOYMENT ---"
 
-# 1. Принудительная привязка токена (гарантирует успех одной командой)
-TOKEN="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"
-REPO="github.com/Aleksey29212/Ru55darts.git"
-echo "🔍 Настройка удаленного репозитория..."
-git remote set-url origin "https://$TOKEN@$REPO"
-
-# 2. Индексация изменений
+# 1. Индексация изменений
 echo "1. Индексация файлов проекта..."
 git add .
 
-# 3. Коммит
-COMMIT_MSG="Production Update v2.8+: UI Readability and Stable Deploy"
-echo "💾 Создание коммита..."
+# 2. Коммит
+COMMIT_MSG="Production Update: UI Readability and Safe Deploy"
+echo "2. Создание коммита..."
 git commit -m "$COMMIT_MSG" --quiet || echo "Инфо: Изменений для фиксации нет."
 
-# 4. Отправка
-echo "2. Отправка в GitHub (Master Push)..."
-# Отключаем credential helper, чтобы git использовал токен из URL
+# 3. Отправка
+echo "3. Отправка в GitHub (Master Push)..."
+# Используем флаг для игнорирования системных хелперов, так как токен уже в remote URL
 if git -c credential.helper= push origin main; then
   echo "---------------------------------------"
   echo "УСПЕХ: Проект отправлен в GitHub!"

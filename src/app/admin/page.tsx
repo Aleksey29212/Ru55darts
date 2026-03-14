@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowRight, Calculator, Users, Wand2, Trophy, Camera, Library, Handshake, Image, BarChart, CloudDownload, Code2, Shield } from "lucide-react";
+import { ArrowRight, Calculator, Users, Wand2, Trophy, Camera, Library, Handshake, Image, BarChart, CloudDownload, Code2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ClearTournamentsButton } from "./tournaments/clear-button";
 import { ClearButton as ClearPlayersButton } from "./players/clear-button";
@@ -89,7 +89,7 @@ export default async function AdminPage() {
                                 <section.icon className={cn("h-5 w-5", section.color || 'text-muted-foreground/80')} />
                             </div>
                             <div className="flex flex-col flex-1 min-w-0">
-                                <span className="font-headline text-[10px] md:text-[12px] tracking-tight leading-tight text-white group-hover:text-primary transition-colors line-clamp-2 uppercase break-words hyphens-auto">
+                                <span className="font-headline text-[10px] md:text-[13px] tracking-tight leading-tight text-white group-hover:text-primary transition-colors line-clamp-2 uppercase break-words hyphens-auto">
                                     {section.title}
                                 </span>
                                 <span className="text-[8px] text-muted-foreground line-clamp-1 opacity-50 uppercase font-black tracking-widest mt-0.5">

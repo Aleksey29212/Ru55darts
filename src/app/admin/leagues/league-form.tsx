@@ -101,7 +101,7 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        // Мы используем as any для пути, так как TS не может вывести глубокий путь из динамической переменной leagueId
+        // Мы используем as any, чтобы обойти строгую проверку путей в динамическом объекте
         form.setValue(`${leagueId}.bannerUrl` as any, reader.result as string, { shouldDirty: true });
       };
       reader.readAsDataURL(file);
