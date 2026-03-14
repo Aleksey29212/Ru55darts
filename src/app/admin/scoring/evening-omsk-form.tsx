@@ -77,7 +77,7 @@ export function EveningOmskForm({ defaultValues, leagueName }: EveningOmskFormPr
                 <div className="space-y-2">
                     <h3 className="text-lg md:text-xl font-headline uppercase tracking-tight text-orange-500">Автоматическая система ({leagueName})</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                        Для лиги «Вечерний Омск» правила начисления очков фиксированы согласно регламенту:
+                        Для лиги «{leagueName}» правила начисления очков фиксированы согласно регламенту:
                     </p>
                     <ul className="text-xs space-y-1 pt-2 list-disc list-inside text-muted-foreground opacity-80">
                         <li>1/4 финала: <span className="text-foreground font-bold">AVG × 0.25</span></li>
@@ -118,7 +118,7 @@ export function EveningOmskForm({ defaultValues, leagueName }: EveningOmskFormPr
                             />
                         </FormControl>
                         <FormDescription>
-                            Задайте стоимость 1 рейтингового балла в рублях. Диапазон: от 5 до 15 ₽.
+                            Задайте стоимость 1 рейтингового балла в рублях для лиги «{leagueName}».
                         </FormDescription>
                         <FormMessage />
                     </FormItem>
@@ -129,24 +129,16 @@ export function EveningOmskForm({ defaultValues, leagueName }: EveningOmskFormPr
         <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 flex items-center gap-3">
             <Sparkles className="h-5 w-5 text-primary animate-pulse" />
             <p className="text-xs text-muted-foreground italic">
-                Рейтинг ТОП-16 финалистов и суммы выплат будут автоматически отображаться на главной странице в реальном времени.
+                Рейтинг ТОП-16 финалистов и суммы выплат будут автоматически отображаться на главной странице {leagueName} в реальном времени.
             </p>
         </div>
 
-        <CardFooter className="px-0">
-          <Button type="submit" disabled={!form.formState.isDirty || isPending} className="ml-auto h-12 px-8">
-            {isPending ? (
-              <>
-                <Loader2 className="animate-spin mr-2" />
-                Сохранение...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2" />
-                Сохранить параметры
-              </>
-            )}
-          </Button>
+        <CardFooter className="fixed bottom-0 left-0 right-0 md:left-[var(--sidebar-width)] bg-background/95 backdrop-blur-xl py-3 px-6 border-t border-white/10 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+            <div className="max-w-4xl mx-auto w-full flex justify-end">
+                <Button type="submit" disabled={!form.formState.isDirty || isPending} className="h-12 px-10 rounded-xl shadow-2xl shadow-primary/30 font-black text-sm uppercase tracking-widest transition-all active:scale-95">
+                    {isPending ? <><Loader2 className="animate-spin mr-3 h-5 w-5" /> СОХРАНЕНИЕ...</> : <><Save className="mr-3 h-5 w-5" /> УТВЕРДИТЬ КУРС</>}
+                </Button>
+            </div>
         </CardFooter>
       </form>
     </Form>
