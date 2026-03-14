@@ -70,27 +70,6 @@ export default async function AdminPage() {
             <StatCard title="ПАРТНЕРОВ" count={partners?.length || 0} icon={Handshake} />
         </section>
 
-        <section className="space-y-4">
-            <div className="flex items-center gap-4 ml-2">
-                <div className="h-2 w-2 rounded-full bg-primary animate-ping" />
-                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">INTERFACE</h2>
-            </div>
-            <Card className="glassmorphism border-primary/30 bg-primary/10 overflow-hidden relative group/toggle">
-                <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-                    <div className="flex items-center gap-5">
-                        <div className="p-3 rounded-xl bg-primary/20 border border-primary/30">
-                            <Settings2 className="h-6 w-6 text-primary" />
-                        </div>
-                        <div>
-                            <h3 className="font-headline text-xl md:text-2xl tracking-tight text-white uppercase">Вид интерфейса</h3>
-                            <p className="text-[9px] text-muted-foreground uppercase tracking-[0.2em] font-black mt-1 opacity-60">Тестирование адаптивности</p>
-                        </div>
-                    </div>
-                    <ViewModeToggle showLabels className="bg-black/80 p-1.5" />
-                </CardContent>
-            </Card>
-        </section>
-
         <div className="space-y-4">
             <div className="flex items-center gap-4 ml-2">
                 <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
