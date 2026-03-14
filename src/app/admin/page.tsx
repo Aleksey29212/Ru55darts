@@ -7,7 +7,6 @@ import { ClearTournamentsButton } from "./tournaments/clear-button";
 import { ClearButton as ClearPlayersButton } from "./players/clear-button";
 import { ClearPartnersButton } from "./partners/clear-partners-button";
 import { ClearAnalyticsButton } from "./analytics/clear-analytics-button";
-import { ViewModeToggle } from "@/components/view-mode-toggle";
 import { getTournaments } from "@/lib/tournaments";
 import { getPlayerProfiles } from "@/lib/players";
 import { getPartners } from "@/lib/partners";
