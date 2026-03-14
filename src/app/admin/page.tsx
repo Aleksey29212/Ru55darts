@@ -37,16 +37,16 @@ function StatCard({ title, count, icon: Icon, priority = false }: { title: strin
             <CardContent className="p-6 md:p-8 flex items-center justify-between">
                 <div>
                     <p className={cn(
-                        "text-[10px] font-black uppercase tracking-[0.2em]",
+                        "text-[9px] font-black uppercase tracking-[0.2em]",
                         priority ? 'text-primary' : 'text-muted-foreground'
                     )}>{title}</p>
-                    <p className="text-4xl md:text-5xl font-headline mt-2 tracking-tighter text-white">{count}</p>
+                    <p className="text-3xl md:text-5xl font-headline mt-2 tracking-tighter text-white">{count}</p>
                 </div>
                 <div className={cn(
-                    "p-4 rounded-2xl shadow-2xl transition-all duration-500 group-hover:rotate-12",
-                    priority ? 'bg-primary/30 text-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]' : 'bg-primary/10'
+                    "p-3 rounded-2xl shadow-2xl transition-all duration-500 group-hover:rotate-12",
+                    priority ? 'bg-primary/30 text-primary' : 'bg-primary/10'
                 )}>
-                    <Icon className={cn("h-8 w-8", priority ? 'text-primary' : 'text-primary/60')} />
+                    <Icon className={cn("h-6 w-6 md:h-8 md:w-8", priority ? 'text-primary' : 'text-primary/60')} />
                 </div>
             </CardContent>
         </Card>
@@ -101,24 +101,24 @@ export default async function AdminPage() {
                 {adminSections.map(section => (
                     <Button key={section.href} asChild variant="outline" className={cn(
                         "h-auto py-6 md:py-8 justify-start glassmorphism border-white/5 hover:border-primary/60 group transition-all duration-300 rounded-[1.5rem] md:rounded-[2rem] interactive-scale shadow-2xl overflow-hidden",
-                        section.href === '/admin/source-code' ? 'border-primary/40 bg-primary/10 shadow-[0_0_30px_rgba(var(--primary-rgb),0.1)]' : ''
+                        section.href === '/admin/source-code' ? 'border-primary/40 bg-primary/10' : ''
                     )}>
                         <Link href={section.href} className="flex items-center gap-4 w-full text-left">
                             <div className={cn(
                                 "p-3 rounded-xl transition-all duration-500 shadow-3xl group-hover:scale-110 shrink-0",
                                 section.href === '/admin/source-code' ? 'bg-primary/30' : 'bg-muted group-hover:bg-primary/20'
                             )}>
-                                <section.icon className={cn("h-6 w-6", section.color || 'text-muted-foreground/80')} />
+                                <section.icon className={cn("h-5 w-5 md:h-6 md:w-6", section.color || 'text-muted-foreground/80')} />
                             </div>
                             <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-                                <span className="font-headline text-base md:text-lg tracking-tight leading-tight mb-1 text-white group-hover:text-primary transition-colors line-clamp-2">
+                                <span className="font-headline text-sm md:text-base tracking-tight leading-tight mb-1 text-white group-hover:text-primary transition-colors line-clamp-2">
                                     {section.title}
                                 </span>
-                                <span className="text-[9px] text-muted-foreground line-clamp-1 opacity-50 uppercase font-black tracking-widest">
+                                <span className="text-[8px] text-muted-foreground line-clamp-1 opacity-50 uppercase font-black tracking-widest">
                                     {section.description}
                                 </span>
                             </div>
-                            <ArrowRight className="h-6 w-6 text-primary transition-all translate-x-[-10px] group-hover:translate-x-0 opacity-0 group-hover:opacity-100 shrink-0" />
+                            <ArrowRight className="h-5 w-5 text-primary transition-all translate-x-[-10px] group-hover:translate-x-0 opacity-0 group-hover:opacity-100 shrink-0" />
                         </Link>
                     </Button>
                 ))}
@@ -138,19 +138,19 @@ export default async function AdminPage() {
                 </CardHeader>
                 <CardContent className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 p-6 md:p-10">
                     <div className="p-5 rounded-2xl border border-destructive/20 bg-black/40 flex flex-col gap-3 shadow-3xl">
-                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">ТУРНИРЫ</span>
+                        <span className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">ТУРНИРЫ</span>
                         <ClearTournamentsButton />
                     </div>
                     <div className="p-5 rounded-2xl border border-destructive/20 bg-black/40 flex flex-col gap-3 shadow-3xl">
-                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">ПРОФИЛИ</span>
+                        <span className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">ПРОФИЛИ</span>
                         <ClearPlayersButton />
                     </div>
                     <div className="p-5 rounded-2xl border border-destructive/20 bg-black/40 flex flex-col gap-3 shadow-3xl">
-                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">ПАРТНЕРЫ</span>
+                        <span className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">ПАРТНЕРЫ</span>
                         <ClearPartnersButton />
                     </div>
                     <div className="p-5 rounded-2xl border border-destructive/20 bg-black/40 flex flex-col gap-3 shadow-3xl">
-                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">АНАЛИТИКА</span>
+                        <span className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">АНАЛИТИКА</span>
                         <ClearAnalyticsButton />
                     </div>
                 </CardContent>

@@ -201,7 +201,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-orange-500">
                     <Trophy className="h-4 w-4 text-orange-500" />
-                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Базовые баллы (ТОП-16)</h4>
+                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Базовые баллы ({name})</h4>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                     {groupedRanks.map((p, idx) => (
@@ -214,7 +214,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
                 <div className="space-y-2">
                     <div className="flex items-center gap-3 px-3 border-l-2 border-purple-500">
                         <PlusCircle className="h-4 w-4 text-purple-500" />
-                        <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Расширенная сетка</h4>
+                        <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Расширенная сетка ({name})</h4>
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                         {extraEntries.map(([place, points]) => (
@@ -227,7 +227,7 @@ export function ScoringHelpDialog({ settings, leagueName, children }: ScoringHel
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-2 border-l-2 border-cyan-400">
                     <Star className="h-4 w-4 text-cyan-400" />
-                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Про-статистика (Бонусы)</h4>
+                    <h4 className="font-headline text-[9px] md:text-[11px] uppercase tracking-widest text-white/60">Про-Бонусы ({name})</h4>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                     {s.enable180Bonus && renderHelpPill('180', `+${s.bonusPer180}`, Sparkles, 'text-orange-400', 'За каждый максимум')}
