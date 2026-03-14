@@ -100,7 +100,8 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        form.setValue(`${leagueId as any}.bannerUrl`, reader.result as string, { shouldDirty: true });
+        // Мы используем as any для пути, так как TS не может вывести глубокий путь из динамической переменной leagueId
+        form.setValue(`${leagueId}.bannerUrl` as any, reader.result as string, { shouldDirty: true });
       };
       reader.readAsDataURL(file);
     }
@@ -128,7 +129,7 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
             <div key={leagueId} className="flex flex-col space-y-6 rounded-2xl border bg-card/30 p-4 md:p-6 transition-all hover:border-primary/30">
               <FormField
                 control={form.control}
-                name={`${leagueId}.enabled`}
+                name={`${leagueId}.enabled` as any}
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between space-y-0">
                     <FormLabel className="text-lg md:text-xl font-headline tracking-tight uppercase cursor-pointer">{defaultValues[leagueId].name}</FormLabel>
@@ -147,7 +148,7 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
                 <div className="space-y-4">
                     <FormField
                         control={form.control}
-                        name={`${leagueId}.name`}
+                        name={`${leagueId}.name` as any}
                         render={({ field }) => (
                         <FormItem>
                             <FormLabel className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Название для вкладки</FormLabel>
@@ -155,7 +156,7 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
                                 <Input 
                                     {...field} 
                                     value={field.value ?? ''}
-                                    disabled={!form.watch(`${leagueId}.enabled`)} 
+                                    disabled={!form.watch(`${leagueId}.enabled` as any)} 
                                     className="bg-background/50 border-white/5 rounded-xl h-12"
                                 />
                             </FormControl>
@@ -166,7 +167,7 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
 
                     <FormField
                         control={form.control}
-                        name={`${leagueId}.bannerUrl`}
+                        name={`${leagueId}.bannerUrl` as any}
                         render={({ field }) => (
                         <FormItem>
                             <FormLabel className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Обложка лиги (URL или загрузка)</FormLabel>
@@ -175,7 +176,7 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
                                     <Input 
                                         {...field} 
                                         value={field.value ?? ''}
-                                        disabled={!form.watch(`${leagueId}.enabled`)} 
+                                        disabled={!form.watch(`${leagueId}.enabled` as any)} 
                                         placeholder="https://images.unsplash.com/..."
                                         className="bg-background/50 border-white/5 rounded-xl h-12"
                                     />
@@ -184,7 +185,7 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
                                     type="button" 
                                     variant="outline" 
                                     className="rounded-xl h-12 px-4"
-                                    disabled={!form.watch(`${leagueId}.enabled`)}
+                                    disabled={!form.watch(`${leagueId}.enabled` as any)}
                                     onClick={() => fileInputRefs.current[leagueId]?.click()}
                                 >
                                     <Upload className="h-4 w-4" />
@@ -204,13 +205,13 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
                 </div>
 
                 <div className="relative aspect-[3/1] md:aspect-auto md:h-full rounded-xl overflow-hidden border border-white/10 bg-muted/20">
-                    {form.watch(`${leagueId}.bannerUrl`) ? (
+                    {form.watch(`${leagueId}.bannerUrl` as any) ? (
                         <Image 
-                            src={form.watch(`${leagueId}.bannerUrl`)!} 
+                            src={form.watch(`${leagueId}.bannerUrl` as any)!} 
                             alt="Preview" 
                             fill 
                             className="object-cover"
-                            unoptimized={form.watch(`${leagueId}.bannerUrl`)?.startsWith('data:')}
+                            unoptimized={form.watch(`${leagueId}.bannerUrl` as any)?.startsWith('data:')}
                         />
                     ) : (
                         <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
@@ -224,7 +225,7 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
                {leagueId !== 'general' && (
                 <FormField
                     control={form.control}
-                    name={`${leagueId}.includeInGeneralRanking`}
+                    name={`${leagueId}.includeInGeneralRanking` as any}
                     render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-xl border border-white/5 bg-black/20 p-4 shadow-inner">
                         <div className="space-y-0.5 flex-1 pr-4">
@@ -237,7 +238,7 @@ export function LeagueSettingsForm({ defaultValues }: LeagueSettingsFormProps) {
                             <Switch
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
-                                disabled={!form.watch(`${leagueId}.enabled`)}
+                                disabled={!form.watch(`${leagueId}.enabled` as any)}
                             />
                         </FormControl>
                     </FormItem>
