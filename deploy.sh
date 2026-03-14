@@ -1,24 +1,17 @@
 
 #!/bin/bash
 
-# DartBrig Pro: Ultimate Deployment Script v17.0
-# Автоматическая привязка токена и принудительная отправка.
-
-REPO_URL="https://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@github.com/Aleksey29212/Ru55darts.git"
+# DartBrig Pro: Clean Deployment Script v18.0
+# Скрипт без токена внутри для обхода GitHub Push Protection.
 
 echo "--- DARTBRIG PRO DEPLOYMENT ---"
-
-# 0. Принудительная привязка к репозиторию (сброс старых настроек)
-echo "0. Обновление связи с GitHub (через токен)..."
-git remote remove origin 2>/dev/null
-git remote add origin "$REPO_URL"
 
 # 1. Индексация изменений
 echo "1. Индексация файлов проекта..."
 git add .
 
 # 2. Коммит
-COMMIT_MSG="Production Update: UI Readability and Final Repository Link"
+COMMIT_MSG="Production Update: Clean Auth and Maximum Readability"
 echo "2. Создание коммита..."
 git commit -m "$COMMIT_MSG" --quiet || echo "Инфо: Изменений для фиксации нет."
 
@@ -31,11 +24,8 @@ if git push origin main --force; then
   echo "---------------------------------------"
 else
   echo "---------------------------------------"
-  echo "ОШИБКА: GitHub заблокировал отправку (Push Protection)."
-  echo "ГДЕ НАЖАТЬ 'ALLOW THIS SECRET':"
-  echo "1. Посмотрите в лог выше. Там есть ссылка https://github.com/.../unblock-secret/..."
-  echo "2. Зажмите Ctrl и кликните по ней (или скопируйте в браузер)."
-  echo "3. На открывшейся странице нажмите кнопку 'Allow this secret' или 'Bypass'."
-  echo "4. Снова запустите команду: npm run deploy:github"
+  echo "ОШИБКА: Отправка не удалась."
+  echo "Если вы видите 'Push Protection', значит в коде все еще остался токен."
+  echo "Если вы видите 'Authentication failed', выполните команду привязки токена из чата."
   echo "---------------------------------------"
 fi
