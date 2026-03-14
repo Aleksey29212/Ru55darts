@@ -16,7 +16,7 @@ import type { LeagueId } from "@/lib/types";
 
 const adminSections = [
     { href: '/admin/source-code', title: 'КОД (ЭТАЛОН)', icon: Code2, color: 'text-primary', description: 'Спецификации системы' },
-    { href: '/admin/import', title: 'ИМПОРТ ТУРНИРОВ', icon: CloudDownload, color: 'text-primary', description: 'Загрузка с dartsbase.ru' },
+    { href: '/admin/import', title: 'ИМПОРТ ТУРНИРОВ', icon: CloudDownload, color: 'text-primary', description: 'Загрузка с сайта' },
     { href: '/admin/tournaments', title: 'АРХИВ ТУРНИРОВ', icon: Trophy, color: 'text-primary', description: 'Просмотр результатов' },
     { href: '/admin/analytics', title: 'АНАЛИТИКА', icon: BarChart, color: 'text-primary', description: 'Визиты и клики' },
     { href: '/admin/leagues', title: 'УПРАВЛЕНИЕ ЛИГАМИ', icon: Library, color: 'text-primary', description: 'Включение и названия' },

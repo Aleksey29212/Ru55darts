@@ -195,7 +195,7 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
             <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                 <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500 shadow-inner"><Zap className="h-5 w-5" /></div>
                 <div>
-                    <h3 className="text-lg md:text-xl font-headline uppercase tracking-tight">Про-Бонусы ({leagueName})</h3>
+                    <h3 className="text-lg md:text-xl font-headline uppercase tracking-tight">Про-Бонусы (Лига {leagueName})</h3>
                     <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest opacity-60">Начисления за технические достижения</p>
                 </div>
             </div>
@@ -210,7 +210,7 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
                     )} />
                     <FormField control={form.control} name="bonusPer180" render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-xs opacity-60">Баллов за заход в 180 ({leagueName})</FormLabel>
+                            <FormLabel className="text-xs opacity-60">Баллов за заход в 180 (Лига {leagueName})</FormLabel>
                             <FormControl><Input type="number" {...field} value={field.value ?? 0} disabled={!form.watch('enable180Bonus')} className="h-12 bg-black/40" /></FormControl>
                         </FormItem>
                     )} />
@@ -225,7 +225,7 @@ export function ScoringForm({ leagueId, leagueName, defaultValues }: ScoringForm
                     )} />
                     <div className="grid grid-cols-2 gap-4">
                         <FormField control={form.control} name="hiOutThreshold" render={({ field }) => (<FormItem><FormLabel className="text-[10px]">Порог HF</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} disabled={!form.watch('enableHiOutBonus')} className="bg-black/40" /></FormControl></FormItem>)} />
-                        <FormField control={form.control} name="hiOutBonus" render={({ field }) => (<FormItem><FormLabel className="text-[10px]">Баллы ({leagueName})</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} disabled={!form.watch('enableHiOutBonus')} className="bg-black/40" /></FormControl></FormItem>)} />
+                        <FormField control={form.control} name="hiOutBonus" render={({ field }) => (<FormItem><FormLabel className="text-[10px]">Баллы (Лига {leagueName})</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? 0} disabled={!form.watch('enableHiOutBonus')} className="bg-black/40" /></FormControl></FormItem>)} />
                     </div>
                 </div>
             </div>

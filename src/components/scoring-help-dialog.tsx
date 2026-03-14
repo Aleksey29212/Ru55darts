@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, ReactNode } from 'react';
@@ -28,9 +29,7 @@ import {
     Diamond,
     CircleUser,
     ListOrdered,
-    PlusCircle,
-    Activity,
-    ChevronRight
+    Activity
 } from 'lucide-react';
 import type { ScoringSettings, SponsorshipSettings } from '@/lib/types';
 import { ScrollArea } from './ui/scroll-area';
